@@ -1,78 +1,66 @@
 # Table of Contents
 
-> Phase 3 검증 반영본. 전체 책의 구조를 정의하며 본문은 포함하지 않는다.
+> Phase 5 범위 재정렬본. 기존 Agent Platform 중심 확장을 축소하고 Cloud Agent 활용을 책의 중심축으로 복구한다.
+
+# 책의 중심 질문
+
+> 클라우드 에이전트를 왜 사용하고, 로컬 에이전트와 어떻게 조합하며, 어떤 작업을 맡기고, 토큰과 클라우드 컴퓨팅 자원을 어떻게 효율적으로 활용할 것인가?
 
 # 전체 구성 원칙
 
-책은 하나의 Java/Spring Boot 예제 프로젝트 `campus-platform`을 기본 축으로 사용한다.
+책은 제품 사용 설명서가 아니다.
 
-각 장은 먼저 제품과 언어에 독립적인 문제와 설계 원칙을 설명하고, 그 다음 Java/Spring Boot 적용 예를 보여준다.
-
-독자는 일반적인 프로젝트에서 시작해 다음 순서로 프로젝트를 변화시킨다.
+독자는 다음 순서로 판단 능력을 만든다.
 
 ```text
-일반 프로젝트
-  ↓
-Agent가 이해할 수 있는 프로젝트
-  ↓
-재현 가능한 실행환경
-  ↓
-Agent Contract / Task Contract
-  ↓
-자동 테스트 / 자동 검증
-  ↓
-외부 의존성 격리
-  ↓
-병렬 작업 가능한 모듈 구조
-  ↓
-Local / Cloud Agent
-  ↓
-Trust Boundary / CI Gate
-  ↓
-Project Memory / Observability
-  ↓
-Agent Lifecycle / Roles
-  ↓
-PM Agent
-  ↓
-Hybrid Enterprise Agent System
-  ↓
-Agentic Development Governance
+Cloud Agent가 무엇인가
+        ↓
+왜 Cloud를 사용하는가
+        ↓
+어떤 Task를 Cloud로 보낼 것인가
+        ↓
+Token과 Context를 어떻게 줄일 것인가
+        ↓
+Cloud CPU/RAM을 어떻게 활용할 것인가
+        ↓
+여러 Cloud Worker를 어떻게 병렬화할 것인가
+        ↓
+Local과 Cloud를 어떻게 조합할 것인가
+        ↓
+CI/CD와 어떻게 연결할 것인가
+        ↓
+실전 프로젝트에 어떻게 적용할 것인가
+        ↓
+언제 Cloud Agent를 쓰지 말아야 하는가
+        ↓
+향후 발전 방향
 ```
 
-각 장은 가능하면 다음 구조를 따른다.
-
-- 문제
-- 원인
-- 설계 원칙
-- 구조
-- 실전 적용
-- 실패 사례
-- 체크리스트
+Java/Spring Boot 기반 `campus-platform`을 책 전체의 실전 예제로 사용한다.
 
 ---
 
-# Part I. AI Agent가 바꾸는 개발 방식
+# Part I. Cloud Agent 이해
 
-## 1장. 개발자가 코드를 작성하던 프로젝트에서 Agent가 작업하는 프로젝트로
+## 1장. Coding Agent에서 Cloud Worker로
 
 ### 목적
 
-AI Coding Agent의 등장이 단순한 개발 도구 추가가 아니라 프로젝트 구조와 개발 프로세스의 전제를 어떻게 바꾸는지 정의한다.
+Coding Agent를 IDE 보조 기능이나 Chat UI가 아니라 Repository를 읽고 명령을 실행하고 코드를 변경하는 작업 주체로 설명하고, Cloud Agent를 독립 실행환경을 가진 Remote Worker로 정의한다.
 
 ### 독자가 얻는 것
 
-- 기존 IDE 중심 개발 방식과 Agent 기반 개발 방식의 차이를 이해한다.
-- 왜 기존 프로젝트가 Agent에게 불친절한지 설명할 수 있다.
-- Agent Ready Software Engineering이 해결하려는 문제를 이해한다.
+- Coding Agent와 일반 Chat LLM의 차이를 설명할 수 있다.
+- Cloud Agent를 단순한 원격 AI 개발자가 아니라 실행환경을 가진 Worker로 이해할 수 있다.
+- 책 전체에서 사용할 Cloud Worker 관점을 이해한다.
 
 ### 핵심 개념
 
-- Human-driven Development
-- Agent-driven Development
-- Repository as Interface
-- Machine-verifiable Development
-- Agent Ready Software Engineering
+- Coding Agent
+- Repository
+- Tool Use
+- Remote Worker
+- Execution Environment
 
 ### 선행 장
 
@@ -80,30 +68,30 @@ AI Coding Agent의 등장이 단순한 개발 도구 추가가 아니라 프로�
 
 ### 실전 예제
 
-기존 `campus-platform` 프로젝트를 Agent에게 처음 전달했을 때 발생하는 환경 설정, 문서 탐색, 테스트, 외부 시스템 의존 문제를 분석한다.
+`campus-platform` Repository를 Agent가 clone하고 build/test 명령을 실행할 수 있는 작업공간으로 본다.
 
 ---
 
-## 2장. Local Agent, Cloud Agent, Hybrid Agent
+## 2장. Local Agent와 Cloud Agent
 
 ### 목적
 
-Agent의 실행 위치에 따라 가능한 작업과 제한이 어떻게 달라지는지 정의한다.
+Local과 Cloud의 차이를 모델이 아니라 실행 위치, 네트워크, 격리, 컴퓨팅 자원, Human Steering 관점에서 설명한다.
 
 ### 독자가 얻는 것
 
-- Local Agent와 Cloud Agent의 차이를 설명할 수 있다.
-- 내부망, 개발자 PC, Cloud Sandbox 중 작업 위치를 선택할 수 있다.
-- Hybrid Agent 구조가 필요한 조건을 판단할 수 있다.
+- Local Agent가 적합한 작업과 Cloud Agent가 적합한 작업을 구분할 수 있다.
+- 내부망, VPN, 사내 DB 같은 제약을 고려할 수 있다.
+- Local과 Cloud를 경쟁 관계가 아니라 역할 분담 관계로 볼 수 있다.
 
 ### 핵심 개념
 
 - Local Agent
 - Cloud Agent
-- Hybrid Agent
-- Sandbox
-- Repository-based Execution
 - Network Boundary
+- Human Steering
+- Isolation
+- Hybrid Workflow
 
 ### 선행 장
 
@@ -111,33 +99,31 @@ Agent의 실행 위치에 따라 가능한 작업과 제한이 어떻게 달라�
 
 ### 실전 예제
 
-`campus-platform`에서 코드 리팩터링은 Cloud Agent에, Tibero/HSM/Jenkins 확인은 Local Agent에 배정하는 구조를 설계한다.
+Architecture와 내부 HSM/Tibero 검증은 Local에 남기고 독립 Build/Test는 Cloud에 보내는 구조를 비교한다.
 
 ---
 
-## 3장. Agent Ready 프로젝트의 기준
+## 3장. Cloud Session, Container, Compute와 Token
 
 ### 목적
 
-Agent Ready를 추상적인 표현이 아니라 확인 가능한 프로젝트 특성으로 정의한다.
+Cloud Agent의 CPU/RAM/Disk와 LLM Token을 서로 다른 자원으로 설명한다.
 
 ### 독자가 얻는 것
 
-- 프로젝트의 Agent Ready 수준을 평가할 수 있다.
-- Agent 도입 전에 해결해야 할 구조적 문제를 찾을 수 있다.
-- 이후 장에서 사용할 공통 평가 기준을 이해한다.
+- 테스트 실행시간과 Token 사용량을 구분할 수 있다.
+- LLM이 소비되는 시점과 Container가 계산하는 시점을 구분할 수 있다.
+- Cloud Session을 독립 실행 노드로 이해할 수 있다.
 
 ### 핵심 개념
 
-- Reproducibility
-- Discoverability
-- Executability
-- Testability
-- Verifiability
-- Isolation
-- Parallelizability
-- Observability
-- Security Boundary
+- Cloud Session
+- Container / VM
+- CPU
+- RAM
+- Disk
+- LLM Token
+- Brain / Hands 간단 모델
 
 ### 선행 장
 
@@ -145,106 +131,101 @@ Agent Ready를 추상적인 표현이 아니라 확인 가능한 프로젝트 �
 
 ### 실전 예제
 
-일반적인 Spring Boot 프로젝트를 위 기준으로 평가하여 개선 항목을 도출한다.
+Cloud Container가 10,000개 테스트를 실행하고 Agent는 실패 3건만 읽는 흐름을 설명한다.
 
 ---
 
-# Part II. Agent가 이해하고 실행할 수 있는 프로젝트
+# Part II. 왜 Cloud Agent인가
 
-## 4장. Repository as Interface: Agent가 이해할 수 있는 저장소
+## 4장. 독립 실행환경, 장시간 작업, 병렬성
 
 ### 목적
 
-Repository 자체를 Agent가 탐색하고 판단하는 인터페이스로 보고 구조, 명명, 문서 위치와 context 탐색 비용을 설계한다.
+Cloud Agent의 핵심 가치를 더 많은 AI 호출이 아니라 개발자 PC와 분리된 실행환경, 장시간 작업 위임, 병렬 처리에서 찾는다.
 
 ### 독자가 얻는 것
 
-- Agent가 저장소 구조를 빠르게 파악하도록 만들 수 있다.
-- canonical source와 파생 문서를 구분할 수 있다.
-- 거대한 파일, 숨겨진 규칙, generated file이 만드는 탐색 비용을 줄일 수 있다.
+- Cloud Agent가 실제로 유리한 이유를 설명할 수 있다.
+- 로컬 컴퓨팅 자원을 점유하지 않고 장시간 작업을 위임할 수 있다.
+- 독립 Branch/Container 기반 작업을 병렬화할 수 있다.
 
 ### 핵심 개념
 
-- Repository Layout
-- Discoverability
-- Canonical Source
-- Progressive Disclosure
-- Context Budget
-- Naming
-- Generated File
-- Migration Location
-- Change Locality
+- Isolation
+- Long-running Task
+- Parallel Execution
+- Independent Workspace
+- Remote Worker
 
 ### 선행 장
 
-3장
+2장, 3장
 
 ### 실전 예제
 
-`campus-platform`의 최상위 구조와 모듈별 진입점을 정리하고, Agent가 기능 위치와 변경 범위를 추론하기 쉬운 형태로 재구성한다.
+Backend Test, Integration Test, Web E2E, Docker Build를 서로 다른 Cloud Worker에서 동시에 실행한다.
 
 ---
 
-## 5장. Agent Contract: 프로젝트를 설명하는 계약
+# Part III. 어떤 작업을 Cloud로 보낼 것인가
+
+## 5장. Task Routing: Local인가 Cloud인가
 
 ### 목적
 
-대화 프롬프트에 의존하지 않고 Repository 자체가 Agent에게 프로젝트 규칙을 설명하도록 만든다.
+작업 특성을 보고 실행 위치를 선택하는 판단 기준을 만든다.
 
 ### 독자가 얻는 것
 
-- Agent Contract에 포함할 최소 정보를 정의할 수 있다.
-- README, AGENTS.md, CLAUDE.md, architecture.md 등의 역할을 구분할 수 있다.
-- 제품별 instruction file과 프로젝트의 canonical rule을 분리할 수 있다.
-- 문서 중복과 규칙 충돌을 줄일 수 있다.
+- Task마다 Local/Cloud 선택 기준을 적용할 수 있다.
+- Cloud에 보내면 오히려 비효율적인 작업을 구분할 수 있다.
+- 내부망, Context 크기, Human Steering, 실행시간, 병렬 가능성을 함께 판단할 수 있다.
 
 ### 핵심 개념
 
-- Agent Contract
-- AGENTS.md
-- CLAUDE.md
-- README.md
-- Architecture Document
-- Development Guide
-- Testing Guide
-- ADR
-- Source of Truth
-- Instruction Precedence
-- Product Adapter Document
+- Task Classification
+- Context Size
+- Internal Network
+- Human Steering
+- Independence
+- Execution Cost
 
 ### 선행 장
 
-4장
+2장, 4장
 
 ### 실전 예제
 
-`campus-platform`의 프로젝트 목적, 모듈 경계, 빌드·테스트·검증 명령, 금지 규칙을 canonical contract로 작성하고 제품별 instruction file은 이를 참조하도록 설계한다.
+Architecture 설계, JWT bug fix, 전체 Unit Test, HSM 검증, 문서 수정 등 여러 Task를 Local/Cloud로 분류한다.
 
 ---
 
-## 6장. Task Contract: Agent에게 일을 넘기는 방법
+## 6장. Cloud에 보내기 좋은 개발 작업
 
 ### 목적
 
-Agent에게 자유 형식 지시를 전달하는 대신 실행 가능한 작업 계약을 정의한다.
+Cloud Agent와 Cloud Runner에 실제로 맡길 작업 유형을 구체적으로 설명한다.
 
 ### 독자가 얻는 것
 
-- 작업의 범위와 완료 조건을 명확하게 전달할 수 있다.
-- Agent의 과도한 변경을 줄일 수 있다.
-- 작업 의존성과 병렬 실행 가능성을 판단할 수 있다.
+- Build/Test 중심 작업을 Cloud에 분산할 수 있다.
+- 반복 Refactoring과 작은 Bug Fix를 독립 Task로 만들 수 있다.
+- PR Review와 Documentation도 Cloud Task로 설계할 수 있다.
 
 ### 핵심 개념
 
-- Goal
-- Scope
-- Allowed Files
-- Forbidden Changes
-- Dependencies
-- Acceptance Criteria
-- Verification
-- Deliverables
-- Task Dependency
+- Build
+- Unit Test
+- Integration Test
+- E2E
+- Docker Build
+- Static Analysis
+- Lint
+- Migration Validation
+- Refactoring
+- Bug Fix
+- Documentation
+- PR Review
 
 ### 선행 장
 
@@ -252,32 +233,177 @@ Agent에게 자유 형식 지시를 전달하는 대신 실행 가능한 작업 
 
 ### 실전 예제
 
-`학생 조회 API 추가` 작업을 Task Contract 형태로 변환하고 자유 형식 프롬프트와 비교한다.
+`campus-platform`에서 모듈별 Test, Docker Build, Migration Validation을 독립 작업으로 분리한다.
 
 ---
 
-## 7장. 재현 가능한 개발환경
+# Part IV. Cloud Agent의 Token 절약
+
+## 7장. 작은 Task와 작은 Context
 
 ### 목적
 
-Agent가 새로운 환경에서도 최소한의 명령으로 프로젝트를 실행할 수 있게 한다.
+Cloud Agent가 Repository 전체를 반복해서 읽지 않도록 Task 범위와 Context 범위를 줄인다.
 
 ### 독자가 얻는 것
 
-- 개발자 개인 PC에 숨겨진 환경 의존성을 제거할 수 있다.
-- Local, CI, Cloud Agent의 실행 환경 차이를 줄일 수 있다.
-- 자동 Setup의 범위를 결정할 수 있다.
+- Cloud Agent에 작은 Task Context Package를 전달할 수 있다.
+- 관련 파일, 검증 명령, 변경 금지 범위를 명시할 수 있다.
+- Progressive Context를 사용할 수 있다.
 
 ### 핵심 개념
 
-- Reproducible Environment
-- Bootstrap
-- Dependency Pinning
-- Container
-- Dev Container
-- Environment Variables
-- Toolchain Version
-- Idempotent Setup
+- Task Scope
+- Context Scope
+- Relevant Files
+- Forbidden Changes
+- Acceptance Criteria
+- Progressive Context
+- AGENTS.md
+- Task Contract의 최소 형태
+
+### 선행 장
+
+5장, 6장
+
+### 실전 예제
+
+`AuthServiceTest.expiredToken` 실패 수정에 필요한 파일 3개와 단일 테스트 명령만 Cloud Agent에 전달한다.
+
+---
+
+## 8장. Tool Output을 줄이고 필요한 결과만 보여주기
+
+### 목적
+
+Build/Test 로그 전체를 LLM에 전달하지 않고 필요한 실패 정보만 조회하게 한다.
+
+### 독자가 얻는 것
+
+- Tool Output이 Token 사용량에 미치는 영향을 이해한다.
+- Result Filter / Result Gateway를 Cloud Token 절약에 사용할 수 있다.
+- Retry, Token, Cost Budget을 적용할 수 있다.
+
+### 핵심 개념
+
+- Result Filter
+- Result Gateway
+- Raw Artifact
+- Failure Summary
+- Log Lookup
+- Retry Limit
+- Token Budget
+- Cost Budget
+- Failure Fingerprint
+
+### 선행 장
+
+3장, 7장
+
+### 실전 예제
+
+100MB build log는 Artifact로 저장하고 Agent에는 실패 테스트 3건만 먼저 전달한다.
+
+---
+
+# Part V. Cloud 컴퓨팅 자원 활용
+
+## 9장. Prebuilt Environment, Cache, Snapshot
+
+### 목적
+
+Cloud Worker가 생성될 때마다 개발환경과 Dependency를 처음부터 구성하는 비용을 줄인다.
+
+### 독자가 얻는 것
+
+- 즉시 작업 가능한 Cloud 환경을 준비할 수 있다.
+- 재사용 가능한 Cache와 초기화해야 하는 Runtime State를 구분할 수 있다.
+- Snapshot과 Warm Worker의 적용 조건을 판단할 수 있다.
+
+### 핵심 개념
+
+- Prebuilt Environment
+- Base Image
+- Gradle / Maven Cache
+- npm Cache
+- Docker Layer Cache
+- Playwright Browser Cache
+- Snapshot
+- Warm Environment
+- Disposable Runtime State
+
+### 선행 장
+
+3장, 4장
+
+### 실전 예제
+
+Java 21, Gradle dependency, Node, Playwright, Docker CLI가 준비된 이미지에서 Worker를 시작한다.
+
+---
+
+## 10장. Cloud Agent를 Test Runner처럼 사용하기
+
+### 목적
+
+Cloud Agent의 실행환경을 Build/Test/Validation 노드로 적극 활용하되 LLM 호출과 실행 작업을 분리한다.
+
+### 독자가 얻는 것
+
+- 일반 Runner와 Cloud Agent를 역할별로 구분할 수 있다.
+- 정상 경로에서는 LLM을 호출하지 않을 수 있다.
+- Unit/Integration/E2E/Docker 작업을 여러 실행 노드로 분산할 수 있다.
+
+### 핵심 개념
+
+- Cloud Runner
+- Agent Worker
+- Deterministic Validation
+- Runner-first
+- Agent-on-failure
+- Parallel Test
+- Test Container
+
+### 선행 장
+
+6장, 8장, 9장
+
+### 실전 예제
+
+```text
+Task
+→ Runner
+→ PASS: 종료
+→ FAIL: Cloud Agent 분석
+→ 수정
+→ Runner 재검증
+```
+
+---
+
+# Part VI. 여러 Cloud Agent 사용
+
+## 11장. Branch, Worktree, Container로 작업 격리하기
+
+### 목적
+
+여러 Cloud Worker가 서로 간섭하지 않고 병렬 작업할 수 있게 한다.
+
+### 독자가 얻는 것
+
+- Task별 Branch/Worktree/Container를 설계할 수 있다.
+- 같은 Working Directory를 공유할 때 발생하는 문제를 이해한다.
+- 병렬화하면 안 되는 공통 파일/schema 작업을 구분할 수 있다.
+
+### 핵심 개념
+
+- Task Branch
+- Git Worktree
+- Independent Clone
+- Cloud Container
+- File Scope
+- Shared File
+- Migration Conflict
 
 ### 선행 장
 
@@ -285,613 +411,290 @@ Agent가 새로운 환경에서도 최소한의 명령으로 프로젝트를 실
 
 ### 실전 예제
 
-Java 버전, Gradle, Docker, 환경변수, 테스트 의존성을 자동 구성하는 `setup` 절차를 설계한다.
+student, attendance, notification 작업을 서로 다른 Branch와 Worker에 배정한다.
 
 ---
 
-## 8장. Agent 실행 인터페이스: setup, test, verify
+## 12장. 병렬 Worker와 중복 Context 비용
 
 ### 목적
 
-Agent와 사람이 동일한 명령으로 프로젝트를 조작할 수 있는 표준 실행 인터페이스를 설계한다.
+여러 Cloud Agent를 병렬로 사용할 때 Compute 이점과 LLM Context 중복 비용을 함께 관리한다.
 
 ### 독자가 얻는 것
 
-- Agent가 빌드 도구와 CI 구조를 추측하지 않게 만들 수 있다.
-- 로컬 명령과 CI 명령을 통일할 수 있다.
-- 검증 진입점을 하나로 수렴시킬 수 있다.
+- 독립 Task를 fan-out/fan-in할 수 있다.
+- 여러 Agent가 같은 Repository를 반복 분석하는 낭비를 줄일 수 있다.
+- Best-of-N을 필요한 어려운 Task에만 사용할 수 있다.
 
 ### 핵심 개념
 
-- setup
-- build
-- test
-- verify
-- Makefile
-- scripts/
-- CI Parity
-- Exit Code
-- Deterministic Command
+- Fan-out
+- Fan-in
+- Context Duplication
+- Parallel Compute
+- Agent Count
+- Best-of-N Advanced Pattern
 
 ### 선행 장
 
-7장
+7장, 10장, 11장
 
 ### 실전 예제
 
-`./scripts/setup.sh`, `./scripts/test.sh`, `./scripts/verify.sh` 또는 동등한 인터페이스를 설계한다.
+Java 17→21 마이그레이션을 서비스별 Cloud Worker에 분산하고 마지막에 Full Validation을 수행한다.
 
 ---
 
-# Part III. Agent가 스스로 검증할 수 있는 아키텍처
+# Part VII. Local + Cloud Hybrid Workflow
 
-## 9장. 외부 시스템 없이 테스트 가능한 구조
-
-### 목적
-
-DB, Redis, Kafka, HSM, 외부 API가 없어도 대부분의 작업을 Agent가 검증할 수 있도록 애플리케이션 경계를 설계한다.
-
-### 독자가 얻는 것
-
-- 외부 시스템 의존이 Agent 실행을 막는 이유를 이해한다.
-- Fake, Mock, Testcontainers의 역할을 구분할 수 있다.
-- Adapter 경계를 테스트 가능한 형태로 설계할 수 있다.
-
-### 핵심 개념
-
-- Unit Test
-- Integration Test
-- Contract Test
-- E2E Test
-- Testcontainers
-- Mock Server
-- Fake Adapter
-- Ports and Adapters
-
-### 선행 장
-
-7장, 8장
-
-### 실전 예제
-
-Tibero, Redis, Kafka, HSM, 외부 학사 API를 각각 Testcontainer, Fake 또는 Mock으로 대체한다.
-
----
-
-## 10장. 자동 검증과 Agent Definition of Done
+## 13장. Local과 Cloud를 하나의 개발 흐름으로 연결하기
 
 ### 목적
 
-Agent의 `완료했습니다`라는 설명 대신 기계적으로 판단 가능한 완료 조건을 만든다.
+Local Agent와 Cloud Agent를 역할별로 연결한 실제 개발 Workflow를 만든다.
 
 ### 독자가 얻는 것
 
-- 자동 검증 파이프라인을 설계할 수 있다.
-- 작업 완료 여부를 PASS/FAIL로 판단할 수 있다.
-- 신규 기능과 기존 기능의 회귀를 동시에 검증할 수 있다.
+- Local에서 설계/분해하고 Cloud에서 독립 작업을 실행할 수 있다.
+- 내부망 검증을 Local에 남기면서 Cloud 결과를 통합할 수 있다.
+- PM 또는 개발자가 Task Routing을 수행할 수 있다.
 
 ### 핵심 개념
 
-- Definition of Done
-- Format
-- Lint
-- Compile
-- Unit Test
-- Integration Test
-- Security Check
-- Secret Detection
-- Diff Validation
-- Exit Code
-
-### 선행 장
-
-8장, 9장
-
-### 실전 예제
-
-`verify.sh`가 코드 형식, 컴파일, 테스트, Secret, 변경 범위를 검사하도록 설계한다.
-
----
-
-## 11장. Architecture Rule을 코드로 검증하기
-
-### 목적
-
-문서에 적힌 아키텍처 규칙을 일부 실행 가능한 테스트로 전환한다.
-
-### 독자가 얻는 것
-
-- 의존성 방향과 모듈 경계를 자동 검증할 수 있다.
-- 문서 규칙과 실제 코드 간 차이를 줄일 수 있다.
-- Agent가 구조를 훼손하는 변경을 조기에 차단할 수 있다.
-
-### 핵심 개념
-
-- Architecture Test
-- Dependency Rule
-- Package Rule
-- Module Rule
-- Forbidden Dependency
-- Static Analysis
-
-### 선행 장
-
-4장, 10장
-
-### 실전 예제
-
-`attendance` 모듈이 `student` 내부 구현에 직접 의존하지 못하도록 규칙을 정의한다.
-
----
-
-# Part IV. 여러 Agent가 동시에 일하는 프로젝트
-
-## 12장. 병렬 Agent 개발을 위한 모듈 경계
-
-### 목적
-
-모듈화를 유지보수 목적뿐 아니라 병렬 Agent 작업의 충돌 제어 수단으로 사용한다.
-
-### 독자가 얻는 것
-
-- 병렬 작업 가능성을 기준으로 모듈 경계를 평가할 수 있다.
-- shared file과 common module이 만드는 충돌을 줄일 수 있다.
-- 작업을 독립적으로 분할하기 쉬운 구조를 만들 수 있다.
-
-### 핵심 개념
-
-- Bounded Context
-- Module Ownership
-- Change Locality
-- Parallelizability
-- Shared State
-- Common Module
-- Migration Conflict
-
-### 선행 장
-
-4장, 11장
-
-### 실전 예제
-
-`auth`, `attendance`, `notification`을 세 Agent가 동시에 변경할 때 충돌 지점을 분석한다.
-
----
-
-## 13장. Git, Worktree, Branch, Cloud Sandbox
-
-### 목적
-
-여러 Agent가 동일 Repository를 병렬로 변경하는 실행 전략을 설계한다.
-
-### 독자가 얻는 것
-
-- branch per agent, worktree, independent clone의 차이를 이해한다.
-- Local Agent와 Cloud Agent에 맞는 Git 격리 전략을 선택할 수 있다.
-- Merge와 충돌 해결 흐름을 설계할 수 있다.
-
-### 핵심 개념
-
-- Task Branch
-- Git Worktree
-- Independent Clone
-- Cloud Sandbox
-- Commit Policy
-- Merge Strategy
-- Conflict Handling
-
-### 선행 장
-
-6장, 12장
-
-### 실전 예제
-
-여러 Task Branch와 Worktree를 만들어 세 작업을 독립 실행하고 결과를 통합하는 흐름을 설계한다.
-
----
-
-## 14장. Trust Boundary: Agent에게 어디까지 권한을 줄 것인가
-
-### 목적
-
-Agent의 실행 편의성과 시스템 보안 사이의 경계를 설계한다.
-
-### 독자가 얻는 것
-
-- Local과 Cloud Agent의 권한 차이를 설계할 수 있다.
-- Secret, Network, Repository, Production 접근을 분리할 수 있다.
-- 비신뢰 입력이 Agent 행동에 영향을 주는 위험을 통제할 수 있다.
-- Agent별 최소 권한 원칙을 적용할 수 있다.
-
-### 핵심 개념
-
-- Least Privilege
-- Secret Boundary
-- Network Boundary
-- Repository Permission
-- PR Permission
-- Merge Permission
-- Deployment Permission
-- Production Access
-- Untrusted Input
-- Prompt Injection
-- Secret Exfiltration
-- Tool Allowlist
-- Command Execution Boundary
-
-### 선행 장
-
-2장, 13장
-
-### 실전 예제
-
-Worker Agent는 feature branch 쓰기만 허용하고, Integrator만 merge 권한을 갖게 한다. 외부 문서와 Issue 내용은 비신뢰 입력으로 취급하고 Secret 및 명령 실행 경계를 분리한다.
-
----
-
-## 15장. CI/CD Gate와 Agent 권한 연결
-
-### 목적
-
-Agent의 변경이 실제 Merge와 배포로 이어질 때 필요한 기계적 보호 장치와 승인 단계를 설계한다.
-
-### 독자가 얻는 것
-
-- Agent와 CI의 검증 책임을 구분할 수 있다.
-- PR, Merge, Deploy 권한 단계를 설계할 수 있다.
-- Production 배포를 Agent에게 직접 허용할지 판단할 수 있다.
-
-### 핵심 개념
-
-- CI Gate
-- PR Check
-- Merge Gate
-- Deployment Gate
-- Approval
-- Environment Protection
-- Audit Log
-- Separation of Duties
-
-### 선행 장
-
-10장, 14장
-
-### 실전 예제
-
-Worker Agent → PR → CI Verify → Reviewer → Merge → Jenkins Deploy 흐름을 설계한다.
-
----
-
-# Part V. 장기 작업과 Project Memory
-
-## 16장. Project Memory와 Long Running Task
-
-### 목적
-
-Agent의 대화 컨텍스트와 프로젝트가 장기간 유지해야 하는 정보를 분리하고, 몇 시간 또는 며칠 동안 이어지는 작업을 중단·재개할 수 있게 한다.
-
-### 독자가 얻는 것
-
-- 세션 종료 후에도 유지되어야 할 정보를 판단할 수 있다.
-- 여러 Agent가 동일한 프로젝트 상태를 공유할 수 있다.
-- 작업 중단과 재개가 가능한 상태 구조를 만들 수 있다.
-- Agent 교체 후에도 작업을 이어갈 수 있다.
-
-### 핵심 개념
-
-- Agent Memory
-- Project Memory
-- Decision Log
-- ADR
-- Task State
-- Progress
-- Failed Attempts
-- Test Result
-- Next Task
-- Checkpoint
-- Resume
-- Idempotency
-- Source of Truth
-
-### 선행 장
-
-5장, 6장, 10장
-
-### 실전 예제
-
-`docs/decisions`, `docs/tasks`, `docs/progress`, `docs/knowledge`와 작업 상태 파일을 사용해 대규모 모듈 분리 작업을 여러 세션에 걸쳐 이어가는 구조를 설계한다.
-
----
-
-## 17장. Agent Observability와 Quality Evaluation
-
-### 목적
-
-여러 Agent의 실행 상태와 결과물의 품질을 사람이 추측하지 않고 관찰하고 평가할 수 있게 한다.
-
-### 독자가 얻는 것
-
-- Agent 상태 모델을 정의할 수 있다.
-- 테스트 통과와 작업 품질을 구분할 수 있다.
-- 실행 시간, 재시도 횟수, 비용과 자원 사용량을 관찰할 수 있다.
-- PM Agent가 Worker 상태와 결과를 판단하는 기준을 만들 수 있다.
-
-### 핵심 개념
-
-- queued
-- running
-- blocked
-- failed
-- verifying
-- completed
-- Requirement Coverage
-- Change Scope
-- Unnecessary Changes
-- Retry Count
-- Execution Time
-- Cost
-- Resource Usage
-- Audit Trail
-
-### 선행 장
-
-10장, 15장, 16장
-
-### 실전 예제
-
-Worker Agent의 작업 상태, 검증 결과, 변경 파일, 실패 원인, 재시도 횟수와 실행 비용을 수집하는 구조를 설계한다.
-
----
-
-# Part VI. Agent Orchestration
-
-## 18장. Agent Lifecycle과 역할 분리
-
-### 목적
-
-Agent를 작업 단위의 일시적 실행 자원으로 정의하고, 작업 복잡도에 따라 Planner, Worker, Tester, Reviewer 등의 역할을 선택하는 방법을 설계한다.
-
-### 독자가 얻는 것
-
-- 작업에 필요한 Agent 수와 역할을 결정할 수 있다.
-- Agent 생성, 실행, 검증, 종료 흐름을 설계할 수 있다.
-- 구현 Agent와 검증 Agent를 분리할 수 있다.
-- 역할을 과도하게 늘리지 않고 필요한 수준으로 구성할 수 있다.
-
-### 핵심 개념
-
-- Task Analysis
-- Agent Allocation
-- Spawn
-- Execute
-- Verify
-- Terminate
-- Planner
-- Worker
-- Tester
-- Reviewer
-- Security Reviewer
-- Integrator
-- Separation of Duties
-
-### 선행 장
-
-6장, 13장, 17장
-
-### 실전 예제
-
-`학생 출결 기능` 작업을 분석해 Backend Worker와 Tester를 생성하고 Reviewer가 결과를 검토한 뒤 작업이 끝나면 Agent를 종료한다.
-
----
-
-## 19장. PM Agent: 여러 Agent를 운영하는 Agent
-
-### 목적
-
-사람이 모든 Worker를 직접 지시하는 구조에서 프로젝트 상태를 읽고 작업을 분해·할당·검증하는 PM Agent 구조로 확장한다.
-
-### 독자가 얻는 것
-
-- PM Agent의 책임 범위를 정의할 수 있다.
-- Task Queue와 의존성 기반 작업 배분 구조를 설계할 수 있다.
-- 필요한 Agent 수를 동적으로 결정할 수 있다.
-- 실패 작업의 재할당과 완료 판단 흐름을 설계할 수 있다.
-
-### 핵심 개념
-
-- PM Agent
-- Project State
-- Task Queue
-- Dependency Graph
-- Task Decomposition
-- Agent Allocation
-- Scheduling
-- Result Collection
-- Retry
-- Completion Decision
-
-### 선행 장
-
-16장, 17장, 18장
-
-### 실전 예제
-
-PM Agent가 프로젝트 상태를 읽고 다음 작업 목록을 생성한 뒤 의존성을 분석해 필요한 Agent 수를 계산하고 병렬 배정한다.
-
----
-
-## 20장. 실패, 재시도, 충돌, 통합
-
-### 목적
-
-Agent 시스템을 정상 흐름만이 아니라 실패를 전제로 설계한다.
-
-### 독자가 얻는 것
-
-- 실패 유형을 구분하고 재시도 여부를 판단할 수 있다.
-- 동일 실패의 무한 반복을 방지할 수 있다.
-- 병렬 작업 결과를 안전하게 통합할 수 있다.
-- 사람이 개입해야 하는 조건을 정의할 수 있다.
-
-### 핵심 개념
-
-- Retry Policy
-- Failure Classification
-- Blocked Task
-- Conflict
-- Rebase
-- Integration
-- Rollback
-- Human Escalation
-- Retry Budget
-
-### 선행 장
-
-13장, 16장, 19장
-
-### 실전 예제
-
-테스트 실패, Git 충돌, 외부 시스템 접근 실패, 요구사항 불명확 상황을 각각 다른 방식으로 처리한다.
-
----
-
-# Part VII. 기업 환경과 Agentic Development 운영
-
-## 21장. VPN과 내부망이 있는 Hybrid Agent 시스템
-
-### 목적
-
-Cloud Agent가 모든 시스템에 접근할 수 없다는 현실을 전제로 기업 프로젝트의 작업 경계와 handoff를 설계한다.
-
-### 독자가 얻는 것
-
-- Cloud Agent에 보내도 되는 작업과 Local Agent가 수행해야 하는 작업을 구분할 수 있다.
-- 내부망 의존 작업을 Agent 시스템에 포함할 수 있다.
-- Cloud와 Local Agent 사이의 결과 전달 구조를 설계할 수 있다.
-
-### 핵심 개념
-
-- VPN
-- Internal Git
-- Nexus
-- Tibero / Oracle
-- Redis
-- Kafka
-- HSM
-- Jenkins
-- Internal API
-- Hybrid Execution
+- Hybrid Workflow
 - Handoff
+- Local Integration
+- Cloud Execution
+- Internal Network
+- Final Review
 
 ### 선행 장
 
-2장, 14장, 15장, 19장
+5장, 10장, 12장
 
 ### 실전 예제
 
-Cloud Agent는 독립 코드 개발과 테스트를 수행하고 Local Agent는 Tibero, HSM, Jenkins 통합 검증을 수행한 뒤 PM Agent가 결과를 통합한다.
+```text
+Local
+→ Architecture / Task 분리
+
+Cloud
+→ 구현 / Test / Docker / E2E
+
+Local
+→ Tibero/HSM/Jenkins 검증
+→ 통합 / Review
+```
 
 ---
 
-## 22장. Full Agentic Development로의 진화와 Governance
+# Part VIII. CI/CD와 Cloud Agent
+
+## 14장. 실패와 이벤트가 Cloud Agent를 호출하게 만들기
 
 ### 목적
 
-앞 장들의 원칙을 하나의 프로젝트 개발 프로세스로 통합하고, 자동화 수준을 단계적으로 높이면서 사람의 책임과 운영 기준을 유지하는 방법을 정리한다.
+Agent를 항상 실행하지 않고 CI 실패, Review Comment, Nightly Failure 같은 이벤트에서만 Cloud Agent를 활성화한다.
 
 ### 독자가 얻는 것
 
-- 기존 프로젝트를 단계적으로 Agent Ready 프로젝트로 전환할 수 있다.
-- 모든 기능을 한 번에 자동화하지 않고 성숙도에 따라 도입할 수 있다.
-- 사람과 Agent의 최종 책임 경계를 설계할 수 있다.
-- 비용, 권한, 감사, 모델 선택과 자동화 수준을 Governance 관점에서 관리할 수 있다.
+- CI PASS 경로에서는 Agent 호출을 생략할 수 있다.
+- CI Failure와 Review Comment를 Cloud Agent 작업으로 변환할 수 있다.
+- Nightly 반복 작업을 설계할 수 있다.
 
 ### 핵심 개념
 
-- Agent Ready Maturity
-- Incremental Adoption
-- Human-in-the-loop
-- Human-on-the-loop
-- Full Agentic Development
-- Governance
-- Cost Budget
-- Resource Budget
-- Auditability
-- Accountability
-- Model Independence
+- Event-driven Agent
+- CI Failure
+- Review Comment
+- Nightly Task
+- Dependency Update
+- Draft PR
+- Revalidation
 
 ### 선행 장
 
-1장부터 21장까지
+8장, 10장, 13장
 
 ### 실전 예제
 
-`campus-platform`이 일반적인 Spring Boot 프로젝트에서 Agent Contract, 재현 가능한 환경, 자동 검증, 병렬 Agent, Project Memory, PM Agent, Hybrid Agent 구조를 갖춘 프로젝트로 변하는 전체 과정을 정리하고 단계별 도입 기준을 정의한다.
+CI 실패 → Cloud Agent 수정 → Runner 재검증 → Draft PR 흐름을 구성한다.
 
 ---
 
-# 부록 후보
+# Part IX. 실전 프로젝트
 
-## 부록 A. Agent Contract 템플릿
+## 15장. campus-platform Cloud Agent Workflow 설계
 
-- README.md
-- AGENTS.md
-- 제품별 instruction adapter
-- architecture.md
-- development.md
-- testing.md
+### 목적
 
-## 부록 B. Task Contract 템플릿
+앞 장의 원칙을 Java/Spring Boot 예제 프로젝트에 하나의 Workflow로 통합한다.
 
-- Goal
-- Scope
-- Allowed Files
-- Forbidden Changes
-- Dependencies
-- Acceptance Criteria
-- Verification
-- Deliverables
+### 독자가 얻는 것
 
-## 부록 C. Agent Ready 체크리스트
+- 실제 Repository에서 Local/Cloud 역할을 설계할 수 있다.
+- Cloud Task와 실행 명령을 정의할 수 있다.
+- Prebuilt Environment, Cache, Result Gateway를 프로젝트에 연결할 수 있다.
 
-새 프로젝트와 기존 프로젝트를 평가할 수 있는 점검표를 제공한다.
+### 핵심 개념
 
-## 부록 D. 제품별 구현 사례
+- Java 21
+- Spring Boot
+- Gradle
+- MyBatis
+- PostgreSQL/Testcontainers
+- Docker
+- Web E2E
+- Task Routing
 
-Claude Code, Codex, GitHub Copilot Coding Agent, Devin 등의 현재 기능을 책의 일반 원칙과 연결해 비교한다.
+### 선행 장
 
-제품 기능은 변경될 수 있으므로 본문보다 부록 또는 별도 Research 문서에 가깝게 유지한다.
+1장부터 14장까지
+
+### 실전 예제
+
+기능 설계는 Local, Unit/Integration/Docker/E2E는 여러 Cloud Worker에 배정한다.
+
+---
+
+## 16장. 하나의 기능을 Local + Cloud로 끝까지 개발하기
+
+### 목적
+
+작은 기능 하나를 요구사항 분석부터 PR까지 실제 단계로 따라간다.
+
+### 독자가 얻는 것
+
+- Task 분해부터 Cloud 병렬 검증까지 전체 흐름을 실행할 수 있다.
+- 실패했을 때 어떤 Context만 Cloud Agent에 추가할지 결정할 수 있다.
+- 최종 Local Integration까지 수행할 수 있다.
+
+### 핵심 개념
+
+- Local Design
+- Cloud Task
+- Parallel Validation
+- Failure Summary
+- Agent Fix
+- PR
+- Final Integration
+
+### 선행 장
+
+15장
+
+### 실전 예제
+
+학생 출결 API 변경을 Local에서 설계하고 Cloud #1 Unit Test, #2 Integration, #3 Docker, #4 E2E로 검증한 뒤 결과를 통합한다.
+
+---
+
+# Part X. Cloud Agent를 언제 쓰지 말아야 하는가
+
+## 17장. Cloud가 항상 정답은 아니다
+
+### 목적
+
+Cloud Agent 도입 비용과 제약이 이점보다 큰 상황을 판단한다.
+
+### 독자가 얻는 것
+
+- Cloud Agent를 사용하지 않아야 할 조건을 설명할 수 있다.
+- 작은 수정, 큰 Context, 내부망, 보안, 재현 불가 문제를 구분할 수 있다.
+- Local 작업으로 되돌리는 기준을 만들 수 있다.
+
+### 핵심 개념
+
+- Internal Network
+- Large Context
+- Human Steering
+- Setup Overhead
+- Security Restriction
+- Non-reproducible Issue
+- Local Fallback
+
+### 선행 장
+
+5장, 13장
+
+### 실전 예제
+
+HSM 장애, 미커밋 로컬 상태, 한 줄 수정, 전체 아키텍처 재설계 같은 작업을 Cloud에 보내지 않는 이유를 비교한다.
+
+---
+
+# Part XI. Cloud Agent 중심 개발환경의 미래
+
+## 18장. 다음 단계: Harness, Orchestration, Agent-Native Environment
+
+### 목적
+
+현재 책의 범위를 넘어 발전할 수 있는 방향을 짧게 소개하되 Agent Platform 일반론으로 확장하지 않는다.
+
+### 독자가 얻는 것
+
+- Cloud Agent 활용이 향후 어떤 방향으로 발전할 수 있는지 이해한다.
+- 현재 프로젝트에 필요한 범위와 후속 연구 주제를 구분할 수 있다.
+
+### 핵심 개념
+
+- Harness Engineering
+- Agent Orchestration
+- Agent-native Observability
+- Brain / Hands
+- Agent Platform
+- Multi-agent
+
+### 선행 장
+
+1장부터 17장까지
+
+### 실전 예제
+
+현재 `campus-platform` Cloud Workflow를 기반으로 향후 자동 Task Scheduling이나 Agent-native 실행환경으로 확장할 수 있는 지점만 표시한다.
+
+상세 설계는 `planning/future-topics.md`로 이동한다.
 
 ---
 
 # 장 의존성 요약
 
 ```text
-1 → 2 → 3
+1 → 2 → 3 → 4
         ↓
-        4 → 5 → 6 → 7 → 8
-        ↓               ↓
-       12 ← 11 ← 10 ← 9
-        ↓       ↓
-       13 → 14 → 15
-        ↓         ↓
-        └────→ 16 → 17 → 18 → 19 → 20
-                           ↓          ↓
-                           └────→ 21 → 22
+        5 → 6 → 7 → 8
+                ↓    ↓
+                9 → 10
+                     ↓
+                11 → 12
+                     ↓
+                    13 → 14
+                     ↓
+                    15 → 16
+                     ↓
+                    17 → 18
 ```
 
-# Phase 3에서 확정한 사항
+# 범위에서 제외한 독립 장
 
-- 전체 목차는 7개 Part, 22개 장으로 구성한다.
-- 하나의 `campus-platform` 예제를 책 전체의 기본 축으로 사용한다.
-- 4장은 Repository의 탐색성과 context 구조에 집중하고, 12장은 병렬 변경과 충돌 제어에 집중한다.
-- `Task Contract`와 `Trust Boundary`는 독립 장으로 유지한다.
-- `Agent Memory와 Project Memory`, `Long Running Agent`는 하나의 장으로 통합한다.
-- `Agent Lifecycle`, `Planner/Worker/Tester/Reviewer`는 하나의 장으로 통합한다.
-- CI/CD Gate는 기업 환경이 아니라 일반 Trust Boundary의 연장선으로 다룬다.
-- Trust Boundary에는 Untrusted Input과 Prompt Injection을 포함한다.
-- Agent Observability에는 품질뿐 아니라 실행 시간, 재시도, 비용과 자원 사용량을 포함한다.
-- 제품별 기능 설명은 본문의 중심이 아니라 사례 또는 부록으로 둔다.
-- Java/Spring Boot는 주요 실전 예제지만 일반 원칙보다 먼저 등장하지 않는다.
-- PM Agent는 Repository, Verification, Parallel Development, Memory, Observability를 설명한 뒤 도입한다.
-- 기업 내부망과 Hybrid Agent는 일반 원칙을 설명한 이후 적용 사례로 다룬다.
+다음 항목은 기존 설계에서 별도 장 후보였으나 현재 Cloud Agent 중심 책에서는 독립 장으로 사용하지 않는다.
+
+- Agent-Native Development Environment 전체 아키텍처
+- Agent Memory Architecture
+- Agent Security Platform
+- Agent Chaos Engineering
+- Garbage Collector Agent
+- Shadow Agent
+- Canary Agent
+- Agent Platform Governance
+- Agent-native Observability Platform
+- Multi-agent 조직론
+
+필요한 내용은 18장에서 짧게 언급하고 상세 설계는 `planning/future-topics.md`에 보존한다.
+
+# 최종 독자 판단
+
+이 책을 읽은 뒤 독자가 가장 먼저 할 수 있어야 하는 말은 다음이다.
+
+> 이 작업은 Local에서 하고, 이 작업은 Cloud Agent에게 보내자.
