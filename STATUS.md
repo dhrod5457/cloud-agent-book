@@ -1,10 +1,10 @@
 # Current Phase
 
-Phase 6 - 본문 초고 작성 시작
+Phase 6 - 본문 초고 작성 진행 중
 
 Phase 5의 1~18장 설계와 전체 정합성 점검을 완료했다.
 
-현재 1장 초고 작성을 시작했다.
+현재 1~2장 초고를 작성했다.
 
 # Source of Truth
 
@@ -98,16 +98,11 @@ Cloud Agent
 
 Phase 5 완료.
 
-완료 항목:
-
-- Cloud Agent 중심 Concept 확정
-- Scope 재정의
-- 11 Part / 18 Chapter 목차 확정
 - 1~18장 설계 완료
-- 기존 Agent Platform 확장 주제를 `planning/future-topics.md`로 이동
-- 1~18장 역할/중복/용어/범위 정합성 점검 완료
+- 전체 역할/중복/용어/범위 정합성 점검 완료
 - `planning/phase5-consistency-check.md` 작성
-- `chapters/02/execution-platform.md`를 과거 확장 참고자료로 명확히 분리
+- Agent Platform 확장 내용은 `planning/future-topics.md`로 이동
+- 과거 `chapters/02/execution-platform.md`는 참고자료로만 유지
 
 # Phase 6 Writing Rules
 
@@ -127,26 +122,45 @@ Phase 5 완료.
 
 ## 1장 - Coding Agent에서 Cloud Worker로
 
-상태: `초고 작성 시작`
+상태: `초고 작성 및 설계 대비 1차 검토 완료`
 
 파일:
 
 - 설계: `chapters/01/plan.md`
 - 초고: `chapters/01/draft.md`
-- 공식 근거 메모: `research/chapter-01-cloud-worker-official-sources.md`
+- 공식 근거: `research/chapter-01-cloud-worker-official-sources.md`
 
-초고에 반영한 핵심:
+주요 내용:
 
-- Chat LLM과 Coding Agent의 차이
-- Cloud Agent = LLM + Repository + Execution Environment + Compute + Tools
+- Chat LLM과 Coding Agent 구분
 - Remote Development Worker 정의
-- Token보다 독립 실행환경과 병렬성이 중요한 이유
-- Prompt가 아니라 Task를 전달한다는 관점
-- 자연어 완료 선언보다 Evidence를 요구하는 관점
-- Git을 Remote Worker Handoff Boundary로 보는 관점
+- Cloud Agent = LLM + Repository + Execution Environment + Compute + Tools
+- Prompt보다 Task 관점
+- Evidence 기반 결과
+- Git Handoff Boundary 소개
 - `campus-platform` 병렬 검증 예제
 
-제품 사례는 공식 자료에서 확인한 공통 실행 모델만 사용한다.
+## 2장 - Local Agent와 Cloud Agent
+
+상태: `초고 작성 완료`
+
+파일:
+
+- 설계: `chapters/02/plan.md`
+- 초고: `chapters/02/draft.md`
+- 공식 근거: `research/chapter-02-local-cloud-official-sources.md`
+
+주요 내용:
+
+- 모델보다 실행 위치를 우선하는 비교
+- Local에 적합한 Interactive / Internal 작업
+- Cloud에 적합한 독립 / 장시간 / 검증 가능한 작업
+- Local → Cloud → Local Handoff
+- Internal Network를 Hard Constraint로 판단
+- Human Steering / Context 크기 기준
+- Agent Execution Time vs Developer Blocking Time
+- Git Handoff Boundary
+- `campus-platform` 작업별 Local / Cloud / Hybrid 분류
 
 # Preserved / Future Topics
 
@@ -168,8 +182,8 @@ Phase 5 완료.
 
 # Next
 
-1. 1장 초고 자체 검토 및 설계 대비 누락/중복 점검
-2. 필요한 수정 반영 후 1장 초고 완료 처리
-3. 2장 `Local Agent와 Cloud Agent` 본문 초고 시작
+1. 2장 초고 설계 대비 자체 검토
+2. 필요한 수정 반영
+3. 3장 `Cloud Session, Container, Compute와 Token` 초고 작성
 
 Phase 6에서는 장별로 `초고 → 설계 대비 검토 → 수정 → 다음 장` 순서로 진행한다.
