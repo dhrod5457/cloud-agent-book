@@ -11,10 +11,11 @@ Phase 5 - 장별 설계 진행 중 / Cloud Agent 중심 범위 재정렬 완료
 1. `planning/concept.md`
 2. `planning/scope.md`
 3. `planning/toc.md`
-4. `planning/future-topics.md`
-5. `STATUS.md`
+4. `planning/cloud-agent-remote-worker-model.md`
+5. `planning/future-topics.md`
+6. `STATUS.md`
 
-이전 `planning/toc-amendment-agent-native.md`의 독립 장 추가 결정은 현재 목차 결정보다 우선하지 않는다.
+이전 Agent-Native 독립 장 설계는 현재 목차 결정보다 우선하지 않는다.
 
 # Book Direction
 
@@ -22,9 +23,26 @@ Phase 5 - 장별 설계 진행 중 / Cloud Agent 중심 범위 재정렬 완료
 
 핵심 질문:
 
-> 클라우드 에이전트를 왜 사용하고, 로컬 에이전트와 어떻게 조합하며, 어떤 작업을 맡기고, 토큰과 클라우드 컴퓨팅 자원을 어떻게 효율적으로 활용할 것인가?
+> 클라우드 코딩 에이전트를 실제 개발에서 어떻게 더 빠르고, 저렴하고, 효율적으로 사용할 것인가?
 
 `Agent Ready Software Engineering`은 지원 철학으로 남기지만 책의 중심축으로 확장하지 않는다.
+
+# Cloud Agent Definition
+
+Cloud Agent를 단순히 Cloud에서 실행되는 LLM으로 정의하지 않는다.
+
+```text
+Cloud Agent
+= LLM
++ Repository
++ Independent Execution Environment
++ CPU / RAM / Disk
++ Development Tools
+```
+
+책에서 사용할 확장 정의:
+
+> Cloud Agent는 필요할 때 독립된 개발환경을 할당받고, Git을 통해 Task를 받아 비동기적으로 작업하며, 테스트와 Artifact를 포함한 검증 가능한 결과를 반환하는 Remote Development Worker다.
 
 # Core Messages
 
@@ -40,42 +58,60 @@ Phase 5 - 장별 설계 진행 중 / Cloud Agent 중심 범위 재정렬 완료
 
 > 작은 Task와 작은 Context를 전달한다.
 
+> Agent에게 개발환경을 설치하게 하지 말고, 바로 작업 가능한 환경을 제공한다.
+
+> Cloud Agent에게 결과를 요구하지 말고 검증 가능한 결과물을 요구한다.
+
 > Cloud Agent를 잘 사용하는 핵심은 Agent 수를 늘리는 것이 아니라 어떤 작업을 Cloud로 보낼지 결정하는 것이다.
 
-# Local / Cloud 판단 기준
+# Local / Cloud Handoff
 
-## Local 중심
+하나의 Task는 Local 또는 Cloud에 영구적으로 속하지 않는다.
 
-- Architecture 설계
-- 복잡한 디버깅
-- Human Steering이 잦은 작업
-- 내부망 / VPN / 사내 DB / HSM
-- 여러 모듈을 동시에 이해해야 하는 작업
-- 빠른 질문/수정 반복
-- 최종 통합 / Review
+```text
+Local
+→ 요구사항 분석
+→ Architecture
+→ Task Split
+→ Commit / Push
+      ↓
+Cloud
+→ Build / Test / E2E
+→ Refactoring / CI Fix
+→ Evidence Result / PR
+      ↓
+Local
+→ 내부망 검증
+→ Review
+→ Integration / Merge
+```
 
-## Cloud 중심
+핵심 원칙:
 
-- Build
-- Unit Test
-- Integration Test
-- E2E Test
-- Docker Build
-- Static Analysis
-- Lint
-- Migration Validation
-- 반복적인 Refactoring
-- 작은 Bug Fix
-- 독립 Feature
-- Documentation
-- PR Review
-- CI 실패 수정
-- 장시간 작업
-- 독립적인 병렬 작업
+> Task는 작업 단계에 따라 실행 위치를 이동할 수 있다.
 
-독자가 최종적으로 다음을 판단할 수 있어야 한다.
+# Git as Handoff Boundary
 
-> 이 Task는 Local에서 해야 하는가, Cloud로 보내야 하는가?
+Git은 단순 형상관리뿐 아니라 Local과 Cloud 사이의 작업 전달 경계로 사용한다.
+
+```text
+Local
+→ Commit / Push
+→ Git
+→ Cloud Task Branch
+→ Work / Test
+→ Commit / Push / PR
+```
+
+Cloud Task 상태 후보:
+
+- Task ID
+- Session ID
+- Branch
+- Commit SHA
+- Status
+- Test Result
+- PR
 
 # Cloud Agent Efficiency
 
@@ -125,11 +161,9 @@ Runner
 - Progressive Context
 - Repository 전체 재탐색 방지
 
-## Result Gateway
+## Result Gateway / Evidence
 
-목적은 Cloud Agent가 읽어야 하는 Tool Output을 줄이는 것이다.
-
-원본 로그와 Artifact는 저장하고 다음만 먼저 제공한다.
+원본 로그와 Artifact는 저장하고 Agent에는 필요한 정보만 먼저 제공한다.
 
 - PASS / FAIL
 - Failed Test
@@ -137,26 +171,78 @@ Runner
 - Stack Trace 위치
 - Artifact 경로
 
-필요할 때만 상세 내용을 조회한다.
+Cloud Agent 완료 결과에는 가능한 경우 다음 Evidence를 포함한다.
 
-## Prebuilt Environment / Cache
+- Commit / Diff
+- Build Result
+- Unit / Integration Test Result
+- E2E Result
+- Screenshot / Video
+- Log Reference
+- PR
+
+UI 작업에서는 `Demos over Diffs`를 빠른 1차 검증 방식으로 사용할 수 있다.
+
+# Prepared Cloud Environment
 
 Cloud Worker가 매번 JDK, Node, Dependency, Browser, Docker Image를 처음부터 준비하지 않게 한다.
 
-사용 후보:
+핵심 개념:
 
-- Base Image
+- Prepared Cloud Environment
+- Cloud Environment as Code
+- 작업별 Environment
 - Snapshot
-- Gradle/Maven Cache
-- npm Cache
+- Gradle/Maven/npm Cache
 - Docker Layer Cache
 - Playwright Browser Cache
-- Preinstalled Tools
 - Warm Worker
+- Cold Start
 
-핵심:
+작업별 환경 후보:
 
-> Agent에게 개발환경을 설치하게 하지 말고, 바로 작업 가능한 환경을 제공한다.
+```text
+backend-test
+frontend-e2e
+migration-test
+fullstack
+```
+
+환경 상태를 나눈다.
+
+```text
+Reusable
+- Runtime
+- Tools
+- Dependencies
+- Cache
+
+Fresh
+- Source
+- Branch
+- Task
+- Test Result
+- Temporary Data
+```
+
+# Task Size
+
+Cloud Task가 너무 작으면 다음 overhead가 커진다.
+
+- Environment start
+- Repository checkout
+- Agent startup
+- Context loading
+
+너무 크면 다음 비용이 커진다.
+
+- Context
+- Token
+- Failure Scope
+- Retry
+- Review
+
+절대 시간 규칙 대신 프로젝트별로 측정해 적정 크기를 정한다.
 
 # Parallel Cloud Workers
 
@@ -167,39 +253,54 @@ Cloud Worker가 매번 JDK, Node, Dependency, Browser, Docker Image를 처음부
 - 다른 File Scope
 - 독립 검증 가능
 
-공통 파일이나 Schema를 수정한다면 먼저 dependency를 분석하고 순차 실행으로 전환한다.
+같은 파일/Schema를 여러 Agent가 동시에 수정하지 않는다.
 
-여러 Agent를 사용할 때 같은 Repository 전체를 각 Agent가 반복 분석하지 않도록 한다.
+병렬 Agent 수가 늘면 다음 비용도 함께 증가한다.
 
-# Hybrid Workflow
+- Context 중복
+- Dependency setup 중복
+- Merge Conflict
+- Review
+- LLM usage
+- PR 관리
 
-```text
-Local / PM
-→ Architecture
-→ Task 분리
+# Task Queue / Event-driven Agent
 
-Cloud Worker
-→ 독립 구현 / Build / Test / E2E
+Cloud Agent 실행 시작점이 개발자 PC일 필요는 없다.
 
-Local
-→ 내부망 검증
-→ 통합
-→ 최종 Review
-```
+Task Source:
 
-# CI/CD
-
-Agent는 항상 실행될 필요가 없다.
-
-호출 후보:
-
+- Issue
 - CI Failure
-- Review Comment
-- Nightly Test Failure
-- Dependency Update Failure
-- 반복 검증 실패
+- PR Review
+- Scheduled Test
+- Dependency Update
+- Nightly Build
 
-PASS 경로에서는 Agent 호출을 생략할 수 있다.
+핵심:
+
+> 이벤트가 없으면 Agent도 실행하지 않는다.
+
+PASS 경로에서는 Agent를 호출하지 않는다.
+
+# Developer Time
+
+Cloud Agent 생산성을 Agent 실행시간만으로 평가하지 않는다.
+
+분리 지표:
+
+- Agent Execution Time
+- Developer Blocking Time
+
+Cloud Agent의 중요한 가치는 Developer Blocking Time과 Context Switching을 줄이는 데 있다.
+
+# Multi-Repository
+
+Task에 여러 Repository가 필요할 수 있지만 모든 Repository를 항상 제공하지 않는다.
+
+원칙:
+
+> 현재 Task에서 함께 수정될 가능성이 높은 Repository만 Cloud Workspace에 제공한다.
 
 # Current TOC
 
@@ -219,7 +320,23 @@ PASS 경로에서는 Agent 호출을 생략할 수 있다.
 - Cloud Agent를 언제 쓰지 말아야 하는가
 - Cloud Agent 중심 개발환경의 미래
 
-이 목차가 현재 최신 목차다.
+새로 반영된 배치:
+
+- 1장: Remote Development Worker 정의
+- 4장: Developer Blocking Time
+- 5장: Task Size / Cloud 적합 조건
+- 7장: Cloud Agent Task Contract
+- 8장: Evidence Result / Demos over Diffs
+- 9장: Prepared Cloud Environment / Cold Start / 작업별 Environment
+- 11장: Git Handoff Boundary / Branch-Session-Task 상태
+- 12장: 병렬화 상한 / 중복 비용
+- 13장: Local→Cloud→Local Handoff / Multi-Repository
+- 14장: Task Queue / Event-driven Cloud Agent
+- 15~16장: 전체 Hybrid Workflow와 Evidence-based Result
+
+상세 운영 모델:
+
+- `planning/cloud-agent-remote-worker-model.md`
 
 # Future Topics
 
@@ -238,17 +355,6 @@ PASS 경로에서는 Agent 호출을 생략할 수 있다.
 
 필요하면 마지막 미래 장에서 짧게 소개한다.
 
-# Existing Artifacts
-
-기존에 만든 다음 문서는 삭제하지 않는다.
-
-- `planning/agent-native-development-environment.md`
-- `planning/toc-amendment-agent-native.md`
-- `examples/campus-platform/agent-native-development-environment.md`
-- `research/anthropic/agent-native-development-environment.md`
-
-이들은 현재 책의 핵심 목차가 아니라 후속 주제 연구 자료로 취급한다.
-
 # Completed
 
 - Phase 1 초기 방향 정의
@@ -256,23 +362,26 @@ PASS 경로에서는 Agent 호출을 생략할 수 있다.
 - Phase 3 초기 목차 검증
 - Phase 4 `campus-platform` 예제 설계
 - Phase 5 1~3장 초기 설계
-- Cloud Runner / Agent Worker 구분
-- Token / Compute 분리 관점
+- Cloud Agent 중심 Concept / Scope / TOC 재정렬
+- Cloud Agent를 Remote Development Worker로 정의
+- Token / Compute 분리
+- Runner-first
 - Result Gateway
-- Prebuilt Environment / Cache
-- Parallel Cloud Session
-- GitHub Continuous AI 사례 조사
-- Claude Code Web 실행환경 사례 조사
-- Cloud Agent 중심 Concept 재정의
-- Cloud Agent 중심 Scope 재정의
-- 11 Part / 18 Chapter 목차 재정렬
-- 고급 Agent Platform 내용을 Future Topics로 이동
+- Prepared Environment / Cache
+- Git Handoff Boundary
+- Evidence-based Result
+- Demos over Diffs
+- Task Queue / Event-driven Agent
+- Task Size 최적화
+- Parallelization 상한
+- Developer Blocking Time 분리
+- Cloud Agent Remote Worker 운영 모델 설계
 
 # In Progress
 
-Phase 5 장별 설계를 새 목차 기준으로 재정렬한다.
+Phase 5 장별 설계를 새 18장 목차 기준으로 재정렬한다.
 
-기존 `chapters/01~03/plan.md`는 참고 자료로 유지하되 새 목차와 번호/범위가 달라졌으므로 순차적으로 다시 맞춘다.
+기존 `chapters/01~03/plan.md`는 참고 자료로 유지하되 새 목차와 번호/범위가 달라졌으므로 다시 맞춘다.
 
 # Next
 
@@ -280,9 +389,9 @@ Phase 5 장별 설계를 새 목차 기준으로 재정렬한다.
 
 우선 순서:
 
-1. 기존 `chapters/01~03/plan.md`를 새 1~3장과 비교
-2. 2장의 Execution Platform 내용을 Cloud Agent 활용 범위로 축소/재배치
-3. 새 4장부터 순차 설계
-4. 기존 Agent Platform 중심 내용은 `planning/future-topics.md` 참조로 전환
+1. `chapters/01~03/plan.md`를 새 1~3장과 맞춘다.
+2. 기존 2장 Execution Platform 내용을 3/8/9/10장으로 재배치한다.
+3. 새 4장부터 순차적으로 `plan.md`를 작성한다.
+4. Agent Platform 일반론은 `planning/future-topics.md` 참조로 유지한다.
 
 Phase 6 본문 집필은 시작하지 않는다.
