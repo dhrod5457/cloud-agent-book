@@ -4,7 +4,7 @@ Phase 6 - 본문 초고 작성 진행 중
 
 Phase 5의 1~18장 설계와 전체 정합성 점검을 완료했다.
 
-현재 1~4장 초고를 작성했다.
+현재 1~6장 초고를 작성했다.
 
 # Source of Truth
 
@@ -124,8 +124,6 @@ Phase 5 완료.
 
 상태: `초고 작성 및 설계 대비 1차 검토 완료`
 
-파일:
-
 - 설계: `chapters/01/plan.md`
 - 초고: `chapters/01/draft.md`
 - 공식 근거: `research/chapter-01-cloud-worker-official-sources.md`
@@ -134,62 +132,79 @@ Phase 5 완료.
 
 상태: `초고 작성 및 설계 대비 1차 검토 완료`
 
-파일:
-
 - 설계: `chapters/02/plan.md`
 - 초고: `chapters/02/draft.md`
 - 공식 근거: `research/chapter-02-local-cloud-official-sources.md`
 
-검토 결과:
-
-- 실행 위치 중심 비교 유지
-- Local / Cloud / Hybrid 역할 구분 유지
-- Internal Network, Human Steering, Context 크기 반영
-- 3장 이후의 Token/Compute, Result Gateway, Prepared Environment 상세로 과도하게 확장하지 않음
-
 ## 3장 - Cloud Session, Container, Compute와 Token
 
 상태: `초고 작성 및 설계 대비 1차 검토 완료`
-
-파일:
 
 - 설계: `chapters/03/plan.md`
 - 초고: `chapters/03/draft.md`
 
 주요 내용:
 
-- Cloud Session을 Repository/Workspace/CPU/RAM/Disk/Tools를 가진 작업 단위로 정의
 - Reasoning Resource와 Execution Resource 분리
-- Brain / Hands를 Compute와 Token 설명용 간단 모델로만 사용
-- Build/Test wall-clock time과 LLM Token 사용을 분리
-- 10,000 Test 실행과 3 Failure 분석 예제
-- Compute-heavy / Context-light 작업
-- Cloud Runner와 Cloud Agent 구분 소개
-- Parallel Compute와 Parallel Reasoning 구분
+- Brain / Hands 간단 모델
+- Build/Test wall-clock time과 Token 사용 분리
+- 10,000 Test / 3 Failure 예제
+- Parallel Compute vs Parallel Reasoning
 - Compute / LLM / Human Cost 분리
-- 제품별 CPU/RAM 수치는 research로 분리
 
 ## 4장 - 독립 실행환경, 장시간 작업, 병렬성, 시간 분리
 
-상태: `초고 작성 완료 / 다음 자체 검토 대상`
-
-파일:
+상태: `초고 작성 및 설계 대비 1차 검토 완료`
 
 - 설계: `chapters/04/plan.md`
 - 초고: `chapters/04/draft.md`
 
 주요 내용:
 
-- 독립 실행환경을 Local Resource와 분리
-- 장시간 Build/Test의 비동기 위임
-- Agent Execution Time과 Developer Blocking Time 분리
-- Local Resource Occupancy를 비용으로 포함
-- 비동기 위임에 적합한 Task 조건
-- 병렬화 대상을 Agent가 아니라 독립 Task로 정의
-- 좋은 병렬화 / 나쁜 병렬화 비교
-- Parallel Compute와 Parallel Reasoning 재연결
-- Evidence 반환과 `campus-platform` 병렬 검증 예제
-- Agent 수 증가가 선형 생산성 증가를 의미하지 않음을 설명
+- 독립 실행환경
+- 장시간 작업 비동기 위임
+- Agent Execution Time vs Developer Blocking Time
+- Local Resource Occupancy
+- 병렬화 대상은 Agent가 아니라 독립 Task
+- 좋은 병렬화 / 나쁜 병렬화
+- 병렬화의 비선형 비용
+
+## 5장 - Task Routing: Local인가 Cloud인가
+
+상태: `초고 작성 및 설계 대비 1차 검토 완료`
+
+- 설계: `chapters/05/plan.md`
+- 초고: `chapters/05/draft.md`
+
+주요 내용:
+
+- Local / Cloud / Hybrid / Runner-first Routing
+- Runner로 끝낼 수 있는지 먼저 확인
+- Human Steering / Context / Internal Network / Git Handoff / File Conflict 판단
+- 너무 작은 Task와 너무 큰 Task의 비용
+- Routing Decision Matrix
+- Routing Score는 참고용으로만 사용
+- `campus-platform` 실제 Task 분류
+- 실행 중 재분류 / Local Fallback 가능
+
+## 6장 - Cloud에 보내기 좋은 개발 작업
+
+상태: `초고 작성 완료 / 다음 자체 검토 대상`
+
+- 설계: `chapters/06/plan.md`
+- 초고: `chapters/06/draft.md`
+
+주요 내용:
+
+- Build / Unit / Integration / E2E / Docker를 Runner 중심으로 분류
+- Static Analysis / Lint는 Tool-first
+- Migration 작성과 검증 분리
+- 반복 Refactoring / 작은 Bug Fix를 Cloud Agent 후보로 분류
+- Documentation / PR Review의 Cloud 활용 조건
+- Dependency Update를 Runner-first로 처리
+- CI Failure Fix를 Agent-on-failure로 처리
+- Runner → Agent → Runner 반복 구조
+- `campus-platform` Cloud Task Catalog
 
 # Preserved / Future Topics
 
@@ -211,9 +226,9 @@ Phase 5 완료.
 
 # Next
 
-1. 4장 초고 설계 대비 자체 검토
+1. 6장 초고 설계 대비 자체 검토
 2. 필요한 수정 반영
-3. 5장 `Task Routing: Local인가 Cloud인가` 초고 작성
+3. 7장 `Cloud Agent Task Contract: 작은 Task와 작은 Context` 초고 작성
 4. 이후 같은 방식으로 18장까지 순차 진행
 
 Phase 6에서는 장별로 `초고 → 설계 대비 검토 → 수정 → 다음 장` 순서로 진행한다.
