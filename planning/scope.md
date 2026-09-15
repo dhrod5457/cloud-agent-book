@@ -8,7 +8,7 @@ Repository 설계, Harness, Validation, Observability 같은 개념은 이 질�
 
 새로운 주제를 추가할 때 다음 기준을 사용한다.
 
-> 이 내용이 Cloud Agent를 더 잘 사용하는 방법과 직접 관련이 있는가?
+> 이 내용이 개발자가 Cloud Agent를 더 잘 사용하는 데 직접적인 도움이 되는가?
 
 - YES: 핵심 본문
 - 간접적: Tip / Advanced Topic / 미래 전망
@@ -26,7 +26,22 @@ Repository 설계, Harness, Validation, Observability 같은 개념은 이 질�
 - 독립 실행환경
 - CPU / RAM / Disk
 - LLM Token과 Compute Resource의 차이
-- Cloud Agent를 Remote Worker로 보는 관점
+- Cloud Agent를 Remote Development Worker로 보는 관점
+
+Cloud Agent 정의에는 다음을 포함한다.
+
+```text
+Cloud Agent
+= LLM
++ Repository
++ Independent Execution Environment
++ CPU / RAM / Disk
++ Development Tools
+```
+
+후반부에서는 다음 정의를 다시 사용한다.
+
+> 필요할 때 독립된 개발환경을 할당받고, Git을 통해 Task를 받아 비동기적으로 작업하며, 테스트와 Artifact를 포함한 검증 가능한 결과를 반환하는 Remote Development Worker.
 
 ## 2. Cloud Agent를 쓰는 이유
 
@@ -36,6 +51,10 @@ Repository 설계, Harness, Validation, Observability 같은 개념은 이 질�
 - 병렬 처리
 - 여러 Branch/Container 기반 격리
 - 개발자 PC와 분리된 Build/Test 실행
+- Developer Blocking Time 감소
+- Context Switching 감소
+
+Cloud Agent 생산성을 Agent Execution Time 하나로만 평가하지 않는다.
 
 ## 3. Local / Cloud Task Routing
 
@@ -68,11 +87,65 @@ Repository 설계, Harness, Validation, Observability 같은 개념은 이 질�
 - 장시간 작업
 - 독립적인 병렬 작업
 
-핵심 독자 판단:
+Cloud에 적합한 Task의 특징:
 
-> 이 Task는 Local에서 해야 하는가, Cloud로 보내야 하는가?
+- Scope가 명확함
+- 완료 조건 정의 가능
+- 독립 검증 가능
+- 파일 충돌이 적음
+- 지속적인 Human Steering이 필요하지 않음
+- 오래 걸리는 Build/Test를 포함함
+- Git으로 결과 회수 가능
 
-## 4. Cloud Agent의 Token 절약
+Task는 Local 또는 Cloud에 영구적으로 속하지 않는다. 단계에 따라 이동할 수 있다.
+
+## 4. Local → Cloud Handoff
+
+```text
+Local
+→ 요구사항 분석
+→ Architecture
+→ 핵심 구현 / Task 분해
+
+Cloud
+→ Build / Test / E2E
+→ 반복 Refactoring
+→ CI 문제 수정
+
+Local
+→ 내부망 검증
+→ 최종 Review
+→ Merge
+```
+
+핵심 원칙:
+
+> Task는 작업 단계에 따라 실행 위치를 이동할 수 있다.
+
+## 5. Git Handoff Boundary
+
+Git을 단순 형상관리뿐 아니라 Local과 Remote Worker 사이의 작업 전달 경계로 다룬다.
+
+```text
+Local
+→ Commit / Push
+→ Git
+→ Cloud Task Branch
+→ Work / Test
+→ Commit / Push / PR
+```
+
+Cloud Task 상태 관리 후보:
+
+- Task ID
+- Session ID
+- Branch
+- Commit SHA
+- Status
+- Test Result
+- PR
+
+## 6. Cloud Agent의 Token 절약
 
 - Task Scope 축소
 - Context Scope 축소
@@ -87,26 +160,122 @@ Repository 설계, Harness, Validation, Observability 같은 개념은 이 질�
 - 작은 Task 단위
 - 여러 Agent의 중복 Context 문제
 
-## 5. Compute Resource 활용
+## 7. Cloud Agent Task Contract
+
+Cloud Task Contract는 Prompt를 길게 만들기 위한 것이 아니라 Agent의 탐색 범위를 줄이기 위한 것이다.
+
+필수 후보:
+
+- Task
+- Goal
+- Scope / Relevant Files
+- Validation
+- Expected Result
+- Do Not Change
+- Output
+
+Output은 가능한 한 검증 가능해야 한다.
+
+- commit
+- changed files
+- test result
+- artifact reference
+- PR
+
+## 8. Task 크기 최적화
+
+너무 작은 Cloud Task:
+
+- Environment start overhead
+- Repository checkout
+- Agent startup
+- Context loading 비용 비중 증가
+
+너무 큰 Cloud Task:
+
+- Context 증가
+- Token 증가
+- 실패 범위 증가
+- Review 어려움
+- Retry 비용 증가
+
+절대 시간 규칙을 두지 않고 실제 프로젝트에서 측정해 적정 Task 크기를 찾는다.
+
+## 9. Compute Resource 활용
 
 - Cloud Runner
 - Build/Test Runner
 - Test Container
 - Parallel Build/Test
 - UI/E2E 반복 실행
-- Prebuilt Environment
+- Prepared Cloud Environment
+- Cloud Environment as Code
+- 작업 종류별 Environment
 - Preinstalled Tool
 - Gradle/Maven/npm Cache
 - Docker Layer Cache
 - Snapshot
 - Warm Environment / Warm Worker
 - Cloud Session 재사용
+- Cloud Agent Cold Start
 
 핵심 원칙:
 
 > Agent에게 개발환경을 설치하게 하지 말고, 바로 작업 가능한 환경을 제공한다.
 
-## 6. Runner와 Cloud Agent 분리
+## 10. 작업별 Cloud Environment
+
+예:
+
+```text
+backend-test
+- Java 21
+- Gradle
+- Testcontainers
+- Docker
+- DB client
+
+frontend-e2e
+- Node
+- Chrome
+- Playwright
+
+migration-test
+- Java
+- migration tool
+- DB client
+
+fullstack
+- Java
+- Node
+- Docker
+- Browser
+```
+
+Task 성격에 따라 필요한 Environment를 선택한다.
+
+## 11. Cache와 Fresh State 분리
+
+재사용:
+
+- JDK / Node
+- Gradle/Maven dependency
+- npm cache
+- Docker layer
+- Playwright browser
+- compiler cache
+
+항상 최신:
+
+- Source Code
+- Branch
+- Task
+- Test Result
+- Temporary Data
+
+Cache 재사용이 테스트 상태 오염으로 이어지지 않도록 구분한다.
+
+## 12. Runner와 Cloud Agent 분리
 
 ```text
 Task
@@ -125,7 +294,41 @@ Runner
 - 실패 분석과 코드 수정이 필요할 때 Cloud Agent를 호출한다.
 - CPU/RAM 작업과 LLM 판단을 분리한다.
 
-## 7. Cloud Agent 병렬 실행
+## 13. Evidence-based Cloud Agent Result
+
+Cloud Agent의 결과는 `완료했습니다`라는 설명만으로 끝내지 않는다.
+
+가능한 Evidence:
+
+- Commit
+- Diff
+- Unit Test Result
+- Integration Test Result
+- Build Result
+- Screenshot
+- Browser Video
+- E2E Result
+- Log Reference
+- Artifact
+- PR
+
+핵심 원칙:
+
+> Cloud Agent에게 결과를 요구하지 말고 검증 가능한 결과물을 요구한다.
+
+### Demos over Diffs
+
+UI 작업에서는 실행환경이 이미 존재한다는 장점을 Review에 사용한다.
+
+- Build PASS
+- Test PASS
+- Before/After Screenshot
+- E2E Video
+- 필요한 Diff 확인
+
+코드 Review를 생략하지 않는다.
+
+## 14. Cloud Agent 병렬 실행
 
 - Task 분해
 - Branch per Task
@@ -138,24 +341,50 @@ Runner
 - 같은 파일/schema를 수정하는 작업의 병렬화 제한
 - Best-of-N은 고급 사례로만 소개
 
-## 8. Local + Cloud Hybrid Workflow
+병렬화는 다음 조건에서 우선한다.
 
-예:
+- 다른 Repository
+- 다른 Module
+- 다른 File Scope
+- 독립 검증 가능
+
+Agent 수가 늘어날수록 다음 비용도 증가함을 설명한다.
+
+- Context 중복
+- Dependency setup 중복
+- Merge Conflict
+- Review
+- LLM usage
+- PR 관리
+
+## 15. Multi-Repository Cloud Task
+
+여러 Repository가 필요한 Task는 하나의 Cloud Workspace에 함께 둘 수 있다.
+
+단 원칙은 다음과 같다.
+
+> 현재 Task에서 함께 수정될 가능성이 높은 Repository만 제공한다.
+
+무관한 Repository까지 연결해 Context와 탐색량을 늘리지 않는다.
+
+## 16. Local + Cloud Hybrid Workflow
 
 ```text
 PM / Local Agent
 → Architecture
 → Task 분리
+→ Git Handoff
 
 Cloud Worker
 → 독립 구현
 → Build/Test/E2E
-→ 검증
+→ Evidence Result
+→ PR
 
 Local Agent
 → 내부망 검증
-→ 통합
 → 최종 Review
+→ 통합 / Merge
 ```
 
 기업 환경 사례:
@@ -169,17 +398,33 @@ Local Agent
 - Jenkins
 - Internal API
 
-## 9. CI/CD와 Cloud Agent
+## 17. CI/CD, Task Queue, Event-driven Cloud Agent
+
+Cloud Agent 실행 시작점이 개발자 PC일 필요는 없다.
+
+Task Source:
+
+- Issue
+- CI Failure
+- PR Review
+- Scheduled Test
+- Dependency Update
+- Nightly Build
+
+Task Queue → Cloud Worker Pool 구조를 소개한다.
+
+Event-driven 호출:
 
 - CI Failure → Cloud Agent
-- 수정 → 재검증 → PR
-- Review Comment 대응
-- Nightly Test Failure
-- Dependency Update 검증
-- Event-driven 호출
-- PR 수정과 follow-up session
+- Review Comment → Cloud Agent
+- Nightly Test Failure → Cloud Agent
+- Dependency Update → Runner → 실패 시 Cloud Agent
 
-## 10. Cloud Agent를 쓰지 말아야 하는 경우
+핵심:
+
+> 이벤트가 없으면 Agent도 실행하지 않는다.
+
+## 18. Cloud Agent를 쓰지 말아야 하는 경우
 
 - 내부망 의존이 강함
 - Repository를 Cloud에 제공할 수 없음
@@ -189,7 +434,7 @@ Local Agent
 - Cloud에서 재현할 수 없는 문제
 - 동일 파일을 여러 Agent가 동시에 변경해야 함
 
-## 11. 실전 Java/Spring Boot 프로젝트
+## 19. 실전 Java/Spring Boot 프로젝트
 
 `campus-platform`을 이용한다.
 
@@ -198,6 +443,7 @@ Local Agent
 ```text
 Local
 → 기능 설계 / 구현 / Task 분리
+→ Commit / Push
 
 Cloud #1
 → Unit Test
@@ -215,7 +461,10 @@ FAIL
 → Agent 분석
 
 PASS
-→ PR / 통합
+→ Evidence Result / PR
+
+Local
+→ Review / Internal Validation / Merge
 ```
 
 Java/Spring Boot 예제에서 다음을 실전 적용한다.
@@ -233,9 +482,7 @@ Java/Spring Boot 예제에서 다음을 실전 적용한다.
 
 # Cloud Agent 효율화에 직접 연결되는 보조 개념
 
-다음 내용은 Cloud Agent 사용을 설명하는 수단으로 유지하되 독립된 플랫폼 이론으로 확장하지 않는다.
-
-## Agent Contract / Repository 안내
+## Repository 안내
 
 - README / AGENTS.md
 - build/test/verify 명령
@@ -244,31 +491,9 @@ Java/Spring Boot 예제에서 다음을 실전 적용한다.
 
 목적은 Cloud Agent가 Repository 전체를 다시 추론하는 비용을 줄이는 것이다.
 
-## Task Contract
-
-- Goal
-- Scope
-- Relevant Files
-- Forbidden Changes
-- Acceptance Criteria
-- Verification
-- Budget
-
-목적은 작은 Task와 작은 Context를 Cloud Agent에 전달하는 것이다.
-
 ## Progressive Context
 
 Cloud Agent가 현재 Task에 필요한 문서만 읽게 한다.
-
-예:
-
-```text
-AGENTS.md
-├─ Backend → docs/backend.md
-├─ Auth → docs/security/auth.md
-├─ DB → docs/database.md
-└─ Test → docs/testing.md
-```
 
 Agent Memory Architecture로 확장하지 않는다.
 
@@ -303,8 +528,6 @@ Hands → Cloud Container에서 명령 실행
 
 어려운 Bug에서 여러 Cloud Agent가 독립 Patch를 만들고 Test Runner가 검증하는 병렬화 사례로 짧게 다룬다.
 
-본문 핵심 개념으로 만들지 않는다.
-
 ## Harness Engineering
 
 Cloud Agent가 실행 명령과 검증 방법을 쉽게 찾도록 하는 개발환경 개선 관점까지만 설명한다.
@@ -334,7 +557,7 @@ Cloud Agent가 실행 명령과 검증 방법을 쉽게 찾도록 하는 개발�
 - Multi-agent 조직론
 - Agent Platform 운영
 
-기존에 작성한 설계는 삭제하지 않고 `planning/future-topics.md`에서 후속 주제 후보로 보존한다.
+기존 설계는 삭제하지 않고 `planning/future-topics.md`에서 후속 주제 후보로 보존한다.
 
 ---
 
@@ -356,11 +579,15 @@ Claude Code, Codex, GitHub Copilot Coding Agent, Cursor 등의 제품은 설계 
 - Local Agent와 무엇이 다른가
 - 어떤 Task를 Cloud에 보내야 하는가
 - 어떤 Task를 Local에 남겨야 하는가
+- Cloud Task에 어떤 Environment를 제공해야 하는가
+- Git으로 Local/Cloud Handoff를 어떻게 구성하는가
 - 여러 Cloud Agent를 어떻게 병렬로 사용하는가
 - Token을 어떻게 절약하는가
 - Cloud CPU/RAM을 어떻게 활용하는가
 - Build/Test를 어떻게 Cloud에 분산하는가
 - Cloud Agent Context를 어떻게 줄이는가
+- 어떤 Evidence를 결과로 받아야 하는가
+- Agent Execution Time과 Developer Blocking Time을 어떻게 구분할 것인가
 - Local + Cloud Hybrid 개발환경을 어떻게 구성하는가
 
 책의 목표는 독자가 Agent Platform 전체를 설계하게 만드는 것이 아니다.
