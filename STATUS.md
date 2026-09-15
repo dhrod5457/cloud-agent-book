@@ -10,6 +10,7 @@ Phase 5 - 장별 설계 진행 중
 - Phase 4 `campus-platform` 예제 프로젝트 설계
 - Phase 5 1장 설계
 - Phase 5 2장 설계 및 Cloud Runner 패턴 보강
+- Phase 5 3장 `Agent Ready 프로젝트의 기준` 설계
 - Cloud compute resource와 LLM usage 분리
 - Cloud Runner / Agent Worker 역할 분리
 - Runner-first / Agent-on-exception 구조 추가
@@ -20,6 +21,8 @@ Phase 5 - 장별 설계 진행 중
 - Agent Harness 개념 추가
 - GitHub Continuous AI / token efficiency 사례 조사
 - Claude Code Web PR auto-fix 사례 조사
+- Agent Ready 9개 평가 기준 정의
+- `campus-platform` Stage 0 Agent Ready baseline 작성
 
 # Phase 4 Artifacts
 
@@ -28,11 +31,13 @@ Phase 5 - 장별 설계 진행 중
 - `examples/campus-platform/testing.md`
 - `examples/campus-platform/evolution.md`
 - `examples/campus-platform/cloud-test-runner.md`
+- `examples/campus-platform/agent-ready-baseline.md`
 
 # Phase 5 Artifacts
 
 - `chapters/01/plan.md`
 - `chapters/02/plan.md`
+- `chapters/03/plan.md`
 - `research/anthropic/claude-code-web-execution-resources.md`
 - `research/github/continuous-ai-runner-first.md`
 
@@ -149,6 +154,69 @@ Agent Harness는 Agent가 프로젝트를 이해하고 실행하고 검증할 �
 
 Agent 실패 때마다 프롬프트를 길게 만드는 대신 실행 환경과 검증 인터페이스를 개선한다.
 
+## Agent Ready 평가 기준
+
+3장에서는 Agent Ready를 특정 제품 지원 여부나 단일 점수가 아니라 `Agent Ready Profile`로 평가한다.
+
+평가 기준:
+
+1. Reproducibility
+2. Discoverability
+3. Executability
+4. Testability
+5. Verifiability
+6. Isolation
+7. Parallelizability
+8. Observability
+9. Security Boundary
+
+각 기준은 `PASS / PARTIAL / FAIL`로 평가하며 반드시 실행 가능한 증거를 함께 기록한다.
+
+예:
+
+```text
+Criterion: Executability
+Status: PASS
+Evidence: ./scripts/test.sh
+Expected: exit code로 성공/실패 판정 가능
+```
+
+단순 평균 점수는 기본 평가 방식으로 사용하지 않는다. Security Boundary처럼 하나의 치명적인 FAIL이 전체 Agent 활용 범위를 제한할 수 있기 때문이다.
+
+3장에서 정의한 Profile은 이후 장들의 개선 목표이자 22장의 Agent Ready 성숙도 평가 입력으로 사용한다.
+
+## 작업 유형별 Readiness
+
+모든 Agent 활용에 동일한 조건을 요구하지 않는다.
+
+### Cloud Test Runner
+
+주요 조건:
+
+- Reproducibility
+- Executability
+- Testability
+- Isolation
+- Observability
+
+### Cloud Agent Worker
+
+추가 조건:
+
+- Discoverability
+- Verifiability
+- Security Boundary
+
+### Parallel Agent Development
+
+추가 조건:
+
+- Parallelizability
+- Isolation
+- Verifiability
+
+이 구분을 통해 기존 프로젝트에도 Cloud Runner부터 점진적으로 도입할 수 있게 한다.
+
 ## 공개 사례 사용 원칙
 
 ### GitHub Continuous AI
@@ -191,7 +259,15 @@ PR auto-fix에서 CI failure와 review comment가 Agent 활성화 이벤트가 �
 
 Phase 5 장별 설계.
 
-현재 1장과 2장의 `plan.md`가 작성되었고 2장의 Cloud Agent 관련 설계를 보강한 상태다.
+현재 1장, 2장, 3장의 `plan.md`가 작성된 상태다.
+
+3장에서는 다음을 확정했다.
+
+- Agent Ready는 제품 기능이 아니라 프로젝트 속성이다.
+- 설명이 아니라 실행 가능한 Evidence로 평가한다.
+- 단일 총점보다 기준별 Profile을 기본으로 사용한다.
+- 정상 build/test/validation이 LLM 없이 실행 가능한지를 Executability의 핵심 증거로 본다.
+- 작업 유형별로 필요한 Readiness 조건이 다르다.
 
 # Next
 
@@ -199,9 +275,21 @@ Phase 5를 계속 진행한다.
 
 다음 대상:
 
-`chapters/03/plan.md` - Agent Ready 프로젝트의 기준
+`chapters/04/plan.md` - Repository as Interface: Agent가 이해할 수 있는 저장소
 
-3장에서는 2장에서 정의한 Runner/Agent 패턴을 반복 설명하지 않고, 프로젝트가 Agent Ready인지 판단할 수 있는 평가 기준으로 연결한다.
+4장에서는 3장의 `Discoverability` 기준을 구체화한다.
+
+주요 설계 대상:
+
+- Repository Layout
+- canonical source
+- Progressive Disclosure
+- Context Budget
+- naming
+- generated file
+- migration 위치
+- change locality
+- Agent가 전체 Repository를 읽지 않고 필요한 영역을 찾는 구조
 
 장 설계가 확정되기 전에는 Phase 6 본문 초고를 시작하지 않는다.
 
@@ -217,3 +305,4 @@ Phase 5 이후 실제 구현과 집필 과정에서 검증한다.
 - Test Runner 결과 포맷을 JSON Schema로 고정할지
 - `Runner-first / Agent-on-exception` 용어를 최종 용어로 유지할지
 - Agent Harness를 독립 용어로 정의할지 기존 Agent Contract/실행 인터페이스의 상위 개념으로 둘지
+- Agent Ready Profile을 향후 YAML/JSON 같은 machine-readable 형식으로 제공할지
