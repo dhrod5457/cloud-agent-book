@@ -1,77 +1,164 @@
 # Current Phase
 
-Phase 3 - 목차 검증 완료
+Phase 4 - 예제 프로젝트 설계 완료
 
 # Completed
 
 - Phase 1 방향 정의
-- 책이 해결할 핵심 문제 정의
-- 핵심 주장 정의
-- 주요 독자 정의
-- 선수지식 정의
-- 독자의 최종 역량 정의
-- 포함 범위와 제외 범위 정의
-- Phase 2 전체 목차 초안 작성
+- Phase 2 전체 목차 설계
 - Phase 3 목차 검증
-- 장 간 중복 검토
-- 빠진 핵심 개념 검토
-- 장 순서와 난이도 흐름 검토
-- 특정 AI 제품 편향 검토
-- Java/Spring Boot 편향 검토
-- 실전성과 이론의 균형 검토
-- Security, Audit, Human Escalation 범위 보완
-- `review/toc-review.md` 작성
-- `planning/toc.md`를 7개 Part, 22개 장으로 수정
+- Phase 4 `campus-platform` 예제 프로젝트 설계
+- 예제 도메인 범위 확정
+- 모듈 책임 경계 확정
+- 기본 기술 스택 결정
+- 외부 의존성 처리 원칙 결정
+- 테스트 전략 정의
+- Agent Ready 단계별 진화 계획 정의
+- 일반 원칙과 Java/Spring Boot 구현 예의 경계 정의
 
-# In Progress
+# Phase 4 Artifacts
 
-없음. Phase 3 완료 상태이며 다음 Phase 시작 전 사용자 검토를 기다린다.
-
-# Next
-
-Phase 4 - 예제 프로젝트 설계
-
-Phase 4에서는 아직 전체 구현을 시작하지 않고 다음을 정의한다.
-
-- 예제 시스템 도메인
-- 모듈 구조
-- 기술 스택
-- 외부 의존성
-- 테스트 전략
-- Agent Ready 단계별 진화 과정
-- 일반 원칙과 Java/Spring Boot 구현 예의 경계
-
-예정 산출물은 `examples/campus-platform/`의 설계 문서이며, 실제 애플리케이션 구현은 이후 검증에 필요한 범위에서 진행한다.
+- `examples/campus-platform/README.md`
+- `examples/campus-platform/architecture.md`
+- `examples/campus-platform/testing.md`
+- `examples/campus-platform/evolution.md`
 
 # Decisions
 
-- 책의 상위 개념은 `Agent Ready Software Engineering`으로 정의한다.
-- `Cloud-Agent Ready`는 하위 개념으로 다룬다.
-- Java/Spring Boot는 주요 실전 예제이지만 책의 원칙은 언어와 제품에 종속되지 않는다.
-- 특정 제품의 사용법보다 프로젝트 구조와 개발 프로세스 설계를 중심으로 다룬다.
-- 프로젝트 파일을 Source of Truth로 사용한다.
-- 하나의 `campus-platform` 예제를 책 전체의 기본 축으로 사용한다.
-- 전체 목차는 7개 Part, 22개 장으로 구성한다.
-- 4장은 Repository 탐색성과 context 구조에 집중한다.
-- 12장은 병렬 변경과 모듈 충돌 제어에 집중한다.
-- `Task Contract`와 `Trust Boundary`는 독립 장으로 유지한다.
-- Project Memory와 Long Running Task는 하나의 장으로 통합한다.
-- Agent Lifecycle과 Planner/Worker/Tester/Reviewer 역할 분리는 하나의 장으로 통합한다.
-- CI/CD Gate는 기업 내부망 문제가 아니라 일반 Trust Boundary의 연장선으로 다룬다.
-- Trust Boundary에 Untrusted Input, Prompt Injection, Secret Exfiltration, Tool/Command Boundary를 포함한다.
-- Agent Observability와 Quality Evaluation은 하나의 장으로 묶고 실행 시간, 재시도, 비용과 자원 사용량을 포함한다.
-- PM Agent는 Repository, Verification, Parallel Development, Memory, Observability를 설명한 이후 배치한다.
-- 기업 내부망과 Hybrid Agent는 일반 원칙 이후 적용 사례로 다룬다.
-- 제품별 기능 설명은 사례 또는 부록으로 분리한다.
+## 예제 도메인
+
+대학의 학생, 출결, 알림, 외부 연동을 최소 범위로 사용한다.
+
+핵심 유스케이스:
+
+- 학생 조회
+- 수강 정보 조회
+- 출결 기록 및 조회
+- 알림 발행
+- 외부 학사 시스템 동기화
+
+## 모듈
+
+최종 목표 모듈은 다음과 같다.
+
+- `auth`
+- `student`
+- `attendance`
+- `notification`
+- `integration`
+- 최소 범위의 `common`
+
+예제는 처음부터 완성형 멀티모듈로 시작하지 않는다. 일반적인 단일 Spring Boot 프로젝트에서 시작하여 책의 진행에 따라 명시적인 모듈 구조로 진화한다.
+
+## 기술 스택
+
+기본 예제:
+
+- Java 21+
+- Spring Boot 3.x
+- Gradle Groovy DSL
+- MyBatis
+- PostgreSQL
+- Redis
+- Kafka
+- Testcontainers
+- Docker
+- JUnit 5
+- ArchUnit
+- Mock HTTP Server
+- GitHub Actions
+
+정확한 제품 버전은 해당 장을 집필할 때 지원 상태와 공식 문서를 확인하여 고정한다.
+
+## 데이터베이스
+
+기본 로컬/CI DB는 PostgreSQL을 사용한다.
+
+Tibero/Oracle은 기업 환경 장의 상용 DB 사례로 다루며 Cloud Agent가 직접 접근할 수 없는 상황과 Local Agent 기반 실제 통합 검증을 설명하는 데 사용한다.
+
+## Persistence
+
+기본 구현 예는 MyBatis를 사용한다.
+
+설계 원칙은 Persistence Framework에 종속시키지 않으며 필요한 곳에서 JPA 적용 시 차이를 설명한다.
+
+## 외부 의존성
+
+- PostgreSQL: Testcontainers
+- Redis: Testcontainers 또는 테스트 목적에 따른 Fake
+- Kafka: Testcontainers 또는 이벤트 Port Fake
+- 외부 HTTP API: Mock Server / Fake Adapter
+- HSM: 기본 환경에서는 Fake Adapter, 실제 장비 검증은 Local/Enterprise 환경
+- Jenkins: 기업 내부망 적용 사례
+
+## 테스트 전략
+
+- Unit Test
+- Integration Test
+- Contract Test
+- Architecture Test
+- 최소 범위 E2E Test
+- Fast Verification
+- Full Verification
+
+Agent 작업 완료 판단은 Full Verification 결과와 Task Contract의 Acceptance Criteria를 연결한다.
+
+## 프로젝트 진화
+
+예제는 다음 흐름으로 발전한다.
+
+```text
+일반 Spring Boot 프로젝트
+→ 재현 가능한 환경
+→ Agent Contract / Task Contract
+→ 표준 실행 인터페이스
+→ 테스트 격리 / 자동 검증
+→ 모듈 경계 / Architecture Rule
+→ 병렬 Agent 개발
+→ Trust Boundary / CI Gate
+→ Project Memory / Observability
+→ Planner / Worker / Reviewer
+→ PM Agent
+→ Hybrid Enterprise
+→ Agent Ready 성숙도 평가
+```
+
+## Snapshot 전략
+
+실제 코드 구현 단계에서는 하나의 예제 Repository를 유지하고 Stage별 Git tag를 사용하는 방식을 우선한다.
+
+코드를 복제한 여러 디렉터리를 유지하는 방식은 피한다.
+
+# In Progress
+
+없음. Phase 4 완료 상태이며 다음 Phase 시작 전 사용자 검토를 기다린다.
+
+# Next
+
+Phase 5 - 장별 설계
+
+각 장을 작성하기 전에 `chapters/<장번호>/plan.md`를 작성한다.
+
+장 설계 문서에는 다음을 포함한다.
+
+- 장의 목표
+- 문제 정의
+- 핵심 주장
+- 독자가 얻는 것
+- 예제에서 사용할 Stage
+- 필요한 구조/그림
+- 필요한 코드 예제
+- 필요한 공식 자료 조사
+- 앞 장과 뒤 장의 연결
+- 본문에서 의도적으로 다루지 않을 내용
+
+Phase 5는 1장부터 순차적으로 진행한다. 장 설계가 승인되기 전에는 해당 장의 본문 초고를 작성하지 않는다.
 
 # Open Questions
 
-Phase 4에서 다음 사항을 결정한다.
+Phase 5 이후 실제 구현과 집필 과정에서 검증한다.
 
-- `campus-platform`의 구체적인 도메인 범위
-- 모듈 수와 각 모듈의 책임 경계
-- JPA와 MyBatis 중 예제 기본 선택 또는 병행 방식
-- Gradle과 Maven 중 기본 빌드 도구
-- Redis, Kafka, DB, HSM, 외부 API를 예제에서 어느 수준까지 실제 구성할지
-- Testcontainers와 Fake Adapter의 역할 분담
-- 단일 모듈에서 시작해 멀티모듈로 진화시킬지, 처음부터 멀티모듈로 제시할지
+- MyBatis 예제가 특정 독자층에 지나치게 종속되지 않는지
+- Redis/Kafka가 모든 장에 불필요한 복잡도를 만들지 않는지
+- Stage별 Git tag가 독자의 실습 흐름에 가장 적절한지
+- 기업 환경 장에서 Tibero/HSM/Jenkins 사례의 깊이를 어느 수준까지 둘지
