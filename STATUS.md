@@ -9,20 +9,21 @@ Phase 5 - 장별 설계 진행 중
 - Phase 3 목차 검증
 - Phase 4 `campus-platform` 예제 프로젝트 설계
 - Phase 5 1장 설계
-- Phase 5 2장 설계 및 Cloud Runner 패턴 보강
+- Phase 5 2장 설계
+- Phase 5 2장 `Agent-friendly Execution Platform` 확장 설계
 - Phase 5 3장 `Agent Ready 프로젝트의 기준` 설계
 - Cloud compute resource와 LLM usage 분리
-- Cloud Runner / Agent Worker 역할 분리
-- Runner-first / Agent-on-exception 구조 추가
-- Result Filter 설계 추가
-- Event-driven Agent / Nightly Agent 사례 추가
-- Fan-out 병렬 실행 패턴 추가
-- UI/E2E 반복 검증 사례 추가
-- Agent Harness 개념 추가
-- GitHub Continuous AI / token efficiency 사례 조사
-- Claude Code Web PR auto-fix 사례 조사
-- Agent Ready 9개 평가 기준 정의
-- `campus-platform` Stage 0 Agent Ready baseline 작성
+- Runner-first / Agent-on-exception 구조
+- Result Gateway / Artifact First 설계
+- Prebuilt Environment / Cache 정책
+- Deterministic First 원칙
+- Progressive Context / Task Context Package
+- Budgeted Autonomy / Failure Fingerprint / Retry 정책
+- Event-driven Agent / Continuous Small Task
+- Fan-out / Fan-in
+- Harness Engineering
+- Agent Ready 9개 평가 기준
+- `campus-platform` Stage 0 Agent Ready baseline
 
 # Phase 4 Artifacts
 
@@ -31,12 +32,14 @@ Phase 5 - 장별 설계 진행 중
 - `examples/campus-platform/testing.md`
 - `examples/campus-platform/evolution.md`
 - `examples/campus-platform/cloud-test-runner.md`
+- `examples/campus-platform/execution-platform.md`
 - `examples/campus-platform/agent-ready-baseline.md`
 
 # Phase 5 Artifacts
 
 - `chapters/01/plan.md`
 - `chapters/02/plan.md`
+- `chapters/02/execution-platform.md`
 - `chapters/03/plan.md`
 - `research/anthropic/claude-code-web-execution-resources.md`
 - `research/github/continuous-ai-runner-first.md`
@@ -45,15 +48,14 @@ Phase 5 - 장별 설계 진행 중
 
 ## 책의 기본 방향
 
-- 책의 상위 개념은 `Agent Ready Software Engineering`으로 정의한다.
-- `Cloud-Agent Ready`는 하위 개념으로 다룬다.
-- Java/Spring Boot는 주요 실전 예제이지만 책의 원칙은 언어와 제품에 종속되지 않는다.
-- 특정 제품의 사용법보다 프로젝트 구조와 개발 프로세스 설계를 중심으로 다룬다.
+- 상위 개념은 `Agent Ready Software Engineering`이다.
+- Java/Spring Boot는 주요 실전 예제지만 일반 원칙은 언어와 제품에 종속되지 않는다.
+- 특정 제품의 사용법보다 프로젝트 구조, 실행환경, 검증, orchestration 설계를 중심으로 다룬다.
 - 프로젝트 파일을 Source of Truth로 사용한다.
 
 ## Cloud Agent 핵심 원칙
 
-2장 `Local Agent, Cloud Agent, Hybrid Agent`에서는 다음 세 문장을 핵심 원칙으로 사용한다.
+2장에서는 다음 원칙을 유지한다.
 
 > LLM은 판단하고, 컨테이너는 실행한다.
 
@@ -61,104 +63,305 @@ Phase 5 - 장별 설계 진행 중
 
 > 정상 경로는 Runner가 처리하고, 예외 경로에서만 Agent를 호출한다.
 
-클라우드 에이전트 시스템의 목표를 다음과 같이 정의한다.
+추가 원칙:
+
+- 환경은 미리 준비한다.
+- 가능한 판정은 코드로 처리한다.
+- Context는 필요할 때 필요한 만큼만 제공한다.
+- 실패 결과 전체를 전달하지 않고 조회 가능한 형태로 저장한다.
+- Agent의 자율성에는 시간, retry, token, 비용 한도를 둔다.
+- Agent가 반복해서 실패하면 프롬프트보다 실행환경과 도구를 먼저 개선한다.
+
+클라우드 실행 구조의 목표:
 
 > AI를 최대한 많이 사용하는 시스템이 아니라, AI가 반드시 필요한 순간에만 호출되는 시스템.
 
-## Runner-first / Agent-on-exception
+더 확장된 관점:
 
-기본 실행 구조:
+> 클라우드 에이전트의 최종 형태는 Agent를 계속 실행하는 시스템이 아니라, Agent가 필요할 때 붙을 수 있도록 잘 준비된 실행 플랫폼이다.
+
+## Agent-friendly Execution Platform
+
+권장 구조:
 
 ```text
-Task Scheduler
-      ↓
-Cloud Runner
-      ↓
-Build / Test / Lint / Validation
-      ↓
- +----+----+
- |         |
-PASS      FAIL
- |         |
-종료   Result Filter
-           ↓
-      Agent Worker
-           ↓
-         수정
-           ↓
-      Runner 재검증
-           ↓
-          PR
+                PM / Orchestrator
+                       |
+                Task Scheduler
+                       |
+               Task Classification
+                       |
+        +--------------+--------------+
+        |                             |
+ Deterministic                   Reasoning Required
+        |                             |
+        v                             v
+  Cloud Runner                   Agent Worker
+        |                             |
+ Build/Test/E2E                  Analyze/Fix
+        |                             |
+        +------------+----------------+
+                     |
+                Result Gateway
+                     |
+              +------+------+
+              |             |
+             PASS          FAIL
+              |             |
+             Done       Budget Check
+                            |
+                       +----+----+
+                       |         |
+                     Retry   Human Escalation
 ```
 
-Cloud Runner는 build/test/E2E/Docker/lint/static analysis/migration/security scan처럼 결정론적으로 실행 가능한 작업을 담당한다.
+기반 계층:
 
-Agent Worker는 코드 분석, 실패 원인 판단, 설계 결정, 코드 수정처럼 추론이 필요한 작업을 담당한다.
+- Prebuilt Environment
+- Reusable Cache
+- Artifact Store
+- Repository Harness
+- Progressive Documentation
+- Isolated Worktree / Container
 
-## Result Filter
+## Prebuilt Environment
 
-Result Filter는 기본적으로 LLM이 아니라 일반 프로그램 또는 스크립트로 구현한다.
+Agent/Runner가 매번 JDK, Node, dependency, Playwright, Docker tool을 처음부터 준비하지 않도록 한다.
 
-수집 항목:
+핵심 원칙:
 
-- exit code
-- 성공/실패 건수
-- 실패 테스트명
-- root cause 후보
-- 핵심 stack trace
-- error/warning count
-- artifact path
-- raw log path
+> Agent에게 개발환경을 설치하게 하지 않는다. 이미 작업할 수 있는 환경을 준다.
 
-원본 로그는 artifact로 보존하고 Agent에는 기본적으로 축약 결과만 전달한다.
+## Cache
+
+Reusable Cache:
+
+- Gradle/Maven dependency
+- npm cache
+- Docker layer
+- Playwright browser
+- compiler cache
+- immutable code generation result
+
+Disposable Runtime State:
+
+- DB
+- temporary file
+- mutable test data
+- test output
+- browser/process/session state
+
+Cache 재사용과 테스트 상태 격리를 분리한다.
+
+## Deterministic First
+
+> 판단을 코드로 만들 수 있다면 LLM에게 판단시키지 않는다.
+
+대상:
+
+- build
+- test
+- lint
+- architecture rule
+- migration validation
+- security scan
+- dependency check
+
+가능한 검증은 executable validation으로 만든다.
+
+## Result Gateway / Artifact First
+
+Result Filter를 다음 구조로 확장한다.
+
+```text
+Raw Artifact
+→ Result Gateway
+→ Summary / Failure Index / Stack Trace Lookup / Log Search / Artifact Lookup
+→ Agent
+```
+
+원본 로그를 요약 후 폐기하지 않는다.
+
+각 Task는 `result.json`, `junit.xml`, `coverage.xml`, `build.log`, `git.diff`, screenshot/video 등의 artifact를 남길 수 있다.
+
+Agent는 기본적으로 `result.json`만 읽고 필요할 때 특정 artifact를 조회한다.
+
+핵심 원칙:
+
+> 큰 결과를 요약해서 버리는 것이 아니라, 큰 결과를 저장하고 필요한 부분만 조회한다.
+
+## Progressive Context
+
+Repository 전체 문서를 한꺼번에 Context로 전달하지 않는다.
+
+```text
+AGENTS.md
+→ 작업 유형별 문서
+→ 관련 소스
+→ 관련 테스트
+→ 필요한 failure artifact
+```
+
+핵심 원칙:
+
+> Context를 줄이는 것뿐 아니라 Context를 필요할 때 가져오게 만든다.
+
+## Task Context Package
+
+Agent 호출 시 다음 범위를 작게 제공한다.
+
+- Task
+- Failure
+- 관련 파일
+- 검증 명령
+- 변경 금지 영역
+- 완료 조건
+- Budget
+
+정식 형식은 6장 Task Contract에서 다룬다.
+
+## Isolation
+
+병렬 Agent는 같은 Working Directory를 공유하지 않는다.
+
+- task branch
+- worktree
+- 독립 VM/container
+- 독립 artifact path
+
+같은 파일/schema를 수정하는 작업은 처음부터 병렬화하지 않는다.
+
+## Failure Container Retention
+
+성공 container는 즉시 폐기할 수 있다.
+
+실패 container는 짧은 TTL 동안 freeze/retain하여 Agent나 사람이 실패 당시 상태를 확인할 수 있게 한다.
+
+유용한 대상:
+
+- Testcontainers/DB state
+- race condition
+- browser state
+- filesystem/process issue
+- network timeout
+
+## Budgeted Autonomy
+
+> Agent의 자율성은 무제한 실행 권한이 아니라 예산 안에서 스스로 해결할 수 있는 권한이다.
+
+Budget 후보:
+
+- max wall-clock time
+- max turns
+- max retry
+- max tokens
+- max cost
+- max changed files
+- max diff size
+
+Budget 소진 시 Human Escalation으로 전환한다.
+
+## Retry / Failure Fingerprint
+
+`성공할 때까지 계속 수정` 정책을 사용하지 않는다.
+
+Retry마다 실패가 달라졌는지 확인한다.
+
+동일 failure fingerprint가 반복되면 중단한다.
+
+Fingerprint 후보:
+
+- failing test id
+- exception type
+- assertion message
+- error code
+- top stack frame
 
 ## Event-driven Agent
 
-Agent를 상시 프로세스로 두지 않는다.
+Agent는 상시 프로세스가 아니다.
 
-Agent 활성화 후보:
+활성화 이벤트 후보:
 
-- Runner failure
-- PR CI failure
+- Runner/CI failure
 - review comment
+- nightly regression failure
 - security alert
-- scheduled regression failure
+- dependency update failure
 - human escalation
 
-Nightly 또는 repository event에서 deterministic Runner가 PASS하면 Agent를 호출하지 않는다.
+PASS 경로에서는 Agent를 호출하지 않는다.
 
-## Fan-out
+## Continuous Small Task
 
-독립 작업은 여러 Runner로 병렬 실행할 수 있다.
+거대한 Agent 작업보다 작은 검증 가능한 Task를 지속적으로 반복한다.
 
-Fan-out의 목적은 Agent 수 증가가 아니라 독립적인 CPU/RAM 작업의 병렬화다.
+장점:
 
-각 Worker/Runner가 Repository 전체를 반복 분석하지 않도록 module/path, command, acceptance criteria와 관련 Context를 제한한다.
+- 작은 Context
+- 작은 실패 범위
+- 쉬운 rollback
+- 쉬운 verification
+- 작은 PR
+- 예측 가능한 token budget
 
-## Agent Harness
+GitHub Continuous AI 공개 사례는 이 패턴의 사례로만 사용한다.
 
-Agent Harness는 Agent가 프로젝트를 이해하고 실행하고 검증할 수 있도록 Repository가 제공하는 지원 구조다.
+## Fan-out / Fan-in
 
-포함 후보:
+서로 다른 repository/module/file scope처럼 독립 검증 가능한 작업만 fan-out한다.
 
-- build/test/lint 명령
-- validation script
-- architecture 문서
-- coding convention
-- Agent Contract
-- 작은 Task 단위
-- result parser
-- machine-readable report
-- PR template
-- artifact 규칙
+공통 schema/common file 의존성이 있으면 dependency를 먼저 분석하고 순차 작업으로 전환한다.
 
-Agent 실패 때마다 프롬프트를 길게 만드는 대신 실행 환경과 검증 인터페이스를 개선한다.
+## Harness Engineering
+
+Agent가 반복해서 실패하면 먼저 Harness 부족을 확인한다.
+
+예:
+
+- 테스트 명령을 못 찾음 → AGENTS.md/실행 인터페이스 개선
+- 로그가 너무 큼 → Result Gateway
+- 환경 설치 실패 → Prebuilt Image
+- Architecture 위반 반복 → architecture-check
+- 동일 오류 반복 → failure fingerprint
+
+핵심 원칙:
+
+> Agent가 반복해서 실패하면 프롬프트보다 Harness를 먼저 개선한다.
+
+## 비용 모델
+
+세 종류를 분리한다.
+
+### Compute Cost
+
+- CPU
+- RAM
+- Storage
+- Container runtime
+
+### LLM Cost
+
+- input/output token
+- reasoning
+- tool result processing
+
+### Human Cost
+
+- waiting
+- review
+- reproduction
+- context switching
+
+핵심 기준:
+
+> 싼 deterministic compute로 해결할 수 있는 문제에 비싼 probabilistic reasoning을 사용하지 않는다.
+
+다만 전체 비용은 token 하나가 아니라 compute, LLM, 사람 시간을 함께 본다.
 
 ## Agent Ready 평가 기준
 
-3장에서는 Agent Ready를 특정 제품 지원 여부나 단일 점수가 아니라 `Agent Ready Profile`로 평가한다.
-
-평가 기준:
+3장에서는 Agent Ready를 9개 기준의 `Agent Ready Profile`로 평가한다.
 
 1. Reproducibility
 2. Discoverability
@@ -170,104 +373,21 @@ Agent 실패 때마다 프롬프트를 길게 만드는 대신 실행 환경과 
 8. Observability
 9. Security Boundary
 
-각 기준은 `PASS / PARTIAL / FAIL`로 평가하며 반드시 실행 가능한 증거를 함께 기록한다.
+각 기준은 `PASS / PARTIAL / FAIL`과 실행 가능한 Evidence를 사용한다.
 
-예:
+Cloud Runner 도입에는 Reproducibility, Executability, Testability, Isolation, Observability를 우선한다.
 
-```text
-Criterion: Executability
-Status: PASS
-Evidence: ./scripts/test.sh
-Expected: exit code로 성공/실패 판정 가능
-```
-
-단순 평균 점수는 기본 평가 방식으로 사용하지 않는다. Security Boundary처럼 하나의 치명적인 FAIL이 전체 Agent 활용 범위를 제한할 수 있기 때문이다.
-
-3장에서 정의한 Profile은 이후 장들의 개선 목표이자 22장의 Agent Ready 성숙도 평가 입력으로 사용한다.
-
-## 작업 유형별 Readiness
-
-모든 Agent 활용에 동일한 조건을 요구하지 않는다.
-
-### Cloud Test Runner
-
-주요 조건:
-
-- Reproducibility
-- Executability
-- Testability
-- Isolation
-- Observability
-
-### Cloud Agent Worker
-
-추가 조건:
-
-- Discoverability
-- Verifiability
-- Security Boundary
-
-### Parallel Agent Development
-
-추가 조건:
-
-- Parallelizability
-- Isolation
-- Verifiability
-
-이 구분을 통해 기존 프로젝트에도 Cloud Runner부터 점진적으로 도입할 수 있게 한다.
-
-## 공개 사례 사용 원칙
-
-### GitHub Continuous AI
-
-공개된 Continuous test improvement 실험:
-
-- 약 45일
-- 1,400개 이상 테스트
-- coverage 약 5% → near 100%
-- 공개된 당시 token 비용 약 $80
-- 작은 PR을 지속적으로 생성
-
-이 수치는 사례로만 사용하며 일반 비용 예측값으로 사용하지 않는다.
-
-GitHub의 2026년 token efficiency 사례에서는 deterministic data gathering을 LLM loop 밖으로 이동하고 relevance gate를 통해 불필요한 LLM 호출을 제거한 사례를 확인했다.
-
-관련 조사:
-
-- `research/github/continuous-ai-runner-first.md`
-
-### Claude Code Web
-
-Claude Code Web은 격리 Cloud Session, 병렬 작업, PR auto-fix의 제품 사례로만 사용한다.
-
-2026-09-16 기준 공식 문서의 대략적 Cloud Session resource limit:
-
-- 4 vCPU
-- 16 GB RAM
-- 30 GB disk
-
-현재 수치는 변경 가능한 제품 사양이므로 본문의 핵심 논리와 분리한다.
-
-PR auto-fix에서 CI failure와 review comment가 Agent 활성화 이벤트가 될 수 있다는 점을 Event-driven Agent 사례로 사용한다.
-
-관련 조사:
-
-- `research/anthropic/claude-code-web-execution-resources.md`
+Cloud Agent Worker에는 Discoverability, Verifiability, Security Boundary가 추가로 중요하다.
 
 # In Progress
 
 Phase 5 장별 설계.
 
-현재 1장, 2장, 3장의 `plan.md`가 작성된 상태다.
+현재 1장, 2장, 3장의 설계가 작성되었다.
 
-3장에서는 다음을 확정했다.
+2장은 `chapters/02/plan.md`와 `chapters/02/execution-platform.md` 두 문서로 관리한다.
 
-- Agent Ready는 제품 기능이 아니라 프로젝트 속성이다.
-- 설명이 아니라 실행 가능한 Evidence로 평가한다.
-- 단일 총점보다 기준별 Profile을 기본으로 사용한다.
-- 정상 build/test/validation이 LLM 없이 실행 가능한지를 Executability의 핵심 증거로 본다.
-- 작업 유형별로 필요한 Readiness 조건이 다르다.
+`execution-platform.md`는 Cloud Agent에서 Agent-friendly Execution Platform으로 확장한 세부 설계다.
 
 # Next
 
@@ -277,14 +397,13 @@ Phase 5를 계속 진행한다.
 
 `chapters/04/plan.md` - Repository as Interface: Agent가 이해할 수 있는 저장소
 
-4장에서는 3장의 `Discoverability` 기준을 구체화한다.
-
-주요 설계 대상:
+4장에서는 다음을 구체화한다.
 
 - Repository Layout
 - canonical source
 - Progressive Disclosure
 - Context Budget
+- Progressive Context
 - naming
 - generated file
 - migration 위치
@@ -295,14 +414,13 @@ Phase 5를 계속 진행한다.
 
 # Open Questions
 
-Phase 5 이후 실제 구현과 집필 과정에서 검증한다.
+Phase 5 이후 구현/집필 과정에서 검증한다.
 
-- MyBatis 예제가 특정 독자층에 지나치게 종속되지 않는지
-- Redis/Kafka가 모든 장에 불필요한 복잡도를 만들지 않는지
-- Stage별 Git tag가 독자의 실습 흐름에 가장 적절한지
-- 기업 환경 장에서 Tibero/HSM/Jenkins 사례의 깊이를 어느 수준까지 둘지
-- Result Filter를 shell 기반 helper로 시작할지 별도 도구로 만들지
-- Test Runner 결과 포맷을 JSON Schema로 고정할지
-- `Runner-first / Agent-on-exception` 용어를 최종 용어로 유지할지
-- Agent Harness를 독립 용어로 정의할지 기존 Agent Contract/실행 인터페이스의 상위 개념으로 둘지
-- Agent Ready Profile을 향후 YAML/JSON 같은 machine-readable 형식으로 제공할지
+- Result Gateway API/CLI 형식을 어디까지 표준화할지
+- Runner result schema를 JSON Schema로 고정할지
+- failure fingerprint의 일반 형식을 정의할지
+- 실패 container retention을 예제 구현까지 포함할지
+- Prepared Image를 Dockerfile/Dev Container 중 어떤 형태로 예시할지
+- Agent Budget을 Task Contract의 필수 필드로 둘지 선택 필드로 둘지
+- Agent Harness와 Harness Engineering을 책의 정식 용어로 확정할지
+- Agent Ready Profile을 YAML/JSON machine-readable 형식으로 제공할지
