@@ -1,6 +1,6 @@
 # Current Phase
 
-Phase 5 - 장별 설계 진행 중 / 새 Cloud Agent 중심 목차에 1~4장 설계 반영 완료
+Phase 5 - 장별 설계 진행 중 / 새 Cloud Agent 중심 목차에 1~5장 설계 반영 완료
 
 본문은 아직 작성하지 않는다.
 
@@ -168,6 +168,31 @@ Cloud Agent
 
 > 병렬화의 대상은 Agent가 아니라 서로 독립적으로 실행하고 검증할 수 있는 Task다.
 
+## 5장 - Task Routing: Local인가 Cloud인가
+
+정식 파일:
+
+- `chapters/05/plan.md`
+
+핵심 역할:
+
+- Task 특성을 기준으로 Local / Cloud / Hybrid / Runner-first 경로 선택
+- Scope 명확성, 완료 조건, 독립 검증 가능 여부 평가
+- Human Steering 빈도와 Context 크기를 Routing 기준으로 사용
+- Internal Network / VPN / DB / HSM 같은 Hard Constraint 반영
+- File Conflict와 dependency를 병렬 Cloud 작업 전에 확인
+- Git을 통해 입력/결과를 전달할 수 있는지 판단
+- 너무 작은 Task의 Cloud overhead와 너무 큰 Task의 Context/Retry/Review 비용 비교
+- `campus-platform` 작업을 실제 Local/Cloud/Hybrid로 분류
+
+5장의 핵심 문장:
+
+> Cloud Agent를 잘 사용하는 핵심은 Agent 수를 늘리는 것이 아니라 어떤 작업을 Cloud로 보낼지 결정하는 것이다.
+
+> Task는 Local 또는 Cloud 중 하나에 영구적으로 속하지 않는다. 작업 단계에 따라 실행 위치를 이동할 수 있다.
+
+> Cloud에 보낼 수 있는 Task와 Cloud에 보내는 것이 유리한 Task는 다르다.
+
 # Preserved Topics
 
 기존 3장의 `Agent Ready 프로젝트의 기준`은 독립 장에서 제외했지만 삭제하지 않았다.
@@ -206,6 +231,30 @@ Local
 ```
 
 Task는 Local 또는 Cloud에 영구적으로 속하지 않는다.
+
+## Task Routing
+
+Routing은 다음 순서로 판단한다.
+
+```text
+1. Runner로 해결 가능한가?
+2. Cloud에 독립 실행 가능한가?
+3. Human Steering이 필요한가?
+4. Internal Network가 필요한가?
+```
+
+주요 판단 기준:
+
+- Scope 명확성
+- 완료 조건
+- 독립 검증 가능 여부
+- File Conflict
+- Human Steering
+- Context 크기
+- Internal Network
+- 실행시간/Compute 요구량
+- Git Handoff 가능 여부
+- Cloud start overhead
 
 ## Git as Handoff Boundary
 
@@ -320,34 +369,39 @@ Cloud Task가 오래 실행되어도 개발자가 다음 작업을 계속할 수
 - 새 목차 기준 2장 재설계 완료
 - 새 목차 기준 3장 재설계 완료
 - 새 목차 기준 4장 설계 완료
+- 새 목차 기준 5장 Task Routing 설계 완료
 - 기존 Agent Ready Profile을 Future Topics로 보존
 
 # In Progress
 
 Phase 5 장별 설계.
 
-새 목차 기준 1~4장 설계가 완료되었다.
+새 목차 기준 1~5장 설계가 완료되었다.
 
 # Next
 
 다음 대상:
 
-`chapters/05/plan.md` - Task Routing: Local인가 Cloud인가
+`chapters/06/plan.md` - Cloud에 보내기 좋은 개발 작업
 
-5장에서 다룰 핵심:
+6장에서 다룰 핵심:
 
-- Scope 명확성
-- 완료 조건
-- 독립 검증 가능 여부
-- File Conflict 가능성
-- Human Steering 빈도
-- Context 크기
-- Internal Network 필요 여부
-- Build/Test 실행시간
-- Git으로 결과 회수 가능 여부
-- Task 크기와 Cloud overhead의 균형
-- Local / Cloud / Hybrid 선택 판단표
+- Build
+- Unit Test
+- Integration Test
+- E2E
+- Docker Build
+- Static Analysis / Lint
+- Migration Validation
+- Refactoring
+- 작은 Bug Fix
+- Documentation
+- PR Review
+- Dependency Update
+- CI Failure Fix
+- 작업별 Cloud Runner / Cloud Agent 선택
+- `campus-platform`의 실제 Cloud Task 예제
 
-그 다음 6장부터 새 목차 순서대로 설계한다.
+그 다음 7장부터 새 목차 순서대로 설계한다.
 
 Phase 6 본문 집필은 시작하지 않는다.
