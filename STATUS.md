@@ -4,7 +4,7 @@ Phase 6 - 본문 초고 작성 진행 중
 
 Phase 5의 1~18장 설계와 전체 정합성 점검을 완료했다.
 
-현재 1~2장 초고를 작성했다.
+현재 1~4장 초고를 작성했다.
 
 # Source of Truth
 
@@ -130,19 +130,9 @@ Phase 5 완료.
 - 초고: `chapters/01/draft.md`
 - 공식 근거: `research/chapter-01-cloud-worker-official-sources.md`
 
-주요 내용:
-
-- Chat LLM과 Coding Agent 구분
-- Remote Development Worker 정의
-- Cloud Agent = LLM + Repository + Execution Environment + Compute + Tools
-- Prompt보다 Task 관점
-- Evidence 기반 결과
-- Git Handoff Boundary 소개
-- `campus-platform` 병렬 검증 예제
-
 ## 2장 - Local Agent와 Cloud Agent
 
-상태: `초고 작성 완료`
+상태: `초고 작성 및 설계 대비 1차 검토 완료`
 
 파일:
 
@@ -150,17 +140,56 @@ Phase 5 완료.
 - 초고: `chapters/02/draft.md`
 - 공식 근거: `research/chapter-02-local-cloud-official-sources.md`
 
+검토 결과:
+
+- 실행 위치 중심 비교 유지
+- Local / Cloud / Hybrid 역할 구분 유지
+- Internal Network, Human Steering, Context 크기 반영
+- 3장 이후의 Token/Compute, Result Gateway, Prepared Environment 상세로 과도하게 확장하지 않음
+
+## 3장 - Cloud Session, Container, Compute와 Token
+
+상태: `초고 작성 및 설계 대비 1차 검토 완료`
+
+파일:
+
+- 설계: `chapters/03/plan.md`
+- 초고: `chapters/03/draft.md`
+
 주요 내용:
 
-- 모델보다 실행 위치를 우선하는 비교
-- Local에 적합한 Interactive / Internal 작업
-- Cloud에 적합한 독립 / 장시간 / 검증 가능한 작업
-- Local → Cloud → Local Handoff
-- Internal Network를 Hard Constraint로 판단
-- Human Steering / Context 크기 기준
-- Agent Execution Time vs Developer Blocking Time
-- Git Handoff Boundary
-- `campus-platform` 작업별 Local / Cloud / Hybrid 분류
+- Cloud Session을 Repository/Workspace/CPU/RAM/Disk/Tools를 가진 작업 단위로 정의
+- Reasoning Resource와 Execution Resource 분리
+- Brain / Hands를 Compute와 Token 설명용 간단 모델로만 사용
+- Build/Test wall-clock time과 LLM Token 사용을 분리
+- 10,000 Test 실행과 3 Failure 분석 예제
+- Compute-heavy / Context-light 작업
+- Cloud Runner와 Cloud Agent 구분 소개
+- Parallel Compute와 Parallel Reasoning 구분
+- Compute / LLM / Human Cost 분리
+- 제품별 CPU/RAM 수치는 research로 분리
+
+## 4장 - 독립 실행환경, 장시간 작업, 병렬성, 시간 분리
+
+상태: `초고 작성 완료 / 다음 자체 검토 대상`
+
+파일:
+
+- 설계: `chapters/04/plan.md`
+- 초고: `chapters/04/draft.md`
+
+주요 내용:
+
+- 독립 실행환경을 Local Resource와 분리
+- 장시간 Build/Test의 비동기 위임
+- Agent Execution Time과 Developer Blocking Time 분리
+- Local Resource Occupancy를 비용으로 포함
+- 비동기 위임에 적합한 Task 조건
+- 병렬화 대상을 Agent가 아니라 독립 Task로 정의
+- 좋은 병렬화 / 나쁜 병렬화 비교
+- Parallel Compute와 Parallel Reasoning 재연결
+- Evidence 반환과 `campus-platform` 병렬 검증 예제
+- Agent 수 증가가 선형 생산성 증가를 의미하지 않음을 설명
 
 # Preserved / Future Topics
 
@@ -182,8 +211,9 @@ Phase 5 완료.
 
 # Next
 
-1. 2장 초고 설계 대비 자체 검토
+1. 4장 초고 설계 대비 자체 검토
 2. 필요한 수정 반영
-3. 3장 `Cloud Session, Container, Compute와 Token` 초고 작성
+3. 5장 `Task Routing: Local인가 Cloud인가` 초고 작성
+4. 이후 같은 방식으로 18장까지 순차 진행
 
 Phase 6에서는 장별로 `초고 → 설계 대비 검토 → 수정 → 다음 장` 순서로 진행한다.
