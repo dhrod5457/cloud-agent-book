@@ -1,436 +1,288 @@
 # Current Phase
 
-Phase 5 - 장별 설계 진행 중 / 목차 보강
+Phase 5 - 장별 설계 진행 중 / Cloud Agent 중심 범위 재정렬 완료
 
 본문은 아직 작성하지 않는다.
 
-# Completed
+# Source of Truth
 
-- Phase 1 방향 정의
-- Phase 2 전체 목차 설계
-- Phase 3 목차 검증
-- Phase 4 `campus-platform` 예제 프로젝트 설계
-- Phase 5 1장 설계
-- Phase 5 2장 설계
-- Phase 5 2장 `Agent-friendly Execution Platform` 확장 설계
-- Phase 5 3장 `Agent Ready 프로젝트의 기준` 설계
-- `Agent-Native Development Environment` 독립 장 추가 결정
-- Anthropic infrastructure noise / Managed Agents / parallel C compiler 공식 사례 조사
-- `campus-platform` Agent-Native Development Environment 적용 설계
+현재 책의 방향은 다음 문서를 우선한다.
 
-# Phase 4 / Example Artifacts
+1. `planning/concept.md`
+2. `planning/scope.md`
+3. `planning/toc.md`
+4. `planning/future-topics.md`
+5. `STATUS.md`
 
-- `examples/campus-platform/README.md`
-- `examples/campus-platform/architecture.md`
-- `examples/campus-platform/testing.md`
-- `examples/campus-platform/evolution.md`
-- `examples/campus-platform/cloud-test-runner.md`
-- `examples/campus-platform/execution-platform.md`
-- `examples/campus-platform/agent-ready-baseline.md`
-- `examples/campus-platform/agent-native-development-environment.md`
-
-# Phase 5 / Planning Artifacts
-
-- `chapters/01/plan.md`
-- `chapters/02/plan.md`
-- `chapters/02/execution-platform.md`
-- `chapters/03/plan.md`
-- `planning/agent-native-development-environment.md`
-- `planning/toc-amendment-agent-native.md`
-- `research/anthropic/claude-code-web-execution-resources.md`
-- `research/anthropic/agent-native-development-environment.md`
-- `research/github/continuous-ai-runner-first.md`
+이전 `planning/toc-amendment-agent-native.md`의 독립 장 추가 결정은 현재 목차 결정보다 우선하지 않는다.
 
 # Book Direction
 
-- 상위 개념은 `Agent Ready Software Engineering`이다.
-- Java/Spring Boot는 주요 실전 예제지만 원칙은 언어와 제품에 종속되지 않는다.
-- 특정 AI 제품 사용법보다 Repository, 실행환경, 검증, 관찰, orchestration 설계를 중심으로 다룬다.
-- 프로젝트 파일을 Source of Truth로 사용한다.
-- 변경 가능성이 높은 제품 CPU/RAM/가격/세션 제한은 일반 원칙과 분리한다.
+책의 중심 주제는 **Cloud Agent 활용**이다.
 
-# Cloud / Execution 핵심 원칙
+핵심 질문:
 
-2장에서 다음 원칙을 정의했다.
+> 클라우드 에이전트를 왜 사용하고, 로컬 에이전트와 어떻게 조합하며, 어떤 작업을 맡기고, 토큰과 클라우드 컴퓨팅 자원을 어떻게 효율적으로 활용할 것인가?
 
-> LLM은 판단하고, 컨테이너는 실행한다.
+`Agent Ready Software Engineering`은 지원 철학으로 남기지만 책의 중심축으로 확장하지 않는다.
 
-> CPU에는 일을 많이 시키고, LLM에는 필요한 결과만 보여준다.
+# Core Messages
 
-> 정상 경로는 Runner가 처리하고, 예외 경로에서만 Agent를 호출한다.
+> Cloud Agent는 Local Agent를 대체하는 것이 아니다.
 
-추가 운영 원칙:
+> Cloud Agent의 핵심 가치는 더 많은 Token이 아니라 독립 실행환경과 병렬성이다.
 
-- 환경은 미리 준비한다.
-- 가능한 판정은 코드로 처리한다.
-- Context는 필요할 때 필요한 만큼만 제공한다.
-- 실패 결과 전체를 전달하지 않고 조회 가능한 형태로 저장한다.
-- Agent의 자율성에는 시간, retry, token, 비용 한도를 둔다.
-- Agent가 반복해서 실패하면 프롬프트보다 실행환경과 도구를 먼저 개선한다.
+> CPU와 RAM 사용량은 LLM Token 사용량과 직접적으로 같은 개념이 아니다.
 
-확장된 관점:
+> CPU에는 일을 많이 시키고, LLM에는 필요한 정보만 보여준다.
 
-> 클라우드 에이전트의 최종 형태는 Agent를 계속 실행하는 시스템이 아니라, Agent가 필요할 때 붙을 수 있도록 잘 준비된 실행 플랫폼이다.
+> Cloud Agent에게 Repository 전체를 반복해서 이해시키지 않는다.
 
-# Agent-friendly Execution Platform
+> 작은 Task와 작은 Context를 전달한다.
 
-핵심 구성:
+> Cloud Agent를 잘 사용하는 핵심은 Agent 수를 늘리는 것이 아니라 어떤 작업을 Cloud로 보낼지 결정하는 것이다.
 
-- Prebuilt Environment
-- Reusable Cache / Disposable Runtime State
-- Cloud Runner / Agent Worker 분리
-- Failure-driven Agent
-- Result Gateway / Artifact First
+# Local / Cloud 판단 기준
+
+## Local 중심
+
+- Architecture 설계
+- 복잡한 디버깅
+- Human Steering이 잦은 작업
+- 내부망 / VPN / 사내 DB / HSM
+- 여러 모듈을 동시에 이해해야 하는 작업
+- 빠른 질문/수정 반복
+- 최종 통합 / Review
+
+## Cloud 중심
+
+- Build
+- Unit Test
+- Integration Test
+- E2E Test
+- Docker Build
+- Static Analysis
+- Lint
+- Migration Validation
+- 반복적인 Refactoring
+- 작은 Bug Fix
+- 독립 Feature
+- Documentation
+- PR Review
+- CI 실패 수정
+- 장시간 작업
+- 독립적인 병렬 작업
+
+독자가 최종적으로 다음을 판단할 수 있어야 한다.
+
+> 이 Task는 Local에서 해야 하는가, Cloud로 보내야 하는가?
+
+# Cloud Agent Efficiency
+
+## Token / Compute 분리
+
+Cloud Container가 CPU/RAM을 오래 사용해 Build/Test를 수행하는 것과 LLM Token 사용량은 같은 개념이 아니다.
+
+Token은 주로 다음 시점에 증가한다.
+
+- 코드/문서 읽기
+- 계획
+- Tool Result 읽기
+- 로그 분석
+- 수정 방향 판단
+
+권장 구조:
+
+```text
+Container
+→ 많은 Test 실행
+
+Result Filter / Gateway
+→ 실패 정보만 추출
+
+Agent
+→ 필요한 실패만 분석
+```
+
+## Runner-first
+
+```text
+Task
+  ↓
+Runner
+  ├─ PASS → 종료
+  └─ FAIL → Cloud Agent
+```
+
+이 구조는 Agent Platform 일반론이 아니라 Cloud Agent의 Token/비용 최적화 패턴으로 다룬다.
+
+## Context 최소화
+
+- 작은 Task
+- 관련 파일만 전달
+- 검증 명령 명시
+- 변경 금지 범위 명시
 - Progressive Context
-- Task Context Package
-- Isolated Worktree / Container
-- Failure Container Retention
-- Budgeted Autonomy
-- Failure Fingerprint
-- Event-driven Agent
-- Continuous Small Task
-- Fan-out / Fan-in
-- Harness Engineering
+- Repository 전체 재탐색 방지
 
-핵심 원칙:
+## Result Gateway
 
-> 판단을 코드로 만들 수 있다면 LLM에게 판단시키지 않는다.
+목적은 Cloud Agent가 읽어야 하는 Tool Output을 줄이는 것이다.
 
-> 큰 결과를 요약해서 버리는 것이 아니라, 큰 결과를 저장하고 필요한 부분만 조회한다.
+원본 로그와 Artifact는 저장하고 다음만 먼저 제공한다.
 
-> Agent의 자율성은 무제한 실행 권한이 아니라 예산 안에서 스스로 해결할 수 있는 권한이다.
+- PASS / FAIL
+- Failed Test
+- 핵심 Error
+- Stack Trace 위치
+- Artifact 경로
 
-> Agent가 반복해서 실패하면 프롬프트보다 Harness를 먼저 개선한다.
+필요할 때만 상세 내용을 조회한다.
 
-# Agent Ready 평가
+## Prebuilt Environment / Cache
 
-3장에서는 Agent Ready를 다음 9개 기준의 Profile로 평가한다.
+Cloud Worker가 매번 JDK, Node, Dependency, Browser, Docker Image를 처음부터 준비하지 않게 한다.
 
-1. Reproducibility
-2. Discoverability
-3. Executability
-4. Testability
-5. Verifiability
-6. Isolation
-7. Parallelizability
-8. Observability
-9. Security Boundary
+사용 후보:
 
-각 기준은 `PASS / PARTIAL / FAIL`과 실행 가능한 Evidence로 평가한다.
+- Base Image
+- Snapshot
+- Gradle/Maven Cache
+- npm Cache
+- Docker Layer Cache
+- Playwright Browser Cache
+- Preinstalled Tools
+- Warm Worker
 
-# New Chapter Decision - Agent-Native Development Environment
+핵심:
 
-Phase 5 설계 보강에서 새 독립 장을 추가하기로 결정했다.
+> Agent에게 개발환경을 설치하게 하지 말고, 바로 작업 가능한 환경을 제공한다.
 
-이유:
+# Parallel Cloud Workers
 
-2장의 실행 위치/Runner 원칙을 넘어 Repository, Validation, Observability, PM Agent, Retry/Governance를 종합해야 하는 주제가 추가되었기 때문이다.
+독립 Task만 병렬화한다.
 
-목차 변경안:
+- 다른 Repository
+- 다른 Module
+- 다른 File Scope
+- 독립 검증 가능
 
-```text
-20장 실패, 재시도, 충돌, 통합
-→ 21장 Agent-Native Development Environment
-→ 22장 VPN과 내부망이 있는 Hybrid Agent 시스템
-→ 23장 Full Agentic Development로의 진화와 Governance
-```
+공통 파일이나 Schema를 수정한다면 먼저 dependency를 분석하고 순차 실행으로 전환한다.
 
-기존 21장은 22장으로, 기존 22장은 23장으로 이동한다.
+여러 Agent를 사용할 때 같은 Repository 전체를 각 Agent가 반복 분석하지 않도록 한다.
 
-현재 `planning/toc.md`는 Phase 3 확정본이고, Phase 5에서는 `planning/toc-amendment-agent-native.md`가 후반부 배치에 대한 최신 결정을 보완한다. Phase 5 checkpoint에서 두 문서를 통합한다.
-
-# Agent-Native Development Environment 핵심 모델
-
-> 좋은 Agent 시스템은 좋은 모델 하나로 만들어지는 것이 아니라, Model + Context + Harness + Tools + Compute + Validation + Observability + Orchestration이 함께 만들어낸다.
-
-개념 모델:
+# Hybrid Workflow
 
 ```text
-Agent Performance
-= f(Model, Context, Harness, Tools, CPU, RAM, Runtime,
-    Network, Validation, Observability, Orchestration)
+Local / PM
+→ Architecture
+→ Task 분리
+
+Cloud Worker
+→ 독립 구현 / Build / Test / E2E
+
+Local
+→ 내부망 검증
+→ 통합
+→ 최종 Review
 ```
 
-공식 사례 조사에서는 동일 model/harness/task set에서도 runtime resource configuration에 따라 agentic coding 성공률이 달라질 수 있음을 확인했다.
+# CI/CD
 
-# 21장 핵심 설계
+Agent는 항상 실행될 필요가 없다.
 
-## Brain / Hands / Session
+호출 후보:
 
-Brain과 실행환경을 같은 container lifecycle에 고정하지 않는다.
+- CI Failure
+- Review Comment
+- Nightly Test Failure
+- Dependency Update Failure
+- 반복 검증 실패
 
-```text
-Session
-|
-+-- Brain
-|    - LLM
-|    - Harness
-|    - Task State
-|
-+-- Hands
-     - Linux Sandbox
-     - Browser
-     - Android Emulator
-     - Database
-     - External Tool
-```
+PASS 경로에서는 Agent 호출을 생략할 수 있다.
 
-핵심 원칙:
+# Current TOC
 
-> Agent 안에 컴퓨터가 있는 것이 아니라, Agent가 필요할 때 컴퓨터를 호출한다.
+`planning/toc.md`는 현재 다음 구조를 정의한다.
 
-## One Brain, Multiple Hands
+- 11개 Part
+- 18개 장
+- Cloud Agent 이해
+- 왜 Cloud Agent인가
+- 어떤 작업을 Cloud로 보낼 것인가
+- Cloud Agent의 Token 절약
+- Cloud 컴퓨팅 자원 활용
+- 여러 Cloud Agent 사용
+- Local + Cloud Hybrid Workflow
+- CI/CD와 Cloud Agent
+- 실전 프로젝트
+- Cloud Agent를 언제 쓰지 말아야 하는가
+- Cloud Agent 중심 개발환경의 미래
 
-하나의 Agent Brain이 Backend, Browser, Android, Database execution hand를 작업 성격에 따라 호출할 수 있게 한다.
+이 목차가 현재 최신 목차다.
 
-`campus-platform`에서는 Spring Boot Backend, 관리자 Web, Android App, DB Migration을 서로 다른 hand로 검증한다.
+# Future Topics
 
-## Deterministic Sampling
+다음 주제는 본문 핵심에서 제외하고 `planning/future-topics.md`에 보존한다.
 
-대형 test suite는 다음 계층으로 설계할 수 있다.
-
-```text
-Fast Feedback Test
-+
-Distributed Deterministic Sampling
-+
-Final Full Validation
-```
-
-동일 retry에서는 같은 sample을 사용해 재현성을 유지하고, 다른 Worker는 다른 sample을 사용해 aggregate coverage를 넓힌다.
-
-Merge 전 full validation은 유지한다.
-
-## Agent-friendly Log
-
-상세 로그 전체를 stdout/context로 보내지 않는다.
-
-- 짧은 summary
-- machine-readable error line
-- searchable artifact
-- 필요 시 Result Gateway lookup
-
-핵심 원칙:
-
-> Agent가 읽기 쉬운 출력 형식도 개발환경의 일부다.
-
-## Agent Hibernate
-
-Brain/session state와 expensive execution hand lifecycle을 분리한다.
-
-```text
-RUNNING → IDLE → SNAPSHOT → OFF → WAKE → RUNNING
-```
-
-PR CI 대기나 reviewer 대기 동안 execution resource를 끄고 후속 event에서 복원할 수 있게 설계한다.
-
-## PR Babysitter
-
-PR 생성 이후 다음을 관리하는 제한된 role을 둔다.
-
-- CI 확인
-- 실패 대응
-- review comment 처리
-- conflict 감지
-- test 재실행
-- merge-ready 상태 유지
-
-자동 merge 권한은 Trust Boundary와 별도로 관리한다.
-
-## Speculative Coding / Best-of-N
-
-어려운 Task에서는 복수 후보를 병렬 생성할 수 있지만 최종 선택은 가능한 한 deterministic validation으로 수행한다.
-
-N의 기본값은 1이며 task difficulty와 budget에 따라 제한적으로 늘린다.
-
-## Time-travel Debugging
-
-Browser/UI/실행 실패 시 screenshot, video, network log, DOM snapshot, trace 등 실패 시점 artifact를 저장하고 필요한 시점을 조회할 수 있게 한다.
-
-## Garbage Collector Agent
-
-Agent가 생성한 변경으로 쌓일 수 있는 duplication, architecture drift, stale docs, dead code, unused dependency, temporary workaround를 정기적으로 점검한다.
-
-대규모 자동 refactoring보다 작은 cleanup PR을 반복한다.
-
-## Agent-native Observability
-
-17장에서 정의한 Observability를 Agent query interface로 확장한다.
-
-예:
-
-```text
-get_errors(service, since)
-get_slow_spans(service, threshold_ms)
-get_metric(name)
-get_http_failures(status)
-get_browser_console_errors()
-```
-
-핵심 관점:
-
-> Observability for Humans에서 Observability for Agents로 확장한다.
-
-## Compute-aware Orchestration
-
-PM/Scheduler가 model만 고르지 않는다.
-
-판단 대상:
-
-- Model
-- Context
-- CPU
-- RAM
-- Timeout
-- Network
-- Number of Agents
-- Execution Hand
-- Retry Budget
-
-## Warm Pool
-
-unit test, lint, compile, small PR verification처럼 짧고 빈번한 Task는 READY 상태의 Runner pool을 사용할 수 있다.
-
-장시간 작업은 별도 ephemeral worker를 사용할 수 있다.
-
-## Shadow Agent
-
-실제 수정 권한은 Main Agent만 갖고 Shadow Agent는 read-only risk review를 수행한다.
-
-판단 불일치가 큰 경우 Human Escalation으로 전환한다.
-
-## Canary Agent
-
-새 model/harness/toolchain을 전체 Task에 즉시 적용하지 않고 일부 Task에 먼저 적용한다.
-
-비교 지표:
-
-- success rate
-- token usage
-- execution time
-- retry
-- human intervention
-- regression
-
-## Agent Replay
-
-다음 정보를 replay 가능하게 기록한다.
-
-- Task input
-- Prompt/instruction version
-- Context reference
-- Model/version
-- Tool calls/results
-- Environment version
-- Git SHA
-- Agent output
-- Test result
-
-새 model/harness/tool 변경 전후를 동일 Task로 비교한다.
-
-## Agent Platform CI
-
-Application만 테스트하지 않고 Agent workflow도 benchmark suite로 평가한다.
-
-지표:
-
-- 해결 성공률
-- 평균 token
-- 평균 execution time
-- retry
-- human intervention
-- regression
-
-핵심 원칙:
-
-> Agent도 배포하고, 관찰하고, 테스트하고, 회귀 검증해야 하는 소프트웨어 시스템이다.
-
-# Agent-Native Repository
-
-향후 Repository는 사람이 읽는 문서뿐 아니라 Agent가 탐색·실행·검증·관찰할 interface를 제공한다.
-
-후보 구조:
-
-```text
-repository/
-├─ AGENTS.md
-├─ docs/
-├─ scripts/
-│  ├─ build
-│  ├─ test
-│  ├─ verify
-│  └─ architecture-check
-├─ agent/
-│  ├─ task-template
-│  ├─ result-schema
-│  ├─ failure-patterns
-│  └─ benchmarks
-└─ observability/
-   ├─ metrics
-   ├─ traces
-   └─ queries
-```
-
-# Current vs Future
-
-현재 개발팀이 우선 적용할 수 있는 범위:
-
-- deterministic command/validation
-- Result Gateway / Artifact First
-- Progressive Context
-- Task Context Package
-- Prebuilt Environment / Cache
-- isolated branch/worktree/container
-- Budget / Retry / Failure Fingerprint
-- event-driven PR workflow
-- Agent-friendly log
-- 최소 Agent benchmark
-
-플랫폼 성숙 후 확장 범위:
-
-- Brain / Hands / Session 완전 분리
-- One Brain, Multiple Hands
-- Agent Hibernate
-- Compute-aware dynamic scheduling
-- Warm Pool
-- Best-of-N
-- Shadow / Canary Agent
-- Execution Replay
-- Agent-native Observability query plane
+- Agent-Native Development Environment 전체 아키텍처
+- Agent Memory Architecture
+- Agent Security Platform
+- Agent Chaos Engineering
 - Garbage Collector Agent
+- Shadow Agent
+- Canary Agent
+- Agent Platform Governance
+- Agent-native Observability Platform
+- Multi-agent 조직론
 
-# Research Sources
+필요하면 마지막 미래 장에서 짧게 소개한다.
 
+# Existing Artifacts
+
+기존에 만든 다음 문서는 삭제하지 않는다.
+
+- `planning/agent-native-development-environment.md`
+- `planning/toc-amendment-agent-native.md`
+- `examples/campus-platform/agent-native-development-environment.md`
 - `research/anthropic/agent-native-development-environment.md`
-- `research/anthropic/claude-code-web-execution-resources.md`
-- `research/github/continuous-ai-runner-first.md`
+
+이들은 현재 책의 핵심 목차가 아니라 후속 주제 연구 자료로 취급한다.
+
+# Completed
+
+- Phase 1 초기 방향 정의
+- Phase 2 초기 목차 설계
+- Phase 3 초기 목차 검증
+- Phase 4 `campus-platform` 예제 설계
+- Phase 5 1~3장 초기 설계
+- Cloud Runner / Agent Worker 구분
+- Token / Compute 분리 관점
+- Result Gateway
+- Prebuilt Environment / Cache
+- Parallel Cloud Session
+- GitHub Continuous AI 사례 조사
+- Claude Code Web 실행환경 사례 조사
+- Cloud Agent 중심 Concept 재정의
+- Cloud Agent 중심 Scope 재정의
+- 11 Part / 18 Chapter 목차 재정렬
+- 고급 Agent Platform 내용을 Future Topics로 이동
 
 # In Progress
 
-Phase 5 장별 설계.
+Phase 5 장별 설계를 새 목차 기준으로 재정렬한다.
 
-1장, 2장, 3장의 순차 설계는 완료했다.
-
-21장 신규 주제는 본문이 아니라 planning 수준의 설계만 선반영했다.
+기존 `chapters/01~03/plan.md`는 참고 자료로 유지하되 새 목차와 번호/범위가 달라졌으므로 순차적으로 다시 맞춘다.
 
 # Next
 
-순차 설계는 기존 계획대로 4장으로 진행한다.
+다음 작업은 **새 목차 기준 장별 설계 정합성 점검**이다.
 
-`chapters/04/plan.md` - Repository as Interface: Agent가 이해할 수 있는 저장소
+우선 순서:
 
-4장에서 Progressive Disclosure, Context Budget, canonical source, Agent-Native Repository의 기초를 상세히 설계한다.
+1. 기존 `chapters/01~03/plan.md`를 새 1~3장과 비교
+2. 2장의 Execution Platform 내용을 Cloud Agent 활용 범위로 축소/재배치
+3. 새 4장부터 순차 설계
+4. 기존 Agent Platform 중심 내용은 `planning/future-topics.md` 참조로 전환
 
-Phase 6 본문 초고는 시작하지 않는다.
-
-# Open Questions
-
-- `Agent-Native Development Environment`를 최종 21장 제목으로 유지할지
-- Brain / Hands / Session을 책의 정식 용어로 사용할지
-- deterministic sampling 정책을 예제 코드까지 구현할지
-- Result Gateway interface를 CLI/API 중 어디까지 표준화할지
-- Agent Hibernate의 snapshot 범위를 workspace까지 포함할지 task/session state로 제한할지
-- Best-of-N 적용 기준을 Task Contract 필드로 둘지
-- Shadow Agent와 Canary Agent를 본문 또는 보조 패턴으로 둘지
-- Agent Replay artifact의 보안/개인정보 제거 규칙을 어느 장에서 상세히 다룰지
-- Agent Platform benchmark suite를 예제 프로젝트에 실제 구현할지
+Phase 6 본문 집필은 시작하지 않는다.
