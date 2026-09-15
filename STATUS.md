@@ -1,6 +1,6 @@
 # Current Phase
 
-Phase 5 - 장별 설계 진행 중 / 새 Cloud Agent 중심 목차에 1~3장 정합성 반영 완료
+Phase 5 - 장별 설계 진행 중 / 새 Cloud Agent 중심 목차에 1~4장 설계 반영 완료
 
 본문은 아직 작성하지 않는다.
 
@@ -87,8 +87,6 @@ Cloud Agent
 
 # Phase 5 Chapter Alignment
 
-새 목차 기준으로 기존 1~3장 설계를 다시 맞췄다.
-
 ## 1장 - Coding Agent에서 Cloud Worker로
 
 정식 파일:
@@ -144,6 +142,31 @@ Cloud Agent
 - Compute / LLM / Human Cost 분리
 
 제품별 CPU/RAM/Disk 숫자는 `research/`에서 기준일과 함께 관리하며 본문 핵심 논리에 고정하지 않는다.
+
+## 4장 - 독립 실행환경, 장시간 작업, 병렬성, 시간 분리
+
+정식 파일:
+
+- `chapters/04/plan.md`
+
+핵심 역할:
+
+- 개발자 PC와 Cloud Worker 실행환경 분리
+- 장시간 Build/Test 작업의 비동기 위임
+- `Agent Execution Time`과 `Developer Blocking Time` 분리
+- 독립 Task의 병렬 실행
+- Parallelizable Task와 Dependent Task 구분
+- 병렬화가 선형적으로 생산성을 높이지 않는 이유
+- Local Resource Occupancy 감소를 Cloud 활용 가치로 포함
+- `campus-platform`의 Unit/Integration/E2E/Docker 검증 병렬 예제
+
+4장의 핵심 문장:
+
+> Cloud Agent의 핵심 가치는 더 많은 Token이 아니라 독립 실행환경과 병렬성이다.
+
+> Cloud Agent가 오래 실행되는 것과 개발자가 오래 기다리는 것은 같은 의미가 아니다.
+
+> 병렬화의 대상은 Agent가 아니라 서로 독립적으로 실행하고 검증할 수 있는 Task다.
 
 # Preserved Topics
 
@@ -236,6 +259,35 @@ Cloud Agent 완료 결과에는 가능한 경우 다음을 포함한다.
 - Log Reference
 - PR
 
+## Async Delegation / Time Separation
+
+Cloud Agent 활용 효과를 Agent Execution Time만으로 평가하지 않는다.
+
+함께 볼 값:
+
+- Agent Execution Time
+- Queue Time
+- Developer Blocking Time
+- Review Time
+- Retry Time
+- Local Resource Occupancy
+
+Cloud Task가 오래 실행되어도 개발자가 다음 작업을 계속할 수 있다면 전체 Workflow 관점에서는 이점이 있을 수 있다.
+
+## Parallel Execution
+
+독립 Task만 병렬화한다.
+
+좋은 대상:
+
+- Unit Test
+- Integration Test
+- E2E
+- Docker Build
+- 서로 다른 서비스/모듈 작업
+
+같은 파일, 공통 schema, 강한 dependency가 있는 작업은 병렬화보다 순차 처리를 우선한다.
+
 # Future Topics
 
 다음 주제는 본문 핵심에서 제외하고 `planning/future-topics.md`에 보존한다.
@@ -267,31 +319,35 @@ Cloud Agent 완료 결과에는 가능한 경우 다음을 포함한다.
 - 새 목차 기준 1장 재설계 완료
 - 새 목차 기준 2장 재설계 완료
 - 새 목차 기준 3장 재설계 완료
+- 새 목차 기준 4장 설계 완료
 - 기존 Agent Ready Profile을 Future Topics로 보존
 
 # In Progress
 
 Phase 5 장별 설계.
 
-새 목차 기준 1~3장 정합성 작업은 완료했다.
+새 목차 기준 1~4장 설계가 완료되었다.
 
 # Next
 
 다음 대상:
 
-`chapters/04/plan.md` - 독립 실행환경, 장시간 작업, 병렬성
+`chapters/05/plan.md` - Task Routing: Local인가 Cloud인가
 
-4장에서 다룰 핵심:
+5장에서 다룰 핵심:
 
-- 개발자 PC와 분리된 실행환경의 가치
-- Long-running Task
-- 비동기 작업 위임
-- Agent Execution Time vs Developer Blocking Time
-- 독립 Workspace
-- Parallel Execution
-- 병렬화가 실제 생산성 향상으로 이어지는 조건
-- Local 개발환경 점유 감소
+- Scope 명확성
+- 완료 조건
+- 독립 검증 가능 여부
+- File Conflict 가능성
+- Human Steering 빈도
+- Context 크기
+- Internal Network 필요 여부
+- Build/Test 실행시간
+- Git으로 결과 회수 가능 여부
+- Task 크기와 Cloud overhead의 균형
+- Local / Cloud / Hybrid 선택 판단표
 
-그 다음 5장부터 새 목차 순서대로 설계한다.
+그 다음 6장부터 새 목차 순서대로 설계한다.
 
 Phase 6 본문 집필은 시작하지 않는다.
