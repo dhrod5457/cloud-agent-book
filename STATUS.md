@@ -1,6 +1,6 @@
 # Current Phase
 
-Phase 5 - 장별 설계 진행 중 / 새 Cloud Agent 중심 목차에 1~6장 설계 반영 완료
+Phase 5 - 장별 설계 진행 중 / 새 Cloud Agent 중심 목차에 1~7장 설계 반영 완료
 
 본문은 아직 작성하지 않는다.
 
@@ -150,16 +150,40 @@ Cloud Agent
 - Static Analysis / Lint / Migration Validation을 deterministic 실행으로 분류
 - 반복 Refactoring / 작은 Bug Fix / Documentation / PR Review를 Cloud Agent 후보로 분류
 - Dependency Update와 CI Failure Fix를 `Runner → Agent → Runner` 패턴으로 설계
-- 작업별 Input / Validation / Evidence를 정의
-- `campus-platform`에서 재사용할 Cloud Task Catalog 정의
+- 작업별 Input / Validation / Evidence 정의
+- `campus-platform` Cloud Task Catalog 정의
 
-6장의 핵심 원칙:
-
-> Cloud에 보내기 좋은 작업과 Cloud Agent가 직접 해야 하는 작업은 같은 개념이 아니다.
+핵심:
 
 > Runner가 할 수 있으면 Runner에게 맡긴다.
 
 > Agent는 판단과 수정이 필요한 구간에만 사용한다.
+
+## 7장 - Cloud Agent Task Contract: 작은 Task와 작은 Context
+
+- `chapters/07/plan.md`
+- Task / Goal / Scope를 분리
+- Relevant Files를 initial context boundary로 사용
+- Forbidden Changes로 변경 경계 정의
+- Validation을 실행 가능한 명령으로 명시
+- Expected Result를 관찰 가능한 결과로 작성
+- Output을 Commit/Test/Artifact 기반 Evidence로 정의
+- AGENTS.md → 관련 문서 → 관련 소스 → 관련 테스트 순서의 Progressive Context
+- Context 확대 단계를 정의해 Repository 전체 재탐색 방지
+- Base SHA / Task Branch를 작업 입력에 포함
+- Environment와 선택적 Budget을 Task Contract에 연결
+- Task Contract가 지나치게 커지면 Task 분해 또는 Local/Hybrid 전환을 검토
+- `campus-platform` AuthService expired-token Task Contract 예제
+
+7장의 핵심 원칙:
+
+> Task Contract의 목적은 Prompt를 길게 만드는 것이 아니라 Agent가 탐색해야 하는 범위를 줄이는 것이다.
+
+> Goal은 결과를 제한하고 Scope는 탐색과 변경 범위를 제한한다.
+
+> Context를 줄이는 것뿐 아니라 Context를 필요할 때 가져오게 만든다.
+
+> 검증할 수 있는 것은 Agent에게 묻지 말고 실행한다.
 
 # Cloud Agent Efficiency Decisions
 
@@ -203,6 +227,22 @@ Deterministic?
   │          ↓
   │       Cloud Agent
   └─ NO → Cloud Agent 또는 Local/Hybrid
+```
+
+## Small Input / Small Output
+
+7장과 8장을 다음 한 쌍으로 설계한다.
+
+```text
+7장
+Task Contract
+→ 작은 Input / Context
+        ↓
+Cloud Agent / Runner
+        ↓
+8장
+Result Gateway / Evidence
+→ 작은 Output / Tool Result
 ```
 
 ## Token / Compute Separation
@@ -275,35 +315,35 @@ Cloud 결과에는 가능한 경우 다음을 포함한다.
 - 새 목차 기준 4장 설계 완료
 - 새 목차 기준 5장 Task Routing 설계 완료
 - 새 목차 기준 6장 Cloud Task Catalog 설계 완료
+- 새 목차 기준 7장 Cloud Agent Task Contract 설계 완료
 - 기존 Agent Ready Profile을 Future Topics로 보존
 
 # In Progress
 
 Phase 5 장별 설계.
 
-새 목차 기준 1~6장 설계가 완료되었다.
+새 목차 기준 1~7장 설계가 완료되었다.
 
 # Next
 
 다음 대상:
 
-`chapters/07/plan.md` - Cloud Agent Task Contract: 작은 Task와 작은 Context
+`chapters/08/plan.md` - Tool Output을 줄이고 Evidence를 남기기
 
-7장에서 다룰 핵심:
+8장에서 다룰 핵심:
 
-- Goal
-- Scope
-- Relevant Files
-- Forbidden Changes
-- Validation
-- Expected Result
-- Output / Evidence
-- Progressive Context
-- AGENTS.md에서 필요한 문서로 좁혀가는 구조
-- Repository 전체 재탐색 방지
-- Task 크기와 Context 크기 제어
-- `campus-platform` AuthService bug-fix Task Contract 예제
+- Raw log 전체를 LLM에 전달하지 않는 구조
+- Result Filter / Result Gateway
+- Summary / Failed Test Index / Exception / Stack Trace Lookup
+- Artifact First
+- build.log / junit.xml / coverage.xml / screenshot / video
+- 필요한 경우에만 상세 로그 조회
+- Evidence-based Cloud Agent Result
+- Demos over Diffs
+- Failure Fingerprint
+- Retry / Token / Cost Budget과 결과 처리의 연결
+- `campus-platform` 테스트 실패 결과 예제
 
-그 다음 8장부터 새 목차 순서대로 설계한다.
+그 다음 9장부터 새 목차 순서대로 설계한다.
 
 Phase 6 본문 집필은 시작하지 않는다.
