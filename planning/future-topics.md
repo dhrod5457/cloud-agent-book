@@ -214,7 +214,47 @@
 
 ---
 
-# 13. 향후 별도 책 후보
+# 13. Agent Ready Profile
+
+기존 3장 설계에서 정의했던 `Agent Ready 프로젝트의 기준`은 Cloud Agent 중심 목차 재정렬로 독립 장에서 제외했다.
+
+기존 평가 기준:
+
+1. Reproducibility
+2. Discoverability
+3. Executability
+4. Testability
+5. Verifiability
+6. Isolation
+7. Parallelizability
+8. Observability
+9. Security Boundary
+
+평가 방식:
+
+- PASS / PARTIAL / FAIL
+- 설명이 아니라 실행 가능한 Evidence 요구
+- 단일 평균 Score보다 기준별 Profile 사용
+
+이 개념은 여전히 유효하지만 현재 책에서는 독립 방법론으로 확장하지 않는다.
+
+Cloud Agent 활용에 직접 필요한 부분만 각 장에 분산한다.
+
+- Reproducibility → 9장 Prepared Cloud Environment
+- Executability/Testability → 6장, 10장
+- Isolation/Parallelizability → 11장, 12장
+- Discoverability → 7장 Context 최소화
+- Verifiability → 8장 Evidence-based Result
+- Observability → Cloud Task 실행시간/결과 추적 수준
+- Security Boundary → 2장/17장의 Cloud 사용 제한 조건
+
+기존 상세 설계는 Git history의 이전 `chapters/03/plan.md`와 `examples/campus-platform/agent-ready-baseline.md`에서 확인할 수 있다.
+
+후속 책 또는 부록에서 `Agent Ready Assessment`로 다시 확장할 수 있다.
+
+---
+
+# 14. 향후 별도 책 후보
 
 가칭:
 
@@ -235,3 +275,4 @@
 - Agent Operations
 - Compute-aware Orchestration
 - Agent CI / Regression
+- Agent Ready Assessment
