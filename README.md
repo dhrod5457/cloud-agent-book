@@ -1,6 +1,10 @@
-# Cloud Agent Book
+# 클라우드 코딩 에이전트 실전
+
+**Local과 Cloud를 나누고 Task를 위임하는 개발 워크플로 설계**
 
 Cloud Agent를 실제 개발 Workflow에 어떻게 배치하고 활용할지 다루는 Software Engineering 책 프로젝트입니다.
+
+> 더 많은 Agent보다 더 나은 Task Routing, 실행환경, 검증을 설계하는 법
 
 책의 중심 질문은 다음과 같습니다.
 
@@ -24,19 +28,19 @@ Cloud Agent를 실제 개발 Workflow에 어떻게 배치하고 활용할지 다
 
 ## 현재 원고 상태
 
-Phase 8까지 다음 작업을 완료했습니다.
-
-```text
-1~18장 설계
-→ 초고 작성
-→ 전체 편집
-→ 최종 교정
-→ 출판 정합성 검사
-```
+Phase 8까지 1~18장 설계, 초고, 전체 편집, 최종 교정, 출판 정합성 검사를 완료했습니다.
 
 현재는 **Phase 9 - 출판 원고 조립**을 진행하고 있습니다.
 
-본문에 새 개념을 추가하기보다 완성된 18개 장을 실제 책 구조로 묶고 Front Matter와 Back Matter를 준비하는 단계입니다.
+Phase 9에서 현재까지 완료한 항목:
+
+- 출판용 6개 Part 구조
+- 서문
+- 책 소개 / 독자 대상
+- 읽는 방법
+- 최종 제목 / 부제 / 표지용 한 줄 소개
+- 6개 Part 전환 페이지
+- 출판 원고 결합 순서 초안
 
 ## 출판용 Part 구조
 
@@ -62,18 +66,14 @@ Part VI. Cloud의 한계와 다음 단계를 정한다
 
 출판 원고 구조는 `manuscript/book-structure.md`를 기준으로 관리합니다.
 
-## Front Matter
+## 출판 원고 파일
 
-현재 준비된 파일:
-
+- `manuscript/title-and-positioning.md`
 - `manuscript/preface.md`
 - `manuscript/about-this-book.md`
 - `manuscript/how-to-read.md`
 - `manuscript/book-structure.md`
-
-제목과 부제는 Phase 9에서 별도로 확정합니다.
-
-기존 가제 `AI Agent Ready Software Engineering`은 초기 방향에서 사용한 이름이며 현재 책의 최종 제목은 아닙니다.
+- `manuscript/parts/part-01.md` ~ `part-06.md`
 
 ## 실전 예제
 
@@ -117,4 +117,5 @@ Local
 - `planning/phase8-publication-consistency-check.md`
 - `planning/phase9-manuscript-assembly-plan.md`
 - `manuscript/book-structure.md`
+- `manuscript/title-and-positioning.md`
 - `STATUS.md`
