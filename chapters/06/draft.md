@@ -6,10 +6,10 @@
 
 중요한 것은 작업 이름만 보고 Cloud Agent를 호출하지 않는 것이다.
 
-같은 `테스트 작업`도 실제 Workflow에서는 다음처럼 나뉠 수 있다.
+같은 `Test 작업`도 실제 Workflow에서는 다음처럼 나뉠 수 있다.
 
 ```text
-테스트 실행
+Test 실행
 → Cloud Runner
 
 실패 원인 분석
@@ -49,7 +49,7 @@ Dependency Update를 예로 들어보자.
 ```text
 Version Update
       ↓
-Runner
+Cloud Runner
 → Build / Test
       ↓
 PASS ─────────→ Done
@@ -61,7 +61,7 @@ Cloud Agent
  ↓
 Compatibility Fix
  ↓
-Runner 재검증
+Cloud Runner 재검증
 ```
 
 처음부터 Agent가 Repository 전체를 분석할 필요는 없다.
@@ -83,7 +83,7 @@ Runner 재검증
 
 ## 2. Build는 Runner 작업이다
 
-Java/Spring Boot 프로젝트의 Build는 보통 명령과 판정 기준이 명확하다.
+Java / Spring Boot 프로젝트의 Build는 보통 명령과 판정 기준이 명확하다.
 
 ```bash
 ./gradlew clean build
@@ -143,7 +143,7 @@ Unit Test는 실행 명령과 성공 조건이 명확하다.
 기본 구조:
 
 ```text
-Runner
+Cloud Runner
 → Unit Test
 → PASS → 종료
 → FAIL → 실패 Test 목록
@@ -165,7 +165,7 @@ Unit Test는 다음 조건에서 Cloud 활용 가치가 커진다.
 Test 수가 많음
 실행시간이 김
 모듈별 분할 가능
-Local CPU/RAM 점유가 큼
+Local CPU / RAM 점유가 큼
 ```
 
 ---
@@ -185,7 +185,7 @@ Testcontainers
 Mock HTTP Server
 ```
 
-Cloud에서 이 환경을 재현할 수 있다면 Runner에 적합하다.
+Cloud에서 이 환경을 재현할 수 있다면 Cloud Runner에 적합하다.
 
 ```text
 Prepared Environment
@@ -203,7 +203,7 @@ Integration Test
 Cloud
 → 일반 Integration Validation
 
-Local/Internal
+Local / Internal
 → Tibero / Internal API 최종 검증
 ```
 
@@ -263,7 +263,7 @@ Docker Build는 일반적으로 다음 구조로 충분하다.
 
 ```text
 Git SHA
-→ Runner
+→ Cloud Runner
 → Docker Build
 → PASS / FAIL
 → Image Digest / Build Log
@@ -274,7 +274,7 @@ Git SHA
 ```text
 Dockerfile 문제
 Dependency 문제
-Registry/Network 문제
+Registry / Network 문제
 Base Image 문제
 ```
 
@@ -298,7 +298,7 @@ Dependency Check
 Security Scan
 ```
 
-기본:
+기본 흐름:
 
 ```text
 Tool
@@ -328,26 +328,26 @@ Migration 작성
 → Developer / Agent
 
 Migration 검증
-→ Runner
+→ Cloud Runner
 ```
 
 Cloud에서 Disposable DB를 사용할 수 있다면 다음을 검증할 수 있다.
 
 ```text
 clean DB 적용
-기존 Schema에서 upgrade
+기존 DB Schema에서 upgrade
 syntax
 순서
 기본 Integration Test
 ```
 
-실제 대상이 내부 Tibero/Oracle이라면 마지막 경계만 Local에 남긴다.
+실제 대상이 내부 Tibero / Oracle이라면 마지막 경계만 Local에 남긴다.
 
 ```text
 Cloud
 → 일반 Migration Validation
         ↓
-Local/Internal
+Local / Internal
 → 실제 DB 검증
 ```
 
@@ -418,7 +418,7 @@ Cloud Agent
        ↓
 Analyze / Fix
        ↓
-Runner
+Cloud Runner
        ↓
 PASS
 ```
@@ -473,7 +473,7 @@ Cloud Agent는 PR Review를 보조할 수 있다.
 Test 누락
 명확한 오류
 규칙 위반
-문서/코드 불일치
+문서 / 코드 불일치
 ```
 
 권장 순서:
@@ -488,7 +488,7 @@ PR
 
 Cloud Agent의 Review를 최종 승인과 동일하게 취급하지 않는다.
 
-기계적으로 검증할 수 있는 항목은 CI/Tool이 먼저 처리하고, Agent는 의미 판단을 보조한다.
+기계적으로 검증할 수 있는 항목은 CI / Tool이 먼저 처리하고, Agent는 의미 판단을 보조한다.
 
 ---
 
@@ -497,7 +497,7 @@ Cloud Agent의 Review를 최종 승인과 동일하게 취급하지 않는다.
 ```text
 Dependency Version 변경
       ↓
-Runner
+Cloud Runner
 → Build / Test
       ↓
 PASS → PR
@@ -505,9 +505,9 @@ FAIL
  ↓
 Failure Summary
  ↓
-Agent Compatibility Fix
+Cloud Agent Compatibility Fix
  ↓
-Runner 재검증
+Cloud Runner 재검증
 ```
 
 PASS하면 LLM이 필요 없다.
@@ -516,7 +516,7 @@ FAIL일 때도 Agent에게 Repository 전체를 다시 설명하지 않는다.
 
 ```text
 변경 Dependency
-이전/신규 Version
+이전 / 신규 Version
 실패 Command
 실패 Test
 관련 파일
@@ -542,7 +542,7 @@ Cloud Agent
  ↓
 Fix
  ↓
-Runner
+Cloud Runner
  ↓
 PASS
 ```
@@ -563,16 +563,16 @@ CI Failure, Review Comment, Nightly Test 같은 Event가 실제 Task를 만드�
 
 ```text
 Unit Test 실행
-→ Runner
+→ Cloud Runner
 
 실패 원인 분석
-→ Agent
+→ Cloud Agent
 
 코드 수정
-→ Agent
+→ Cloud Agent
 
 재검증
-→ Runner
+→ Cloud Runner
 ```
 
 Migration도 마찬가지다.
@@ -584,8 +584,8 @@ Migration 작성
 Disposable DB Validation
 → Cloud Runner
 
-Tibero 실검증
-→ Local/Internal
+Tibero 실제 검증
+→ Local / Internal
 ```
 
 실행 주체는 Task의 **현재 단계**에 따라 선택한다.
@@ -596,18 +596,18 @@ Tibero 실검증
 
 | 작업 | 기본 실행 주체 | Agent 호출 조건 | 대표 Evidence |
 | --- | --- | --- | --- |
-| Build | Cloud Runner | 코드/Build 수정 필요 | Status, Artifact, Error Summary |
-| Unit Test | Cloud Runner | 실패 원인 분석/수정 | Failed Tests, JUnit Result |
-| Integration Test | Cloud Runner | 재현 가능한 Code Failure | Test Result, Logs/Artifacts |
-| E2E | Cloud Runner | UI/Code 분석 필요 | Screenshot, Video/Trace |
-| Docker Build | Cloud Runner | Dockerfile/코드 수정 필요 | Image Digest, Build Result |
+| Build | Cloud Runner | 코드 / Build 수정 필요 | Status, Artifact, Error Summary |
+| Unit Test | Cloud Runner | 실패 원인 분석 / 수정 | Failed Tests, JUnit Result |
+| Integration Test | Cloud Runner | 재현 가능한 Code Failure | Test Result, Logs / Artifacts |
+| E2E | Cloud Runner | UI / Code 분석 필요 | Screenshot, Video / Trace |
+| Docker Build | Cloud Runner | Dockerfile / 코드 수정 필요 | Image Digest, Build Result |
 | Lint / Static Analysis | Tool / Runner | Auto-fix 불가 | Violation Summary |
 | Migration Validation | Cloud Runner | Migration 수정 필요 | Apply Result, Test Result |
-| 반복 Refactoring | Cloud Agent | 처음부터 판단/수정 필요 | Commit, Test Result |
+| 반복 Refactoring | Cloud Agent | 처음부터 판단 / 수정 필요 | Commit, Test Result |
 | 작은 Bug Fix | Cloud Agent | 재현 가능해야 함 | Commit, Target Test |
 | Documentation | Cloud Agent 후보 | 사실 기반 범위 명확 | Changed Files, Review |
-| PR Review | Cloud Agent 보조 | 의미 검토가 필요 | Findings |
-| Dependency Update | Runner-first | FAIL일 때 | Build/Test Result |
+| PR Review | Cloud Agent 보조 | 의미 검토 필요 | Findings |
+| Dependency Update | Runner-first | FAIL일 때 | Build / Test Result |
 | CI Failure Fix | Agent-on-failure | Code Failure일 때 | Fix Commit, Revalidation |
 
 이 표는 기본값이다.
@@ -649,7 +649,7 @@ Migration은 다음처럼 나눈다.
 Cloud
 → Disposable DB Validation
 
-Local/Internal
+Local / Internal
 → Tibero 실제 검증
 ```
 
@@ -665,19 +665,19 @@ Local/Internal
 
 ```text
 1. Cloud로 보낼 가치가 있는가?
-2. Tool/Runner만으로 처리 가능한가?
+2. Tool / Runner만으로 처리 가능한가?
 3. 실패 또는 코드 판단이 발생했는가?
 4. Agent가 필요한가?
-5. Agent 수정 후 Runner로 재검증했는가?
+5. Agent 수정 후 Cloud Runner로 재검증했는가?
 6. Evidence를 남겼는가?
 ```
 
 한 줄로 줄이면 다음과 같다.
 
 ```text
-Runner
-→ 필요한 순간에 Agent
-→ 다시 Runner
+Cloud Runner
+→ 필요한 순간에 Cloud Agent
+→ 다시 Cloud Runner
 ```
 
 다음 장에서는 Agent에게 실제 수정 Task를 넘길 때 Repository 전체를 다시 탐색하지 않도록 `Task Contract`와 작은 Context를 구성한다.
