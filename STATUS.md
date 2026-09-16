@@ -4,7 +4,7 @@ Phase 6 - 본문 초고 작성 진행 중
 
 Phase 5의 1~18장 설계와 전체 정합성 점검을 완료했다.
 
-현재 1~6장 초고를 작성했다.
+현재 1~8장 초고를 작성했다.
 
 # Source of Truth
 
@@ -143,31 +143,12 @@ Phase 5 완료.
 - 설계: `chapters/03/plan.md`
 - 초고: `chapters/03/draft.md`
 
-주요 내용:
-
-- Reasoning Resource와 Execution Resource 분리
-- Brain / Hands 간단 모델
-- Build/Test wall-clock time과 Token 사용 분리
-- 10,000 Test / 3 Failure 예제
-- Parallel Compute vs Parallel Reasoning
-- Compute / LLM / Human Cost 분리
-
 ## 4장 - 독립 실행환경, 장시간 작업, 병렬성, 시간 분리
 
 상태: `초고 작성 및 설계 대비 1차 검토 완료`
 
 - 설계: `chapters/04/plan.md`
 - 초고: `chapters/04/draft.md`
-
-주요 내용:
-
-- 독립 실행환경
-- 장시간 작업 비동기 위임
-- Agent Execution Time vs Developer Blocking Time
-- Local Resource Occupancy
-- 병렬화 대상은 Agent가 아니라 독립 Task
-- 좋은 병렬화 / 나쁜 병렬화
-- 병렬화의 비선형 비용
 
 ## 5장 - Task Routing: Local인가 Cloud인가
 
@@ -176,35 +157,80 @@ Phase 5 완료.
 - 설계: `chapters/05/plan.md`
 - 초고: `chapters/05/draft.md`
 
-주요 내용:
-
-- Local / Cloud / Hybrid / Runner-first Routing
-- Runner로 끝낼 수 있는지 먼저 확인
-- Human Steering / Context / Internal Network / Git Handoff / File Conflict 판단
-- 너무 작은 Task와 너무 큰 Task의 비용
-- Routing Decision Matrix
-- Routing Score는 참고용으로만 사용
-- `campus-platform` 실제 Task 분류
-- 실행 중 재분류 / Local Fallback 가능
-
 ## 6장 - Cloud에 보내기 좋은 개발 작업
 
-상태: `초고 작성 완료 / 다음 자체 검토 대상`
+상태: `초고 작성 및 설계 대비 1차 검토 완료`
 
 - 설계: `chapters/06/plan.md`
 - 초고: `chapters/06/draft.md`
 
-주요 내용:
+검토 결과:
 
 - Build / Unit / Integration / E2E / Docker를 Runner 중심으로 분류
-- Static Analysis / Lint는 Tool-first
+- Static Analysis / Lint는 Tool-first 유지
 - Migration 작성과 검증 분리
-- 반복 Refactoring / 작은 Bug Fix를 Cloud Agent 후보로 분류
-- Documentation / PR Review의 Cloud 활용 조건
-- Dependency Update를 Runner-first로 처리
-- CI Failure Fix를 Agent-on-failure로 처리
-- Runner → Agent → Runner 반복 구조
-- `campus-platform` Cloud Task Catalog
+- 반복 Refactoring / 작은 Bug Fix는 Agent 후보
+- Documentation / PR Review 조건부 Cloud 활용
+- Dependency Update와 CI Failure Fix는 Runner → Agent → Runner 구조
+- Local/Hybrid가 필요한 내부망·재현 불가 작업 범위 유지
+
+## 7장 - Cloud Agent Task Contract: 작은 Task와 작은 Context
+
+상태: `초고 작성 완료`
+
+- 설계: `chapters/07/plan.md`
+- 초고: `chapters/07/draft.md`
+
+주요 내용:
+
+- Task / Goal / Scope 분리
+- Relevant Files를 initial context boundary로 사용
+- Forbidden Changes로 변경 경계 정의
+- Validation을 실행 가능한 명령으로 명시
+- Expected Result를 관찰 가능한 결과로 작성
+- Output / Evidence 정의
+- Progressive Context와 단계적 Context 확대
+- Base SHA / Task Branch / Environment 연결
+- Retry / Token Budget을 선택 필드로 사용
+- Task Contract가 너무 크면 Task 분해 또는 Local/Hybrid 재검토
+- `campus-platform` AUTH-142 Task Contract 예제
+
+## 8장 - Tool Output을 줄이고 Evidence를 남기기
+
+상태: `초고 작성 완료 / 다음 자체 검토 대상`
+
+- 설계: `chapters/08/plan.md`
+- 초고: `chapters/08/draft.md`
+
+주요 내용:
+
+- Tool Output도 LLM Context라는 관점
+- Result Filter는 결정론적 프로그램으로 시작
+- Result Gateway는 Raw Artifact를 보존하고 필요 부분만 조회
+- Agent가 처음 읽는 Summary를 작게 유지
+- Result 조회에도 Progressive Context 적용
+- Artifact First / result.json 개념
+- 자연어 완료 선언과 Evidence 분리
+- Demos over Diffs
+- Failure Fingerprint
+- Retry와 실패 변화 여부 판단
+- Budget과 Result 처리 연결
+- PASS에도 최소 Evidence 보존
+- `campus-platform` AUTH-142 실패/재검증 예제
+
+# Small Input / Small Output
+
+7장과 8장을 다음 한 쌍으로 완성했다.
+
+```text
+Task Contract
+→ Small Input / Context
+        ↓
+Cloud Runner / Agent
+        ↓
+Result Gateway / Evidence
+→ Small Output / Tool Result
+```
 
 # Preserved / Future Topics
 
@@ -226,9 +252,9 @@ Phase 5 완료.
 
 # Next
 
-1. 6장 초고 설계 대비 자체 검토
+1. 8장 초고 설계 대비 자체 검토
 2. 필요한 수정 반영
-3. 7장 `Cloud Agent Task Contract: 작은 Task와 작은 Context` 초고 작성
+3. 9장 `Prepared Cloud Environment, Cache, Snapshot` 초고 작성
 4. 이후 같은 방식으로 18장까지 순차 진행
 
 Phase 6에서는 장별로 `초고 → 설계 대비 검토 → 수정 → 다음 장` 순서로 진행한다.
