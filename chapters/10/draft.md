@@ -4,7 +4,7 @@ Cloud 환경에서 실행되는 모든 작업에 LLM이 필요한 것은 아니�
 
 9장에서 Prepared Cloud Environment를 만들었다면 그 환경은 Agent 전용 공간이 아니라 반복 가능한 실행 노드가 된다.
 
-Build, Test, E2E, Docker Build처럼 명령과 판정 기준이 정해진 작업은 먼저 Runner가 처리할 수 있다.
+Build, Test, E2E, Docker Build처럼 명령과 판정 기준이 정해진 작업은 먼저 Cloud Runner가 처리할 수 있다.
 
 ```text
 Cloud Runner
@@ -33,7 +33,7 @@ Cloud Agent
 ./gradlew test
 ```
 
-필요한 것은 Repository와 Runtime, CPU/RAM, Test Tool이다.
+필요한 것은 Repository와 Runtime, CPU / RAM, Test Tool이다.
 
 반대로 다음 질문은 판단이 필요하다.
 
@@ -45,14 +45,14 @@ AuthServiceTest.expiredToken이 왜 실패했는가?
 따라서 한 Task 안에서도 실행 주체가 바뀐다.
 
 ```text
-Runner
+Cloud Runner
 → Test
 → FAIL
 
-Agent
+Cloud Agent
 → Analyze / Fix
 
-Runner
+Cloud Runner
 → Verification
 ```
 
@@ -83,7 +83,7 @@ E2E
 
 권장 방식
 → ./gradlew test
-→ exit code / report 확인
+→ Exit Code / Report 확인
 ```
 
 가능하면 완료 조건을 실행 가능한 명령으로 만든다.
@@ -119,7 +119,7 @@ Migration
 
 ```text
 5 FAIL
-├─ Infra Failure
+├─ Infrastructure Failure
 ├─ Auto-fix 가능한 규칙 위반
 └─ Code Reasoning이 필요한 Failure
 ```
@@ -127,7 +127,7 @@ Migration
 Agent는 마지막 경우에만 필요하다.
 
 ```text
-Runner
+Cloud Runner
 → PASS → Done
 → FAIL
     ↓
@@ -234,7 +234,7 @@ Migration syntax error
 코드 판단이 필요한 실패가 남으면 Agent를 호출한다.
 
 ```text
-Runner
+Cloud Runner
   ↓
 FAIL
   ↓
@@ -246,7 +246,7 @@ Analyze / Fix
   ↓
 Commit
   ↓
-Runner
+Cloud Runner
   ↓
 Verification
 ```
@@ -280,7 +280,7 @@ AuthServiceTest.java
 다음 흐름으로 끝내지 않는다.
 
 ```text
-Agent
+Cloud Agent
 → Code Fix
 → "수정 완료"
 → PR
@@ -290,7 +290,7 @@ Agent
 
 ```text
 Agent Fix
-→ Runner
+→ Cloud Runner
 → PASS / FAIL
 ```
 
@@ -319,22 +319,22 @@ Agent의 설명과 실행 사실을 분리하는 과정이다.
 
 ```text
 Agent Fix
-→ Runner
+→ Cloud Runner
 → FAIL
-→ Fingerprint
+→ Failure Fingerprint
 ```
 
 실패가 바뀌었다면 진행 중일 수 있다.
 
 ```text
-1차
+Retry #1
 Compilation Error
 
-2차
+Retry #2
 Assertion Failure
 ```
 
-반대로 동일 Fingerprint가 반복된다면 같은 시도를 계속할 이유가 줄어든다.
+반대로 동일 Failure Fingerprint가 반복된다면 같은 시도를 계속할 이유가 줄어든다.
 
 ```text
 Retry #1 → Fingerprint A
@@ -378,7 +378,7 @@ Docker      → def456
 
 ---
 
-## 10. Sharding은 실행시간과 시작비용을 함께 본다
+## 10. Sharding은 실행시간과 시작 비용을 함께 본다
 
 큰 Test Suite는 여러 Runner로 나눌 수 있다.
 
@@ -401,7 +401,7 @@ Shard 간 State 공유가 적음
 
 하지만 Worker Provisioning과 Environment Restore에도 비용이 있다.
 
-짧은 테스트를 너무 잘게 나누면 시작비용이 실행시간보다 커질 수 있다.
+짧은 테스트를 너무 잘게 나누면 시작 비용이 실행시간보다 커질 수 있다.
 
 따라서 Shard 수는 고정 규칙이 아니라 프로젝트의 실제 실행시간과 준비시간을 보고 정한다.
 
@@ -412,7 +412,7 @@ Shard 간 State 공유가 적음
 출결 인증 변경 Commit이 있다고 하자.
 
 ```text
-SHA: def456
+Git SHA: def456
 ```
 
 Cloud Runner가 먼저 검증한다.
@@ -424,19 +424,20 @@ Docker      PASS
 E2E         PASS
 ```
 
-Integration Failure가 인프라 문제가 아니라 재현 가능한 코드 Failure라면 Agent가 해당 실패만 분석한다.
+Integration Failure가 인프라 문제가 아니라 재현 가능한 Code Failure라면 Agent가 해당 실패만 분석한다.
 
 ```text
 Integration Runner
 → FAIL
 → Failure Summary
 → Cloud Agent
-→ Fix Commit ghi789
+→ Fix
+→ Result SHA ghi789
 → Integration Runner
 → PASS
 ```
 
-수정 SHA가 바뀌었으므로 필요한 검증은 `ghi789` 기준으로 다시 맞춘다.
+Result SHA가 바뀌었으므로 필요한 검증은 `ghi789` 기준으로 다시 맞춘다.
 
 이 구조에서 Agent는 전체 검증 파이프라인을 대신하는 존재가 아니다.
 
@@ -449,15 +450,15 @@ Integration Runner
 ```text
 Prepared Environment
         ↓
-Runner
+Cloud Runner
   ├─ PASS → Evidence → Done
   └─ FAIL
        ↓
    Classification
        ↓
-   Tool / Retry / Agent
+   Tool / Retry / Cloud Agent
        ↓
-   수정이 있으면 Runner 재검증
+   수정이 있으면 Cloud Runner 재검증
 ```
 
 정리하면 다음 세 문장으로 충분하다.
