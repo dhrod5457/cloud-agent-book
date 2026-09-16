@@ -1,10 +1,8 @@
 # Current Phase
 
-Phase 7 - 전체 초고 편집/교정 진행 중
+Phase 7 완료 - 1~18장 전체 초고 편집/교정 및 정합성 점검 완료
 
-Phase 6에서 1~18장 본문 초고 작성과 전체 정합성 점검을 완료했다.
-
-현재 **1~15장 편집/교정을 완료했다.**
+다음 단계는 Phase 8 최종 교정 / 출판 준비다.
 
 # Source of Truth
 
@@ -17,9 +15,10 @@ Phase 6에서 1~18장 본문 초고 작성과 전체 정합성 점검을 완료�
 5. `planning/phase5-consistency-check.md`
 6. `planning/phase6-draft-consistency-check.md`
 7. `planning/phase7-editing-plan.md`
-8. 각 `chapters/NN/plan.md`
-9. `planning/future-topics.md`
-10. `STATUS.md`
+8. `planning/phase7-editing-consistency-check.md`
+9. 각 `chapters/NN/plan.md`
+10. `planning/future-topics.md`
+11. `STATUS.md`
 
 과거 Agent-Native 독립 장 설계와 초기 22~23장 체계는 현행 목차보다 우선하지 않는다.
 
@@ -64,6 +63,7 @@ Cloud Agent
 - Task는 Local 또는 Cloud에 영구적으로 속하지 않는다. 작업 단계에 따라 실행 위치를 이동할 수 있다.
 - 이벤트가 없으면 Agent도 실행하지 않는다.
 - Cloud를 쓰지 않는 결정도 올바른 Routing 결과다.
+- Local Fallback은 실패가 아니라 Routing의 일부다.
 
 # Current TOC
 
@@ -86,147 +86,126 @@ Cloud Agent
 17. Cloud가 항상 정답은 아니다
 18. 다음 단계: Harness와 Orchestration
 
-# Phase 7 Editing Rules
+# Phase 5 Result
 
-`planning/phase7-editing-plan.md`를 기준으로 편집한다.
+Phase 5 완료.
+
+- 1~18장 설계 완료
+- 장별 역할/중복/용어/범위 정합성 점검 완료
+- `planning/phase5-consistency-check.md` 작성
+
+# Phase 6 Result
+
+Phase 6 완료.
+
+- `chapters/01/draft.md` ~ `chapters/18/draft.md` 초고 작성 완료
+- 설계 대비 장별 검토 완료
+- 전체 초고 정합성 점검 완료
+- `planning/phase6-draft-consistency-check.md` 작성
+
+# Phase 7 Result
+
+Phase 7 완료.
+
+- 1~18장 전체 편집/교정 완료
+- 중복 설명 압축
+- 장별 역할 경계 명확화
+- 핵심 용어 표기 정리
+- 설명용 숫자와 제품별 변경 가능한 사실의 본문 원칙 분리
+- 장간 연결부 정리
+- `AUTH-142 / expired token` 반복 예제를 공통 연결 사례로 정리
+- Agent Platform 일반론 확장 방지
+- `planning/phase7-editing-consistency-check.md` 작성
+
+# Final Edited Flow
 
 ```text
-중복 압축
-→ 용어 통일
-→ 장간 연결
-→ 예제 정리
-→ 수치/근거 구분
-→ 문장 교정
-```
-
-편집 원칙:
-
-- 최초 설명 장에서 개념을 정의하고 후속 장에서는 적용 중심으로 줄인다.
-- 새 개념을 추가하지 않는다.
-- 과거 장 번호를 사용하지 않는다.
-- 제품별 변경 가능한 사양은 본문 원칙과 분리한다.
-- `AUTH-142 / expired token` 예제는 연결 장치로 유지하되 배경 설명은 반복하지 않는다.
-- 설명용 숫자는 실제 운영 수치처럼 보이지 않게 구분한다.
-- Part 전환부와 장간 연결 문장을 점검한다.
-
-# Phase 7 Progress
-
-## 1~12장
-
-상태: `편집/교정 완료`
-
-핵심 흐름:
-
-```text
-1장  Cloud Agent 정의
-2장  Local / Cloud / Hybrid 비교
+1장  Cloud Agent = Remote Development Worker
+  ↓
+2장  Local / Cloud / Hybrid
+  ↓
 3장  Compute / LLM / Human Cost
+  ↓
 4장  독립 실행환경 / 비동기 / 병렬 실행 가치
-5장  Task Routing Framework
+  ↓
+5장  Task Routing
+  ↓
 6장  개발 작업 Catalog
+  ↓
 7장  Task Contract / Small Input
-8장  Result Gateway / Small Output / Evidence
+  ↓
+8장  Result Gateway / Evidence / Small Output
+  ↓
 9장  Prepared Environment / Startup Cost
+  ↓
 10장 Runner-first / Agent-on-failure
+  ↓
 11장 Source / Runtime / Evidence Isolation
+  ↓
 12장 Independent Task Fan-out / Fan-in Cost
+  ↓
+13장 Human-driven Handoff
+  ↓
+14장 Event-driven Handoff
+  ↓
+15장 campus-platform 운영 모델
+  ↓
+16장 End-to-End 기능 Timeline
+  ↓
+17장 Cloud Stop / Local Fallback / 재Routing
+  ↓
+18장 Harness / Orchestration 미래 방향 + 결론
 ```
 
-## 13장 - Local → Cloud → Local Handoff
+# Phase 7 Consistency Result
 
-상태: `편집/교정 완료`
+구조적 충돌 없음.
 
-주요 변경:
-
-- Local/Cloud 특성 반복 설명을 제거하고 Handoff 경계에 집중
-- Local→Cloud 입력을 `Git + Task Contract`로 정리
-- Cloud→Local 반환을 `Evidence + Commit / PR`로 정리
-- 미커밋 Local State 처리 원칙 명시
-- Internal Validation을 Hybrid 마지막 Stage로 정리
-- Multi-Repository는 필요한 Repository와 각 SHA만 전달
-- Local Fallback 상세 기준은 17장으로 이동
-- Handoff의 목적을 Developer Blocking Time 감소와 연결
-
-## 14장 - Task Queue와 Event-driven Cloud Agent
-
-상태: `편집/교정 완료`
-
-주요 변경:
-
-- Event를 Agent 호출이 아니라 Task Candidate로 정의
-- `Event → Dedup / Classification → Runner / Tool → 필요 시 Agent` 공통 흐름으로 통일
-- CI / Review / Nightly / Dependency Update를 같은 실행 규칙으로 연결
-- 같은 SHA + Failure Fingerprint 기반 중복 Task 억제
-- Agent Push → CI FAIL → Agent 재호출 Loop에 Budget/Fingerprint 종료 조건 적용
-- Issue가 불명확하면 Local Investigation으로 보내는 경계 유지
-- 결과는 기존 PR Commit 또는 Review 가능한 PR로 반환
-
-## 15장 - campus-platform Cloud Agent Workflow 설계
-
-상태: `편집/교정 완료`
-
-주요 변경:
-
-- 앞 장의 개념을 다시 설명하지 않고 하나의 운영 모델로 통합
-- `Local Agent / Cloud Runner / Cloud Agent` 역할표로 실행 주체 구분
-- Task Type과 Prepared Environment 연결
-- 반복 작업을 Task Catalog로 정리
-- Task ID / Base SHA / Result SHA / Verification / Evidence / PR 상태 연결
-- 같은 SHA에서 Unit / Integration / Docker / E2E 병렬 검증
-- Result Gateway를 프로젝트 공통 반환 인터페이스로 사용
-- Failure를 Environment 경로와 Code Agent 경로로 분리
-- Tibero / HSM / Internal API를 Internal Validation Stage로 유지
-- Event-driven Task를 동일 운영 모델의 입력 채널로 통합
-- 운영 플랫폼 구축보다 반복 가능한 Workflow를 먼저 만든다는 원칙 유지
-
-# Current Edited Flow
+주요 역할 경계:
 
 ```text
-Task Routing
-      ↓
-Task Contract / Small Input
-      ↓
-Prepared Environment
-      ↓
-Runner-first
-      ↓
-필요한 경우 Cloud Agent
-      ↓
-Evidence / Small Output
-      ↓
-Git / Task Isolation
-      ↓
-독립 Task 병렬화
-      ↓
-Local → Cloud → Local Handoff
-      ↓
-Event-driven Task Input
-      ↓
-campus-platform 운영 모델
+2장 = 실행 위치 차이
+5장 = 시작 Routing
+17장 = 실행 중 재Routing
+
+4장 = 병렬화 가치
+12장 = 병렬화 비용
+
+7장 = Task Contract 정의
+16장 = 실제 기능 Timeline에서 적용
+
+13장 = Handoff Protocol
+15장 = 정적 운영 모델
+16장 = 시간순 실행 사례
 ```
 
-# Phase 7 Remaining Focus
+18장은 Agent Platform 일반론으로 확장하지 않고 현재 Workflow의 반복 결정을 자동화하는 다음 단계로 제한한다.
 
-남은 장:
+# Phase 8 - 최종 교정 / 출판 준비
+
+새 구조를 추가하지 않고 출판용 마감에 집중한다.
+
+우선순위:
 
 ```text
-16장 하나의 기능을 Local + Cloud로 끝까지 개발하기
-17장 Cloud가 항상 정답은 아니다
-18장 다음 단계: Harness와 Orchestration
+문장 단위 교정
+→ 제목 / 절 제목 / 용어 표기 통일
+→ 코드블록 / 표 형식 통일
+→ 장간 참조 번호 검사
+→ 제품 사례 공식 출처 / 기준일 재확인
+→ 참고자료 표기 통일
+→ 설명용 수치 표기 재확인
+→ Part 전환부 / 도입 / 결론 연결
+→ 최종 목차와 본문 제목 일치 확인
+→ 출판용 원고 형태 준비
 ```
-
-마지막 편집 기준:
-
-- 16장은 15장의 운영 모델을 다시 설명하지 않고 시간순 End-to-End 사례에 집중
-- 17장은 5장의 시작 Routing을 반복하지 않고 Cloud 중단 / 역판단 / Local Fallback에 집중
-- 18장은 현재 책의 범위를 닫고 Harness / Orchestration을 미래 방향으로만 소개
-- 제품별 변경 가능한 사실과 출처를 최종 점검
-- 장간 참조 번호와 용어 표기를 최종 통일
 
 # Next
 
-1. 16장 `하나의 기능을 Local + Cloud로 끝까지 개발하기` 편집
-2. 17장 `Cloud가 항상 정답은 아니다` 편집
-3. 18장 `다음 단계: Harness와 Orchestration` 편집
-4. 1~18장 전체 편집 결과 최종 정합성 점검
-5. Phase 7 완료 후 최종 교정/출판 준비 단계로 전환
+1. 1~18장 문장/표기 최종 교정
+2. 제품명을 직접 언급한 문장의 공식 출처와 기준일 검증
+3. 장간 참조와 제목 정합성 검사
+4. 참고자료 형식 통일
+5. 최종 원고 묶음 준비
+
+Phase 8에서도 Agent Platform 관련 새 주제를 추가하지 않는다.
