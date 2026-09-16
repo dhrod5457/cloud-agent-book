@@ -4,7 +4,7 @@ Phase 8 - 최종 교정 / 출판 준비 진행 중
 
 Phase 7에서 1~18장 전체 편집/교정과 정합성 점검을 완료했다.
 
-현재 **1~12장 최종 교정을 완료했다.**
+현재 **1~15장 최종 교정을 완료했다.**
 
 # Source of Truth
 
@@ -180,7 +180,7 @@ Phase 7 완료.
 
 # Phase 8 Progress
 
-## 1~9장
+## 1~12장
 
 상태: `최종 교정 완료`
 
@@ -191,48 +191,51 @@ Phase 7 완료.
 - 7장: Task Contract 반환 필드, YAML Budget, AUTH-142 필드 표기 통일
 - 8장: Raw Artifact / Result Gateway / Result SHA / Failure Fingerprint 표기 정리
 - 9장: Prepared Environment / Cache / Snapshot / Fresh Source / Cold Start 표기 정리
+- 10장: Cloud Runner / Failure Classification / Retry / Result SHA 표기 정리
+- 11장: Source / Runtime / Evidence Isolation과 YAML 추적 필드 통일
+- 12장: Parallel Compute / Context Duplication / Fan-in / 설명용 수치 표기 정리
 
-## 10장 - Cloud Agent를 Test Runner처럼 사용하기
-
-상태: `최종 교정 완료`
-
-주요 교정:
-
-- `Cloud Runner → Cloud Agent → Cloud Runner 재검증` 실행 주체 표기 통일
-- `CPU / RAM`, Exit Code, Failure Classification 표기 정리
-- Retry 표현을 `Retry #N`으로 통일
-- Agent 수정 결과를 `Result SHA`와 연결
-- Sharding의 실행시간 / 시작 비용 경계 유지
-
-## 11장 - Git, Branch, Worktree, Container로 작업 격리하기
+## 13장 - Local → Cloud → Local Handoff
 
 상태: `최종 교정 완료`
 
 주요 교정:
 
-- `Base SHA / Result SHA / Validation Result / Artifact Path` 추적 필드 통일
-- YAML 상태 필드를 `result_sha`, `validation_result`, `artifact_path`로 정리
-- Source / Runtime / Evidence Isolation 표기 통일
-- `DB Schema`, Multi-Repository Base SHA, Artifact 경로 표기 정리
+- Handoff 반환 경계를 `Evidence + Result SHA / PR`로 통일
+- `Base SHA → Result SHA → Verification SHA` 관계 명확화
+- Expected Evidence를 `Result SHA / Changed Files / Validation Result`로 통일
+- 상태 YAML을 `result_sha`, `validation_result`, `artifact_path`로 정리
+- 설명용 시간 예시임을 명시
+- 17장의 Local Fallback 경계 참조 유지
 
-## 12장 - 병렬 Worker와 중복 Context 비용
+## 14장 - Task Queue와 Event-driven Cloud Agent
 
 상태: `최종 교정 완료`
 
 주요 교정:
 
-- Parallel Compute / Parallel Reasoning / Context Duplication / Fan-in 용어 통일
-- Read-only 검증의 실행 주체를 Cloud Runner로 명확화
-- Task 10개, PR 20/5 per day, Worker 2→8은 설명용 수치임을 명시
-- 병렬화 비용 모델을 개념 모델로 명확화
-- Best-of-N 기본값 `N=1` 유지
+- Event 입력 상태는 `Git SHA`, Agent 수정 결과는 `Result SHA`로 분리
+- CI / Review Event YAML의 SHA 필드 의미 통일
+- Agent 수정 후 재검증 주체를 `Cloud Runner`로 통일
+- Event-driven 반환 경계를 `Result SHA / Evidence / PR`로 정리
+- Failure Fingerprint / Retry Budget 종료 조건과 17장 참조 유지
+
+## 15장 - campus-platform Cloud Agent Workflow 설계
+
+상태: `최종 교정 완료`
+
+주요 교정:
+
+- 운영 상태 필드를 `Base SHA / Result SHA / Validation Result / Artifact Path`로 통일
+- YAML을 `result_sha`, `validation_result`, `artifact_path`로 정리
+- 모든 병렬 검증이 같은 `Result SHA`를 사용한다는 표현 명확화
+- Result Gateway 첫 화면의 SHA를 `Result SHA`로 통일
+- Agent 수정 후 `Cloud Runner` 재검증 표기 통일
+- 13장 Handoff / 14장 Event-driven 입력을 하나의 운영 모델로 연결
 
 # Phase 8 Remaining Focus
 
 ```text
-13~15장
-Handoff / Event / 운영 모델 장간 참조 점검
-
 16~18장
 Timeline / Fallback / 결론 문장 최종 교정
 ```
@@ -249,8 +252,8 @@ Timeline / Fallback / 결론 문장 최종 교정
 
 # Next
 
-1. 13장 `Local → Cloud → Local Handoff` 최종 교정
-2. 14장 `Task Queue와 Event-driven Cloud Agent` 최종 교정
-3. 15장 `campus-platform Cloud Agent Workflow 설계` 최종 교정
-4. 이후 16~18장 순차 진행
-5. 전체 장 교정 완료 후 제품 출처 / 참조 / 목차 / 참고자료 최종 검사
+1. 16장 `하나의 기능을 Local + Cloud로 끝까지 개발하기` 최종 교정
+2. 17장 `Cloud가 항상 정답은 아니다` 최종 교정
+3. 18장 `다음 단계: Harness와 Orchestration` 최종 교정
+4. 1~18장 전체 장 교정 완료 상태 점검
+5. 제품 출처 / 참조 / 목차 / 참고자료 최종 검사
