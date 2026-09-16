@@ -1,6 +1,7 @@
 # 1장 공식 근거 - Cloud Worker 실행 모델
 
 기준일: 2026-09-16
+공식 자료 재검증: 2026-09-16
 
 이 문서는 1장 본문에서 Cloud coding agent의 공통 실행 모델을 설명할 때 사용할 공식 근거를 정리한다.
 
@@ -19,8 +20,11 @@
 공식 자료:
 
 - GitHub Docs, `About GitHub Copilot cloud agent`
+  - https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-cloud-agent
 - GitHub Docs, `Configure the development environment`
+  - https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/customize-the-agent-environment
 - GitHub Docs, `Best practices for using GitHub Copilot to work on tasks`
+  - https://docs.github.com/en/copilot/tutorials/cloud-agent/get-the-best-results
 
 본문에서 사용할 일반 원칙:
 
@@ -41,7 +45,9 @@
 공식 자료:
 
 - OpenAI, `Addendum to OpenAI o3 and o4-mini system card: Codex`, 2025-05-16
+  - https://openai.com/index/o3-o4-mini-codex-system-card-addendum/
 - OpenAI, `Codex is now generally available`, 2025-10-06
+  - https://openai.com/index/codex-now-generally-available/
 
 본문에서 사용할 일반 원칙:
 
