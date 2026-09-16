@@ -11,8 +11,8 @@ Cloud Agent의 장점은 분명하다.
 ```text
 독립 실행환경
 장시간 작업의 비동기 위임
-병렬 Compute
-Local Resource 점유 감소
+Parallel Compute
+Local Resource Occupancy 감소
 Git 기반 Handoff
 ```
 
@@ -96,7 +96,7 @@ Cloud Overhead > Task Work
 
 `몇 분 이하이면 Local` 같은 절대 기준은 두지 않는다. 프로젝트마다 Cold Start, CI, Review 시간이 다르기 때문이다.
 
-9장의 Prepared Environment로 시작 비용을 줄일 수 있어도, 모든 작은 Task가 Cloud에 적합해지는 것은 아니다.
+9장의 Prepared Environment로 시작 비용을 줄일 수 있어도 모든 작은 Task가 Cloud에 적합해지는 것은 아니다.
 
 ---
 
@@ -194,7 +194,7 @@ Secret 제공 제한
 ```text
 특정 Device 의존
 HSM Firmware 의존
-내부 Network Latency
+Internal Network Latency
 Production-only Race Condition
 운영 데이터 상태 의존
 Local-only File / Process State
@@ -227,7 +227,7 @@ Cloud
 → Local Fallback
 ```
 
-운영 Incident도 마찬가지다. `가끔 느리다` 같은 문제는 먼저 운영/Local 환경에서 범위를 좁힌 뒤, 재현 가능한 작은 Bug가 되었을 때 Cloud Task로 바꾸는 편이 낫다.
+운영 Incident도 마찬가지다. `가끔 느리다` 같은 문제는 먼저 운영/Local 환경에서 범위를 좁힌 뒤 재현 가능한 작은 Bug가 되었을 때 Cloud Task로 바꾸는 편이 낫다.
 
 ---
 
@@ -320,7 +320,7 @@ Human Steering 반복
 Cloud 재현 불가
 ```
 
-예를 들어 처음에는 세 파일 변경으로 예상했지만 실제로 여러 Module과 Schema까지 영향을 준다면 다음처럼 전환한다.
+예를 들어 처음에는 제한된 파일 변경으로 예상했지만 실제로 여러 Module과 DB Schema까지 영향을 준다면 다음처럼 전환한다.
 
 ```text
 Cloud Task Stop
@@ -346,7 +346,9 @@ Cloud에서 해결하지 못함
 Local에서 그대로 이어갈 수 있는 Return Package를 만든다.
 
 ```text
-Current Commit
+Task ID
+Base SHA
+Result SHA
 Changed Files
 Failed Command
 Failure Summary
@@ -362,12 +364,16 @@ Fallback Reason
 ```text
 Task: HSM-37
 Status: LOCAL_FALLBACK
-Current SHA: def456
+Base SHA: abc123
+Result SHA: def456
 Reason: actual HSM required
 
-Cloud Verification
+Cloud Validation Result
 Unit: PASS
 Mock Contract: PASS
+
+Artifact Path
+artifacts/HSM-37/def456/
 
 Remaining
 Actual HSM session validation
@@ -390,9 +396,9 @@ Cloud에서 한 작업을 버리지 않고 남은 경계부터 Local에서 이�
 | 새 인증 Architecture 설계 | Local |
 | 재현 가능한 AuthService Bug | Cloud Agent 후보 |
 | Unit / Integration / E2E / Docker | Cloud Runner |
-| Migration 일반 검증 | Cloud |
+| Migration 일반 검증 | Cloud Runner |
 | Tibero 실제 적용 | Local |
-| HSM Pure Logic / Mock Test | Cloud |
+| HSM Pure Logic / Mock Test | Cloud Runner |
 | 실제 HSM Session | Local |
 
 같은 기능 안에서도 단계별 실행 위치는 달라질 수 있다.
