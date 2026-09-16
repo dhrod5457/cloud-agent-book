@@ -1,6 +1,7 @@
 name: Build master manuscript
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
