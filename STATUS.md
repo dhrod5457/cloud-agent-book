@@ -4,7 +4,7 @@ Phase 7 - 전체 초고 편집/교정 진행 중
 
 Phase 6에서 1~18장 본문 초고 작성과 전체 정합성 점검을 완료했다.
 
-현재 1~9장 편집/교정을 완료했다.
+현재 **1~12장 편집/교정을 완료했다.**
 
 # Source of Truth
 
@@ -67,8 +67,6 @@ Cloud Agent
 
 # Current TOC
 
-`planning/toc.md`가 최신 목차다.
-
 1. Coding Agent에서 Cloud Worker로
 2. Local Agent와 Cloud Agent
 3. Cloud Session, Container, Compute와 Token
@@ -88,30 +86,9 @@ Cloud Agent
 17. Cloud가 항상 정답은 아니다
 18. 다음 단계: Harness와 Orchestration
 
-# Phase 5 Result
-
-Phase 5 완료.
-
-- 1~18장 설계 완료
-- 전체 역할/중복/용어/범위 정합성 점검 완료
-- `planning/phase5-consistency-check.md` 작성
-- Agent Platform 확장 내용은 `planning/future-topics.md`로 이동
-
-# Phase 6 Result
-
-Phase 6 완료.
-
-- `chapters/01/draft.md` ~ `chapters/18/draft.md` 작성 완료
-- 1~18장 설계 대비 검토 완료
-- 전체 역할/중복/용어/범위 정합성 점검 완료
-- `planning/phase6-draft-consistency-check.md` 작성
-- Agent Platform 일반론은 18장의 미래 전망 수준으로 제한
-
 # Phase 7 Editing Rules
 
 `planning/phase7-editing-plan.md`를 기준으로 편집한다.
-
-우선순위:
 
 ```text
 중복 압축
@@ -128,8 +105,8 @@ Phase 6 완료.
 - 새 개념을 추가하지 않는다.
 - 과거 장 번호를 사용하지 않는다.
 - 제품별 변경 가능한 사양은 본문 원칙과 분리한다.
-- `AuthService expired token` 반복 예제는 연결 장치로 유지하되 배경 설명은 반복하지 않는다.
-- 한 문단에 하나의 판단을 두고 같은 의미의 문장을 연속해서 반복하지 않는다.
+- `AUTH-142 / expired token` 예제는 연결 장치로 유지하되 배경 설명은 반복하지 않는다.
+- 설명용 숫자는 실제 운영 수치처럼 보이지 않게 구분한다.
 - Part 전환부와 장간 연결 문장을 점검한다.
 
 # Phase 7 Progress
@@ -138,102 +115,119 @@ Phase 6 완료.
 
 상태: `편집/교정 완료`
 
-핵심 정리:
+- 1장: Cloud Agent 정의와 Remote Development Worker 모델
+- 2장: Local / Cloud / Hybrid 판단 재료
+- 3장: Reasoning Resource / Execution Resource / Compute·LLM·Human Cost
+- 4장: 독립 실행환경 / 비동기 / Developer Blocking Time / 병렬 실행 가치
+- 5장: Task Routing Framework
+- 6장: 개발 작업 Catalog와 `Runner → Agent → Runner`
 
-- 1장: Cloud Agent 정의와 Remote Development Worker 모델에 집중
-- 2장: Local / Cloud / Hybrid 판단 재료에 집중
-- 3장: Reasoning Resource와 Execution Resource 분리
-- 4장: 독립 실행환경 / 비동기 / Developer Blocking Time / 병렬성 가치에 집중
-- 5장: Task Routing Framework로 압축
-- 6장: 개발 작업 Catalog와 `Runner → Agent → Runner` 구조로 압축
+## 7~9장
 
-## 7장 - Cloud Agent Task Contract: 작은 Task와 작은 Context
+상태: `편집/교정 완료`
+
+```text
+7장 Task Contract
+→ Small Input / Context
+
+8장 Result Gateway
+→ Small Output / Evidence
+
+9장 Prepared Environment
+→ Small Startup Overhead
+```
+
+주요 정리:
+
+- 7장은 Task의 입력 경계와 Progressive Context에 집중
+- 8장은 Raw Artifact 보존과 작은 Evidence Summary에 집중
+- 9장은 Prepared Environment / Cache / Snapshot / Fresh State 경계에 집중
+
+## 10장 - Cloud Agent를 Test Runner처럼 사용하기
 
 상태: `편집/교정 완료`
 
 주요 변경:
 
-- Task Contract를 `입력 경계`로 정의
-- `Task / Goal / Scope / Relevant Files / Forbidden Changes / Validation / Expected Result / Evidence`를 핵심 Contract로 정리
-- Progressive Context를 Relevant Files → Dependency → Document → Wider Context 순으로 단순화
-- Base SHA / Environment / Budget은 선택적 실행 메타데이터로 정리
-- AUTH-142 예제를 이후 장에서 재사용할 기준 예제로 고정
-- 16장의 End-to-End 절차와 겹치는 실행 설명 축약
+- 6장의 작업 Catalog 반복을 제거하고 Runner-first 실행 규칙에 집중
+- `Deterministic First`와 정상 PASS 경로에서 Agent 제거
+- FAIL 후 Infrastructure / Tool-fix / Code Reasoning을 분류
+- `Agent-on-failure → Runner 재검증`을 장의 핵심 흐름으로 정리
+- Result Gateway 상세는 8장 참조로 축약
+- 독립 검증의 병렬 Runner는 소개하되 병렬화 비용은 12장으로 이동
+- Sharding은 실행시간과 Startup Overhead를 같이 보는 선택지로 정리
 
-## 8장 - Tool Output을 줄이고 Evidence를 남기기
-
-상태: `편집/교정 완료`
-
-주요 변경:
-
-- `Tool Output → Result Filter → Result Gateway → Evidence` 흐름으로 재구성
-- Raw Artifact 보존과 Agent Context 축소를 분리
-- `result.json`은 예시 결과 인터페이스로만 유지
-- 자연어 Summary와 실행 Evidence 역할 분리
-- Demos over Diffs를 UI 검증 순서로 한정
-- Failure Fingerprint는 반복 실패 식별까지 다루고 중단/Local Fallback 판단은 17장으로 이동
-- 7장 Small Input과 8장 Small Output의 대칭 구조 강화
-
-## 9장 - Prepared Cloud Environment, Cache, Snapshot
+## 11장 - Git, Branch, Worktree, Container로 작업 격리하기
 
 상태: `편집/교정 완료`
 
 주요 변경:
 
-- Cold Start를 Provisioning / Checkout / Dependency Restore / Warm-up / First Command로 분해
-- Prepared Environment와 Cloud Environment as Code에 집중
-- Task-specific Environment 구분
-- Reusable Cache와 Fresh Source/Runtime State 경계 강화
-- Cache Invalidation / Snapshot / Warm Worker를 준비 비용 관점으로 정리
-- 반복 환경 실패는 Prompt가 아니라 Environment를 수정한다는 원칙 유지
-- Task Contract에는 설치 절차 대신 Environment 이름을 사용하도록 연결
-- 10장 Runner-first로 이어지는 연결부 정리
+- Git을 Local↔Cloud Handoff Boundary와 Source 기준점으로 정리
+- Base SHA / Branch per Task / Verification SHA 연결 강화
+- Source Isolation과 Runtime Isolation을 분리
+- Worktree는 Source 격리, Container/VM은 Runtime 격리로 명확화
+- DB / Port / Temp / Artifact Path도 Task별로 분리
+- 같은 파일 / Shared Module / Migration / Schema의 논리적 충돌은 별도 문제로 유지
+- Multi-Repository는 필요한 Repository와 각 Base SHA만 연결
+
+## 12장 - 병렬 Worker와 중복 Context 비용
+
+상태: `편집/교정 완료`
+
+주요 변경:
+
+- Parallel Compute와 Parallel Reasoning 구분
+- Read-only 검증을 병렬화의 첫 대상으로 정리
+- Fan-out 전 Task Dependency와 Change Locality 확인
+- Agent 수 증가에 따른 Context Duplication 비용 명시
+- Fan-in / Review / Merge / Rework 비용을 병렬화 판단에 포함
+- Review Capacity를 병렬도의 상한으로 설명
+- Startup Overhead와 Prepared Environment 연결
+- Dependency-aware Parallel Group 예제 유지
+- Best-of-N은 기본값 N=1인 제한적 고급 기법으로 정리
 
 # Current Edited Flow
 
 ```text
-7장
-Task Contract
-→ Small Input / Context
-        ↓
-8장
-Result Gateway
-→ Small Output / Evidence
-        ↓
-9장
-Prepared Environment
-→ Small Startup Overhead
-        ↓
-10장
-Runner-first / Agent-on-failure
+7장  Task Contract / Small Input
+  ↓
+8장  Result Gateway / Small Output / Evidence
+  ↓
+9장  Prepared Environment / Startup Cost
+  ↓
+10장 Runner-first / Agent-on-failure
+  ↓
+11장 Source / Runtime / Evidence Isolation
+  ↓
+12장 Independent Task Fan-out / Fan-in Cost
+  ↓
+13장 Local → Cloud → Local Handoff
 ```
 
 # Phase 7 Remaining Focus
 
-반복 압축 대상:
+주요 중복 압축 대상:
 
 ```text
-10 ↔ 6 / 8
-11 ↔ 12
 13 ↔ 15 ↔ 16
 5 ↔ 17
 ```
 
 추가 점검:
 
+- 13→14 Human-driven / Event-driven Handoff 경계
+- 15→16 정적 운영 모델 / 시간순 실행 구분
+- 17→18 현재 범위 / 미래 자동화 경계
 - 설명용 Test Count / 시간 / Retry 횟수 표기
 - 영문 용어 표기 통일
 - 제품 사례 기준일/공식 출처
-- 10→11→12→13 연결
-- 13→14 Human-driven / Event-driven 경계
-- 15→16 정적 운영 모델 / 시간순 실행 구분
-- 17→18 결론과 미래 주제 경계
 - 18장이 Agent Platform 일반론으로 확장되지 않는지 재확인
 
 # Next
 
-1. 10장 `Cloud Agent를 Test Runner처럼 사용하기` 편집
-2. 11장 `Git, Branch, Worktree, Container로 작업 격리하기` 편집
-3. 12장 `병렬 Worker와 중복 Context 비용` 편집
-4. 이후 13~18장 순차 편집
+1. 13장 `Local → Cloud → Local Handoff` 편집
+2. 14장 `Task Queue와 Event-driven Cloud Agent` 편집
+3. 15장 `campus-platform Cloud Agent Workflow 설계` 편집
+4. 이후 16~18장 편집
 5. 전체 편집 완료 후 최종 교정/출판 준비 단계로 전환
