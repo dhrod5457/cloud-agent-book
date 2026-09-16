@@ -4,7 +4,7 @@ Cloud Agent를 실제 개발에 사용하면 비용과 성능을 설명할 때 �
 
 바로 **Cloud에서 코드를 실행하는 자원**과 **LLM이 읽고 판단하는 자원**이다.
 
-예를 들어 Cloud 환경에서 전체 테스트를 30분 동안 실행했다고 하자. 이 시간 동안 CPU와 RAM이 사용되고, Testcontainers가 Container를 띄우며, Disk에는 로그와 테스트 결과가 쌓일 수 있다.
+예를 들어 Cloud 환경에서 전체 Test를 30분 동안 실행했다고 하자. 이 시간 동안 CPU와 RAM이 사용되고, Testcontainers가 Container를 띄우며, Disk에는 로그와 Test 결과가 쌓일 수 있다.
 
 그렇다고 이 30분이 그대로 30분치 LLM 추론이나 일정한 비율의 Token 사용을 의미하지는 않는다.
 
@@ -12,11 +12,11 @@ Cloud Agent를 실제 개발에 사용하면 비용과 성능을 설명할 때 �
 
 ```text
 Reasoning Resource
-- LLM input
-- LLM output
-- reasoning
-- source/context 읽기
-- tool result 분석
+- Input Context
+- Output
+- Reasoning
+- Source / Context 읽기
+- Tool Result 분석
 
 Execution Resource
 - CPU
@@ -65,7 +65,7 @@ Cloud Session
 결과는 어떻게 반환되는가?
 ```
 
-제품별 vCPU, RAM, Disk 숫자는 바뀔 수 있다. 이 장에서는 특정 수치보다 **Task가 독립 실행환경을 사용한다는 구조**에 집중한다.
+제품별 vCPU, RAM, Disk 수치는 바뀔 수 있다. 이 장에서는 특정 수치보다 **Task가 독립 실행환경을 사용한다는 구조**에 집중한다.
 
 ---
 
@@ -74,7 +74,7 @@ Cloud Session
 다음 요청을 생각해 보자.
 
 ```text
-전체 테스트를 실행하고 실패 원인을 찾아 수정해줘.
+전체 Test를 실행하고 실패 원인을 찾아 수정해줘.
 ```
 
 한 문장 안에 성격이 다른 작업이 섞여 있다.
@@ -85,7 +85,7 @@ LLM은 무엇을 실행할지 판단할 수 있다.
 ./gradlew test
 ```
 
-실제 테스트는 Shell, JVM, 운영체제, CPU, RAM에서 실행된다.
+실제 Test는 Shell, JVM, 운영체제, CPU, RAM에서 실행된다.
 
 ```text
 Gradle
@@ -113,7 +113,7 @@ LLM
 결과 분석 / 다음 행동 결정
 ```
 
-Agent가 `테스트를 실행했다`고 표현하더라도 컴파일, 테스트, Browser 렌더링, Docker Build 자체는 일반 프로그램이 수행한다.
+Agent가 `Test를 실행했다`고 표현하더라도 컴파일, Test, Browser 렌더링, Docker Build 자체는 일반 프로그램이 수행한다.
 
 이 구분이 후반부의 Cloud Runner 설계로 이어진다.
 
@@ -164,7 +164,7 @@ Hands가 하는 일:
 
 ## 4. Build 시간과 LLM 사용량은 다른 지표다
 
-설명용 예로 전체 Build가 20분 걸린다고 하자.
+다음 수치는 설명용 예다. 전체 Build가 20분 걸린다고 하자.
 
 ```bash
 ./gradlew clean build
@@ -200,10 +200,10 @@ Repository 구조 확인
 
 ```text
 Agent
-→ build 실행
+→ Build 실행
 
 Environment
-→ 20분 build
+→ 20분 Build
 
 Agent
 → 최종 결과 확인
@@ -213,11 +213,11 @@ Agent
 
 ```text
 Agent
-→ build 실행
-→ 반복 polling
+→ Build 실행
+→ 반복 Polling
 → 로그 누적 읽기
 → 중간 상태 분석
-→ 다시 polling
+→ 다시 Polling
 ```
 
 두 경우 Build 시간은 같아도 LLM이 읽는 Tool Output과 Context의 양은 다르다.
@@ -244,7 +244,7 @@ Agent Response
 
 이 정보가 Context가 된다.
 
-예를 들어 Container가 테스트 10,000개를 실행했다고 하자. 이 숫자는 설명용 예다.
+예를 들어 Container가 Test 10,000개를 실행했다고 하자. 이 숫자는 설명용 예다.
 
 결과가 다음과 같을 수 있다.
 
@@ -255,17 +255,17 @@ passed: 9,997
 failed: 3
 ```
 
-실행된 테스트 수가 많다고 해서 Agent가 10,000개 테스트의 모든 출력을 읽어야 하는 것은 아니다.
+실행된 Test 수가 많다고 해서 Agent가 10,000개 Test의 모든 출력을 읽어야 하는 것은 아니다.
 
 중요한 것은 **실행량과 Agent가 읽는 정보량을 분리하는 것**이다.
 
-7장에서는 Agent가 처음 읽는 Source/Context를 줄이고, 8장에서는 Tool Output과 Evidence를 다룬다.
+7장에서는 Agent가 처음 읽는 Source / Context를 줄이고, 8장에서는 Tool Output과 Evidence를 다룬다.
 
 ---
 
-## 6. 테스트를 많이 실행하는 것과 로그를 많이 읽는 것은 다르다
+## 6. Test를 많이 실행하는 것과 로그를 많이 읽는 것은 다르다
 
-다음 설명용 상황을 보자.
+다음 수치 역시 설명용 예다.
 
 ```text
 JUnit Tests: 10,000
@@ -278,18 +278,18 @@ Failures: 3
 
 ```text
 Execution Environment
-→ 테스트 실행
+→ Test 실행
 → 100MB 로그 생성
       ↓
 LLM
 → 전체 로그 분석
 ```
 
-테스트 리포트가 실패 3건을 구조화해서 제공할 수 있다면 LLM에게 전체 정상 로그를 다시 읽힐 필요는 없다.
+Test Report가 실패 3건을 구조화해서 제공할 수 있다면 LLM에게 전체 정상 로그를 다시 읽힐 필요는 없다.
 
 ```text
 Execution Environment
-→ 테스트 실행
+→ Test 실행
       ↓
 Structured Test Result
 → 실패 3건 식별
@@ -424,7 +424,7 @@ Context Switching
 Manual Environment Setup
 ```
 
-예를 들어 Cloud에서 장시간 테스트를 별도 실행하면 Compute 사용은 늘 수 있다. 하지만 개발자가 Local CPU/RAM 점유에서 벗어나 다음 작업을 진행할 수 있다면 Human Cost는 줄 수 있다.
+예를 들어 Cloud에서 장시간 Test를 별도 실행하면 Compute 사용은 늘 수 있다. 하지만 개발자가 Local CPU / RAM 점유에서 벗어나 다음 작업을 진행할 수 있다면 Human Cost는 줄 수 있다.
 
 반대로 작은 문구 수정 하나를 위해 Cloud Environment를 준비하고 Agent가 Repository를 탐색하고 PR까지 만든다면 전체 비용이 더 커질 수 있다.
 
@@ -456,7 +456,7 @@ Git SHA: abc123
         +-- Execution #4: Web E2E
 ```
 
-각 실행환경은 CPU/RAM을 사용해 작업을 수행한다.
+각 실행환경은 CPU / RAM을 사용해 작업을 수행한다.
 
 결과가 다음처럼 모였다고 하자.
 
@@ -477,7 +477,7 @@ E2E: FAIL 2
 
 ---
 
-## 11. 제품별 자원 숫자는 원칙과 분리한다
+## 11. 제품별 자원 수치는 원칙과 분리한다
 
 실제 제품을 선택할 때는 다음 정보가 중요하다.
 
