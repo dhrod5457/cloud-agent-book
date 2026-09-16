@@ -46,7 +46,7 @@ Cloud에서는 이 실행을 별도 Worker로 분리할 수 있다.
 Developer Mac
 ├─ IDE
 ├─ Local Agent
-└─ 현재 Feature 개발
+└─ 현재 기능 개발
 
 Cloud Worker
 ├─ Repository
@@ -63,7 +63,7 @@ Cloud 환경이 항상 Local보다 빠르다는 뜻은 아니다.
 
 이 분리는 다음 효과를 만든다.
 
-- 무거운 Build/Test가 Local 작업을 덜 방해한다.
+- 무거운 Build / Test가 Local 작업을 덜 방해한다.
 - Task별로 독립된 Runtime을 사용할 수 있다.
 - 하나의 개발자 PC보다 많은 실행 작업을 동시에 수행할 수 있다.
 - Task가 끝날 때까지 터미널을 계속 지켜볼 필요가 줄어든다.
@@ -95,7 +95,7 @@ Cloud Worker
 + Result
 ```
 
-Cloud Worker가 가치 있으려면 Local 개발자의 현재 화면을 계속 따라가야 하는 것이 아니라, 일정한 기준점에서 독립적으로 작업할 수 있어야 한다.
+Cloud Worker가 가치 있으려면 Local 개발자의 현재 화면을 계속 따라가는 것이 아니라, 일정한 기준점에서 독립적으로 작업할 수 있어야 한다.
 
 예를 들어 다음 정도가 명확하다고 하자.
 
@@ -155,11 +155,11 @@ Cloud로 분리하면 구조가 달라진다.
 ```text
 Developer
 → Cloud Task 위임
-→ 다음 Feature 진행
+→ 다음 기능 진행
 
 Cloud Worker
 → Integration Test
-→ Result / Artifact 생성
+→ Evidence / Artifact 생성
 ```
 
 여기서 `오래 걸리면 무조건 Cloud`라는 규칙을 만들지는 않는다.
@@ -174,11 +174,11 @@ Cloud Worker
 
 Cloud Agent의 성능을 `몇 분 만에 끝냈는가`만으로 보면 비동기 작업의 장점을 놓친다.
 
-설명용 예시를 보자.
+아래 시간은 설명용 예다.
 
 ```text
 10:00 Cloud Task 위임
-10:01 Developer는 다음 Feature 시작
+10:01 Developer는 다음 기능 시작
 10:40 Cloud Task 완료
 11:20 Developer가 결과 Review
 ```
@@ -197,7 +197,7 @@ Developer Blocking Time
 = 해당 Task 때문에 Developer가 실제로 멈춘 시간
 ```
 
-Cloud Task가 Local보다 조금 늦게 끝나더라도 Developer Blocking Time이 줄어들 수 있다.
+Cloud Task가 Local보다 조금 늦게 끝나더라도 Developer Blocking Time은 줄어들 수 있다.
 
 그래서 Cloud 활용을 평가할 때 다음을 함께 본다.
 
@@ -212,7 +212,7 @@ Local Resource Occupancy
 
 이 값들은 서로 같은 방향으로 움직이지 않는다.
 
-Cloud Compute 사용량이 늘어도 Developer Blocking Time이 줄 수 있고, Agent가 많은 결과를 만들어도 Review Time이 늘 수 있다.
+Cloud Compute 사용량이 늘어도 Developer Blocking Time은 줄 수 있고, Agent가 많은 결과를 만들어도 Review Time은 늘 수 있다.
 
 ---
 
@@ -259,13 +259,13 @@ Scope가 명확함
 완료 조건이 있음
 중간 질문이 적음
 독립 검증 가능
-Git/Artifact로 결과 회수 가능
+Git / Artifact로 결과 회수 가능
 ```
 
 예:
 
 ```text
-특정 Service 테스트 추가
+특정 Service Test 추가
 Module 전체 Test
 Docker Build
 E2E Regression
@@ -310,11 +310,11 @@ Cloud에서는 여러 Worker를 동시에 실행할 수 있다. 하지만 `Agent
 
 이 경우 네 개의 Agent가 필요한 것은 아니다.
 
-대부분은 네 개의 Runner가 각각 독립적인 Compute 작업을 실행하면 된다. 실패 분석이나 코드 수정이 필요할 때만 Agent가 들어간다.
+대부분은 네 개의 Cloud Runner가 각각 독립적인 Compute 작업을 실행하면 된다. 실패 분석이나 코드 수정이 필요할 때만 Agent가 들어간다.
 
 즉 Cloud 병렬성의 첫 사용처는 대개 **Parallel Reasoning이 아니라 Parallel Compute**다.
 
-여러 Worker를 실제로 얼마나 동시에 실행해야 하는지, 중복 Context와 Review/Fan-in 비용이 어디서 생기는지는 12장에서 다룬다.
+여러 Worker를 실제로 얼마나 동시에 실행해야 하는지, 중복 Context와 Review / Fan-in 비용이 어디서 생기는지는 12장에서 다룬다.
 
 ---
 
@@ -340,14 +340,14 @@ Task A → attendance module
 Task B → notification module
 ```
 
-반대로 같은 핵심 파일이나 같은 Schema를 동시에 바꿔야 한다면 실제 독립 Task가 아니다.
+반대로 같은 핵심 파일이나 같은 DB Schema를 동시에 바꿔야 한다면 실제 독립 Task가 아니다.
 
 ```text
 Task A → UserService.java
 Task B → UserService.java
 ```
 
-이런 경우의 Merge/Review 비용과 병렬화 상한은 11~12장에서 자세히 다룬다.
+이런 경우의 Merge / Review 비용과 병렬화 상한은 11~12장에서 자세히 다룬다.
 
 4장에서 기억할 것은 하나다.
 
@@ -397,25 +397,25 @@ Docker Build
 
 Local에서 순차적으로 실행할 수도 있다.
 
-또는 Commit을 기준으로 Cloud에 분리할 수 있다.
+또는 Base SHA를 기준으로 Cloud에 분리할 수 있다.
 
 ```text
 Local
-→ Attendance/Auth 수정
-→ Commit abc123
+→ Attendance / Auth 수정
+→ Base SHA abc123
 
 Cloud
-├─ Runner #1 :attendance:test
-├─ Runner #2 integrationTest
-├─ Runner #3 admin-web E2E
-└─ Runner #4 Docker Build
+├─ Cloud Runner #1 :attendance:test
+├─ Cloud Runner #2 integrationTest
+├─ Cloud Runner #3 admin-web E2E
+└─ Cloud Runner #4 Docker Build
 ```
 
-Developer는 Cloud 검증이 진행되는 동안 다음 Feature를 작업한다.
+Developer는 Cloud 검증이 진행되는 동안 다음 기능을 작업한다.
 
 검증 결과가 돌아오면 실패 항목만 추가로 분석한다.
 
-이 예제에서 Cloud의 가치는 `테스트가 반드시 더 빨리 끝난다`는 것이 아니다.
+이 예제에서 Cloud의 가치는 `Test가 반드시 더 빨리 끝난다`는 것이 아니다.
 
 ```text
 Local Compute 점유 감소
@@ -442,7 +442,7 @@ Cloud Agent를 도입한 뒤 단순히 `Agent가 몇 분 걸렸는가`만 측정
 | Developer Blocking Time | Developer가 실제로 멈춘 시간 |
 | Review Time | 결과 확인과 승인에 사용한 시간 |
 | Retry Time | 실패 후 재실행에 사용한 시간 |
-| Local Resource Occupancy | Local CPU/RAM/Disk를 무거운 Task가 점유한 정도 |
+| Local Resource Occupancy | Local CPU / RAM / Disk를 무거운 Task가 점유한 정도 |
 
 모든 팀에 같은 목표값을 적용하지 않는다.
 
