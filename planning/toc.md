@@ -51,7 +51,7 @@ Java/Spring Boot 기반 `campus-platform`을 책 전체의 실전 예제로 사�
 
 # Part I. Cloud Agent 이해
 
-## 1장. Coding Agent에서 Remote Development Worker로
+## 1장. Coding Agent에서 Cloud Worker로
 
 ### 목적
 
