@@ -16,7 +16,7 @@
 관리자 Web에서는 인증 실패 상태를 확인할 수 있어야 한다.
 ```
 
-이 기능에는 Backend 수정, Unit/Integration Test, Web E2E, Docker Build, 내부 환경 검증이 필요하다고 가정한다.
+이 기능에는 Backend 수정, Unit / Integration Test, Web E2E, Docker Build, 내부 환경 검증이 필요하다고 가정한다.
 
 이 장의 목적은 앞 장의 개념을 다시 설명하는 것이 아니다. 실제 기능 하나에서 **Local과 Cloud가 언제 바뀌고, 무엇을 다음 단계의 입력과 Evidence로 사용하는지** 보여주는 것이다.
 
@@ -71,7 +71,7 @@ AttendanceApiTest.java
 DB Schema 변경 없음
 HSM 변경 없음
 OAuth 전체 구조 변경 없음
-공통 Exception format 변경 없음
+공통 Exception Format 변경 없음
 ```
 
 이 판단이 뒤 단계의 Scope와 Review 범위를 만든다.
@@ -94,7 +94,8 @@ Local
 예:
 
 ```text
-base_sha: abc123
+Base SHA
+abc123
 ```
 
 이후 Cloud Task와 검증 결과는 이 Git 상태에서 출발한다.
@@ -103,7 +104,7 @@ base_sha: abc123
 Base SHA
 abc123
    ↓
-Cloud Result SHA
+Result SHA
    ↓
 Verification
    ↓
@@ -126,15 +127,15 @@ Expired token backend fix
 → Cloud Agent
 
 Task B
-Backend unit / integration validation
+Backend Unit / Integration Validation
 → Cloud Runner
 
 Task C
-Admin Web E2E validation
+Admin Web E2E Validation
 → Cloud Runner
 
 Task D
-Docker build validation
+Docker Build Validation
 → Cloud Runner
 ```
 
@@ -163,7 +164,7 @@ Relevant Files
 Do Not Change
 - DB Schema
 - OAuth 전체 구조
-- Common Exception format
+- Common Exception Format
 
 Validation
 ./gradlew test --tests AuthServiceTest
@@ -172,8 +173,10 @@ Expected Result
 expired token → 401
 normal token → 기존 테스트 PASS
 
-Output
-commit / changed files / test evidence
+Output / Evidence
+- Result SHA
+- Changed Files
+- Validation Result
 ```
 
 여기서 중요한 것은 형식 자체가 아니라 Cloud Worker가 **어디서 시작하고, 어디까지 바꾸며, 무엇을 통과해야 하는지**가 명시되어 있다는 점이다.
@@ -245,7 +248,7 @@ Failure Detail
 → Raw Artifact
 ```
 
-Agent가 수정한 사실이 성공 조건이 아니다. Runner가 동일한 Validation을 통과해야 다음 단계로 이동한다.
+Agent가 수정한 사실이 성공 조건이 아니다. Cloud Runner가 동일한 Validation을 통과해야 다음 단계로 이동한다.
 
 ---
 
@@ -262,6 +265,8 @@ Retry #2
 AuthServiceTest.expiredToken
 expected 401 / actual 200
 ```
+
+위 Retry 횟수는 설명용 예다.
 
 Failure Fingerprint가 그대로이고 Budget도 소진되고 있다면 Context와 Prompt만 계속 늘리지 않는다.
 
@@ -280,18 +285,19 @@ Retry 횟수와 Failure 변화 여부를 같이 본다.
 
 ---
 
-## 7. 수정 Commit에서 Regression을 병렬 실행한다
+## 7. Result SHA에서 Regression을 병렬 실행한다
 
-Agent가 다음 Commit을 만들었다고 하자.
+Agent가 다음 Result SHA를 만들었다고 하자.
 
 ```text
-result_sha: def456
+Result SHA
+def456
 ```
 
 이제 같은 SHA에서 독립 검증을 병렬로 실행한다.
 
 ```text
-Commit def456
+Result SHA def456
       ↓
 +---------+-------------+---------+---------+
 |         |             |         |         |
@@ -329,7 +335,7 @@ Artifact
 screenshot-fail.png
 ```
 
-필요한 경우 Agent가 수정하고, 새 SHA에서 다시 Runner가 검증한다.
+필요한 경우 Agent가 수정하고, 새 Result SHA에서 다시 Cloud Runner가 검증한다.
 
 ---
 
@@ -340,8 +346,8 @@ Cloud 검증이 끝났다면 Local로 자연어 완료 보고가 아니라 검�
 설명용 예:
 
 ```text
-Task: task-auth-expired
-Commit: def789
+Task: AUTH-142
+Result SHA: def789
 
 Build: PASS
 Unit: PASS
@@ -369,7 +375,7 @@ Evidence
 → Architecture 영향
 ```
 
-UI 변경이라면 Screenshot/Video를 먼저 확인한 뒤 Diff를 본다.
+UI 변경이라면 Screenshot / Video를 먼저 확인한 뒤 Diff를 본다.
 
 ---
 
@@ -386,7 +392,7 @@ Cloud
 Local / Internal
 → Tibero
 → Internal API
-→ Jenkins deployment validation
+→ Jenkins Deployment Validation
 ```
 
 HSM 변경이 없다면 HSM 검증까지 추가하지 않는다. Task와 관련된 내부 경계만 확인한다.
@@ -498,17 +504,19 @@ Cloud Runner
 ```text
 Cloud Analysis
 → Tibero-specific behavior 발견
-→ Local/Internal Validation으로 이동
+→ Local / Internal Validation으로 이동
 ```
 
 ### Scope가 예상보다 크게 확대됨
 
 ```text
 3개 파일 예상
-→ 여러 Module / Schema 영향 발견
+→ 여러 Module / DB Schema 영향 발견
 → Cloud Task 중단
 → Local에서 재분해
 ```
+
+위 파일 수는 설명용 예다.
 
 이 분기에서 Cloud 작업은 실패한 것이 아니다. 실행 중 발견된 조건에 따라 Routing을 다시 한 것이다.
 
