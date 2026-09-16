@@ -61,9 +61,9 @@ Task Type
 Agent가 Repository에 들어올 때마다 다음을 다시 찾아야 한다면 비용이 반복된다.
 
 ```text
-어떻게 setup하는가?
-어떻게 build하는가?
-어떻게 test하는가?
+어떻게 Setup하는가?
+어떻게 Build하는가?
+어떻게 Test하는가?
 어떤 파일부터 읽는가?
 무엇이 PASS인가?
 결과는 어디에 남는가?
@@ -101,7 +101,7 @@ Harness는 거대한 프레임워크가 아니다.
 
 > Agent가 반복해서 탐색하고 추론해야 했던 개발 규칙을 발견 가능하고 실행 가능한 형태로 꺼내놓는 것에 가깝다.
 
-Agent가 같은 종류의 환경·빌드·검증 문제로 반복 실패한다면 Prompt를 길게 만들기 전에 Harness와 실행환경을 먼저 점검한다.
+Agent가 같은 종류의 Environment / Build / Validation 문제로 반복 실패한다면 Prompt를 길게 만들기 전에 Harness와 실행환경을 먼저 점검한다.
 
 ---
 
@@ -204,7 +204,7 @@ Hands
 ```text
 Agent
 → backend-test Runner
-→ failure 분석
+→ Failure 분석
 → frontend-e2e Runner
 → 결과 비교
 ```
@@ -286,7 +286,7 @@ Environment Capability
 → Ephemeral Worker 후보
 ```
 
-제품별 CPU/RAM 숫자나 Worker Pool 운영 상세는 현재 책의 원칙으로 고정하지 않는다.
+제품별 CPU / RAM 숫자나 Worker Pool 운영 상세는 현재 책의 원칙으로 고정하지 않는다.
 
 ---
 
@@ -313,7 +313,7 @@ Workflow 자체가 바뀌었을 때는 과거 Task를 다시 실행해 비교하
 같은 Task
 → 이전 Harness / Environment
 → 새로운 Harness / Environment
-→ 성공률 / Retry / Token / Human Intervention 비교
+→ 성공 여부 / Retry / Token / Human Intervention 비교
 ```
 
 이 책에서는 Best-of-N 시스템이나 평가 플랫폼을 설계하지 않는다. Cloud Workflow를 개선할 때 사용할 수 있는 후속 관점으로만 소개한다.
@@ -346,7 +346,7 @@ Cloud Runner로 Test 분리
 → 반복 Routing 일부 자동화
 ```
 
-각 단계에서 실제로 Blocking Time, Retry, Review Cost가 줄었는지 확인한다.
+각 단계에서 실제로 Developer Blocking Time, Retry, Review Cost가 줄었는지 확인한다.
 
 복잡한 Platform보다 반복되는 수동 결정을 하나씩 코드로 옮기는 편이 이 책의 방향에 맞다.
 
@@ -392,7 +392,7 @@ Task Contract / Git Handoff
         ↓
 Prepared Cloud Environment
         ↓
-Runner
+Cloud Runner
    ├─ PASS → Evidence
    └─ FAIL
         ↓
@@ -404,7 +404,7 @@ Runner
             ↓
            Fix
             ↓
-         Runner
+      Cloud Runner
         ↓
 Evidence / PR
         ↓
@@ -434,8 +434,8 @@ Cloud 이점이 사라지면 언제 Local로 돌아올 것인가?
 
 > 더 많은 Agent보다 더 나은 Task Routing, Harness, Validation이 먼저다.
 
-Cloud Agent는 Local Agent를 없애지 않는다. Runner나 CI도 없애지 않는다.
+Cloud Agent는 Local Agent를 없애지 않는다. Cloud Runner나 CI도 없애지 않는다.
 
-각 역할을 분리하고, Task 특성에 맞는 실행 위치에 배치한다.
+각 역할을 분리하고 Task 특성에 맞는 실행 위치에 배치한다.
 
 이 책의 최종 목적은 독자가 자신의 개발 흐름에서 **Local과 Cloud의 역할을 직접 나눌 수 있게 하는 것**이다.
