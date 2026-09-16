@@ -74,9 +74,9 @@ Expected Result
 expired token → HTTP 401
 
 Output / Evidence
-- result commit SHA
-- changed files
-- test result
+- Result SHA
+- Changed Files
+- Validation Result
 ```
 
 Task Contract는 Agent의 사고 과정을 대신 작성하는 문서가 아니다.
@@ -131,7 +131,7 @@ Relevant Files
 
 이 목록은 whitelist가 아니다.
 
-예상하지 못한 dependency가 있을 수 있으므로 다음 순서를 기본으로 한다.
+예상하지 못한 Dependency가 있을 수 있으므로 다음 순서를 기본으로 한다.
 
 ```text
 Relevant Files
@@ -143,7 +143,7 @@ Related Test / Document
 Wider Module Context
 ```
 
-즉 Relevant Files는 `initial context boundary`다.
+즉 Relevant Files는 `Initial Context Boundary`다.
 
 작은 Context의 목적은 정보를 없애는 것이 아니라 필요한 정보까지 도달하는 경로를 짧게 만드는 것이다.
 
@@ -159,7 +159,7 @@ Bug 하나를 고치면서 주변 구조까지 함께 정리하면 Review 범위
 Exception hierarchy 정리
 JWT 구조 변경
 공통 API response 변경
-DB migration 추가
+DB Migration 추가
 OAuth 설정 변경
 ```
 
@@ -238,11 +238,11 @@ Valid token
 
 ```text
 Output / Evidence
-- result commit SHA
-- changed files
-- validation result
-- artifact reference if generated
-- short summary
+- Result SHA
+- Changed Files
+- Validation Result
+- Artifact Reference if generated
+- Short Summary
 ```
 
 다음 결과만 받는 것은 부족하다.
@@ -328,8 +328,8 @@ agent/auth-expired-token-142
 Task ID
 → Base SHA
 → Branch
-→ Result Commit
-→ Test Result
+→ Result SHA
+→ Validation Result
 → PR
 ```
 
@@ -350,11 +350,11 @@ backend-test
 
 실패와 수정을 반복할 수 있는 Task에는 중단 조건을 둘 수 있다.
 
-설명용 예시:
+설명용 예:
 
-```text
-Budget
-max_retry: 2
+```yaml
+budget:
+  max_retry: 2
 ```
 
 표준값은 아니다. 프로젝트에 따라 다음 기준을 사용할 수 있다.
@@ -442,9 +442,9 @@ Expected Result
 - valid token 기존 동작 유지
 
 Output / Evidence
-- result commit SHA
-- changed files
-- test result
+- Result SHA
+- Changed Files
+- Validation Result
 ```
 
 이 장 이후에는 같은 배경을 반복하지 않고 `AUTH-142`로 참조한다.
