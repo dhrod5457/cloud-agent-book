@@ -6,7 +6,7 @@ Cloud Agent가 Task를 받았다고 바로 코드 수정이 시작되는 것은 
 
 ```text
 Worker 생성
-→ Repository checkout
+→ Repository Checkout
 → Runtime 확인
 → Dependency 준비
 → Docker / Browser 준비
@@ -42,7 +42,7 @@ Environment Warm-up Time
 First Command Time
 ```
 
-설명용 예시로 환경 준비가 8분이고 실제 수정이 3분이라면 모델만 바꿔서는 전체 시간이 크게 줄지 않는다.
+설명용 예로 환경 준비가 8분이고 실제 수정이 3분이라면 모델만 바꿔서는 전체 시간이 크게 줄지 않는다.
 
 먼저 어느 구간이 반복되는지 측정해야 한다.
 
@@ -90,7 +90,7 @@ DB Client
 기본 OS Package
 ```
 
-제품별 Snapshot 기능이 없어도 Dockerfile, Dev Container, bootstrap script 같은 방식으로 같은 원칙을 적용할 수 있다.
+제품별 Snapshot 기능이 없어도 Dockerfile, Dev Container, Bootstrap Script 같은 방식으로 같은 원칙을 적용할 수 있다.
 
 ---
 
@@ -136,7 +136,7 @@ Java 21
 Gradle
 Docker
 Testcontainers
-DB client
+DB Client
 ```
 
 ### frontend-e2e
@@ -153,10 +153,10 @@ Chrome
 Java 21
 Migration Tool
 PostgreSQL
-DB client
+DB Client
 ```
 
-Cross-stack 문제처럼 정말 필요한 경우에만 더 큰 `fullstack` 환경을 사용한다.
+Cross-stack 문제처럼 필요한 경우에만 더 큰 `fullstack` 환경을 사용한다.
 
 Routing은 단순하다.
 
@@ -171,7 +171,7 @@ Migration Validation
 → migration-test
 ```
 
-환경이 클수록 항상 좋은 것은 아니다. 사용하지 않는 Tool은 image size와 준비 비용을 늘린다.
+환경이 클수록 항상 좋은 것은 아니다. 사용하지 않는 Tool은 Image 크기와 준비 비용을 늘린다.
 
 ---
 
@@ -182,21 +182,21 @@ Prepared Environment에서 가장 중요한 경계다.
 재사용하기 좋은 상태:
 
 ```text
-Gradle dependency cache
-Maven repository
-npm cache
-Docker layer
-Playwright browser
-compiler cache
+Gradle Dependency Cache
+Maven Repository
+npm Cache
+Docker Layer
+Playwright Browser
+Compiler Cache
 ```
 
 매 Task마다 새로 만들어야 할 상태:
 
 ```text
-Source checkout
+Source Checkout
 Branch
-Task input
-DB state
+Task Input
+DB State
 Temporary File
 Mutable Fixture
 Test Output
@@ -231,12 +231,12 @@ Cache는 오래 남기는 것보다 언제 버릴지 정하는 것이 중요하�
 Cache Key 후보:
 
 ```text
-OS / architecture
-JDK version
-Gradle / Maven lock state
-package manifest hash
-Dockerfile hash
-tool version
+OS / Architecture
+JDK Version
+Gradle / Maven Lock State
+Package Manifest Hash
+Dockerfile Hash
+Tool Version
 ```
 
 예:
@@ -249,10 +249,10 @@ key = os + jdk + dependency-lock-hash
 잘못된 Cache는 다음 문제를 만든다.
 
 ```text
-stale dependency
-이전 generated code 잔존
-다른 branch 결과 혼입
-test pollution
+Stale Dependency
+이전 Generated Code 잔존
+다른 Branch 결과 혼입
+Test Pollution
 ```
 
 Source 상태에 강하게 의존하는 Build Output이나 Test Result를 무조건 재사용하지 않는다.
@@ -265,17 +265,17 @@ Snapshot은 Task 시작 전에 Runtime과 Tool이 준비된 상태를 저장하�
 
 ```text
 Base Image
-→ tools install
-→ dependency restore
-→ browser install
-→ snapshot
+→ Tool 설치
+→ Dependency Restore
+→ Browser 설치
+→ Snapshot
 ```
 
 Task 시작:
 
 ```text
 Snapshot
-→ Fresh Source checkout
+→ Fresh Source Checkout
 → Task Branch
 → Execute
 ```
@@ -290,7 +290,7 @@ Source / Branch / Runtime State
 → Fresh
 ```
 
-Source까지 Snapshot에 포함하면 최신 Commit과의 차이 적용 비용과 stale source 위험을 같이 고려해야 한다.
+Source까지 Snapshot에 포함하면 최신 Commit과의 차이 적용 비용과 Stale Source 위험을 같이 고려해야 한다.
 
 ---
 
@@ -308,10 +308,10 @@ READY
 후보:
 
 ```text
-lint
-compile
-small unit test
-PR verification
+Lint
+Compile
+Small Unit Test
+PR Verification
 ```
 
 반대로 장시간 작업이나 격리가 중요한 Task는 Ephemeral Worker가 더 단순할 수 있다.
@@ -336,7 +336,7 @@ Warm Worker 자체를 기본값으로 두지 않는다. Startup Cost와 격리 �
 Agent
 → JDK 없음
 → 설치 방법 추론
-→ install 실패
+→ 설치 실패
 → 다시 추론
 ```
 
@@ -352,7 +352,7 @@ Prepared Environment 수정
 
 Playwright Browser가 반복해서 없다면 `frontend-e2e` Environment에 포함한다.
 
-> 반복되는 환경 실패는 Agent reasoning 문제가 아니라 Environment 문제로 취급한다.
+> 반복되는 환경 실패는 Agent의 Reasoning 문제가 아니라 Environment 문제로 취급한다.
 
 이 원칙은 18장의 Harness Engineering과도 연결된다.
 
@@ -374,7 +374,7 @@ Execution-time Injection
 - Temporary Credential
 ```
 
-Secret을 Image에 bake하지 않는다.
+Secret을 Image에 포함하지 않는다.
 
 Cloud에서 어떤 Credential을 제공할 수 있는지는 조직 정책과 5장의 Routing 기준을 따른다.
 
@@ -393,7 +393,7 @@ browser_ready_ms
 first_command_ms
 ```
 
-설명용 예시:
+설명용 예:
 
 ```text
 Before
@@ -403,7 +403,7 @@ After
 Worker ready: 55s
 ```
 
-이 숫자는 제품 기준이 아니라 측정 방법을 설명하기 위한 예시다.
+이 숫자는 제품 기준이 아니라 측정 방법을 설명하기 위한 예다.
 
 실제 프로젝트에서는 반복 Task의 준비시간을 측정해 Environment 개선 효과를 확인한다.
 
@@ -434,7 +434,7 @@ Environment: backend-test
 그리고 실행 상태는 Fresh하게 시작한다.
 
 ```text
-Fresh Git checkout
+Fresh Git Checkout
 Task Branch
 Disposable Test DB
 New Test Output Directory
