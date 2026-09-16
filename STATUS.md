@@ -4,7 +4,7 @@ Phase 7 - 전체 초고 편집/교정 진행 중
 
 Phase 6에서 1~18장 본문 초고 작성과 전체 정합성 점검을 완료했다.
 
-현재 1~6장 편집/교정을 완료했다.
+현재 1~9장 편집/교정을 완료했다.
 
 # Source of Truth
 
@@ -105,7 +105,6 @@ Phase 6 완료.
 - 1~18장 설계 대비 검토 완료
 - 전체 역할/중복/용어/범위 정합성 점검 완료
 - `planning/phase6-draft-consistency-check.md` 작성
-- 1장 제목을 `Coding Agent에서 Cloud Worker로`로 통일
 - Agent Platform 일반론은 18장의 미래 전망 수준으로 제한
 
 # Phase 7 Editing Rules
@@ -135,74 +134,70 @@ Phase 6 완료.
 
 # Phase 7 Progress
 
-## 1장 - Coding Agent에서 Cloud Worker로
+## 1~6장
 
 상태: `편집/교정 완료`
 
-- Cloud Agent 정의와 Remote Development Worker 모델에 집중
-- Task Contract / Result Gateway / Runner 상세를 뒤 장으로 이동
-- 제품 사례를 공통 실행 모델 설명 수준으로 축약
+핵심 정리:
 
-## 2장 - Local Agent와 Cloud Agent
+- 1장: Cloud Agent 정의와 Remote Development Worker 모델에 집중
+- 2장: Local / Cloud / Hybrid 판단 재료에 집중
+- 3장: Reasoning Resource와 Execution Resource 분리
+- 4장: 독립 실행환경 / 비동기 / Developer Blocking Time / 병렬성 가치에 집중
+- 5장: Task Routing Framework로 압축
+- 6장: 개발 작업 Catalog와 `Runner → Agent → Runner` 구조로 압축
 
-상태: `편집/교정 완료`
-
-- Local / Cloud / Hybrid 판단 재료에 집중
-- 5장의 Routing Framework와 중복되는 절차 설명 축약
-- 10장의 Runner-first와 11~13장의 Git/Handoff 상세를 예고 수준으로 축약
-
-## 3장 - Cloud Session, Container, Compute와 Token
-
-상태: `편집/교정 완료`
-
-- Reasoning Resource와 Execution Resource 분리 강화
-- Build wall-clock time과 LLM Usage 분리
-- Tool Output 상세는 8장, Runner-first 상세는 10장으로 이동
-- Parallel Compute / Parallel Reasoning과 Compute / LLM / Human Cost 구조로 정리
-
-## 4장 - 독립 실행환경, 장시간 작업, 병렬성, 시간 분리
+## 7장 - Cloud Agent Task Contract: 작은 Task와 작은 Context
 
 상태: `편집/교정 완료`
 
 주요 변경:
 
-- 독립 실행환경 / 비동기 위임 / Developer Blocking Time / 병렬 실행 가치에 집중
-- 병렬화의 중복 Context, Merge, Review, Fan-in 비용은 12장으로 이동
-- Agent Execution Time과 Developer Blocking Time을 핵심 측정축으로 유지
-- Local Resource Occupancy를 Cloud 활용 효과에 포함
-- 병렬화는 독립 Task가 있을 때만 가치가 있다는 조건만 유지
+- 기존 장문의 17개 절을 Task 경계 중심 구조로 압축
+- `Task / Goal / Scope / Relevant Files / Forbidden Changes / Validation / Expected Result / Evidence`를 핵심 Contract로 정리
+- Progressive Context를 Relevant Files → Dependency → Document → Wider Context 순으로 단순화
+- Base SHA / Environment / Budget은 선택적 실행 메타데이터로 정리
+- AUTH-142 예제를 이후 장에서 재사용할 기준 예제로 고정
+- 16장의 end-to-end Task Contract 반복 설명을 줄일 수 있도록 장 역할을 명확히 함
 
-## 5장 - Task Routing: Local인가 Cloud인가
-
-상태: `편집/교정 완료`
-
-주요 변경:
-
-- Task 시작 시점의 Routing Framework에 집중
-- `Hard Constraint → Runner 가능 여부 → Scope/Validation → Handoff → Steering/Context → Conflict/Overhead` 순서로 재구성
-- 17장의 Cloud 중단/Local Fallback 상세를 제거
-- Hybrid를 단계별 Routing으로 정의
-- Score는 보조 수단이고 Hard Constraint가 우선한다는 기준 강화
-
-## 6장 - Cloud에 보내기 좋은 개발 작업
+## 8장 - Tool Output을 줄이고 Evidence를 남기기
 
 상태: `편집/교정 완료`
 
 주요 변경:
 
-- 작업별 장문 설명을 `기본 실행 주체 + Agent 호출 조건 + Evidence` 중심 Catalog로 압축
-- Build / Unit / Integration / E2E / Docker / Static / Migration / Refactoring / Bug / Documentation / PR Review / Dependency / CI Failure 정리
-- Runner / Agent / Local-Hybrid가 하나의 Task 안에서 단계별로 바뀔 수 있음을 유지
-- `Runner → 필요한 순간에 Agent → 다시 Runner`를 장의 실행 원칙으로 정리
-- campus-platform 반복 Task를 RUN-* / FIX-BUG / REFACTOR-MODULE Catalog로 연결
+- `Tool Output → Result Filter → Result Gateway → Evidence` 흐름으로 재구성
+- Raw Artifact 보존과 Agent Context 축소를 분리
+- `result.json`은 예시 결과 인터페이스로만 유지
+- 자연어 Summary와 실행 Evidence 역할 분리
+- Demos over Diffs를 UI 검증 순서로 한정
+- Failure Fingerprint와 Budget을 Retry 종료 판단에 연결
+- 7장 Small Input과 8장 Small Output의 대칭 구조 강화
+
+## 9장 - Prepared Cloud Environment, Cache, Snapshot
+
+상태: `편집/교정 완료`
+
+주요 변경:
+
+- Runner 정의와 실행 경로 설명을 10장으로 넘김
+- Cold Start를 Provisioning / Checkout / Dependency Restore / Warm-up으로 분해
+- Prepared Environment와 Cloud Environment as Code에 집중
+- Task-specific Environment 구분
+- Reusable Cache와 Fresh Source/Runtime State 경계 강화
+- Cache Invalidation / Snapshot / Warm Worker를 준비 비용 관점으로 정리
+- 반복 환경 실패는 Prompt가 아니라 Environment를 수정한다는 원칙 유지
+- 10장 Runner-first로 이어지는 연결부 정리
 
 # Phase 7 Remaining Focus
 
 반복 압축 대상:
 
 ```text
-7 ↔ 16
+10 ↔ 6 / 8
+11 ↔ 12
 13 ↔ 15 ↔ 16
+5 ↔ 17
 ```
 
 추가 점검:
@@ -210,15 +205,16 @@ Phase 6 완료.
 - 설명용 Test Count / 시간 / Retry 횟수 표기
 - 영문 용어 표기 통일
 - 제품 사례 기준일/공식 출처
-- 7→8→9→10 연결
-- 11→12→13 연결
-- 15→16→17 연결
-- 18장 결론이 Agent Platform 일반론으로 확장되지 않는지 재확인
+- 10→11→12→13 연결
+- 13→14 Human-driven / Event-driven 경계
+- 15→16 정적 운영 모델 / 시간순 실행 구분
+- 17→18 결론과 미래 주제 경계
+- 18장이 Agent Platform 일반론으로 확장되지 않는지 재확인
 
 # Next
 
-1. 7장 `Cloud Agent Task Contract: 작은 Task와 작은 Context` 편집
-2. 8장 `Tool Output을 줄이고 Evidence를 남기기` 편집
-3. 9장 `Prepared Cloud Environment, Cache, Snapshot` 편집
-4. 이후 10~18장 순차 편집
+1. 10장 `Cloud Agent를 Test Runner처럼 사용하기` 편집
+2. 11장 `Git, Branch, Worktree, Container로 작업 격리하기` 편집
+3. 12장 `병렬 Worker와 중복 Context 비용` 편집
+4. 이후 13~18장 순차 편집
 5. 전체 편집 완료 후 최종 교정/출판 준비 단계로 전환
