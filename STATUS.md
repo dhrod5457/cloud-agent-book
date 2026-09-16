@@ -1,8 +1,10 @@
 # Current Phase
 
-Phase 7 완료 - 1~18장 전체 초고 편집/교정 및 정합성 점검 완료
+Phase 8 - 최종 교정 / 출판 준비 진행 중
 
-다음 단계는 Phase 8 최종 교정 / 출판 준비다.
+Phase 7에서 1~18장 전체 편집/교정과 정합성 점검을 완료했다.
+
+현재 **1~3장 최종 교정을 완료했다.**
 
 # Source of Truth
 
@@ -16,9 +18,10 @@ Phase 7 완료 - 1~18장 전체 초고 편집/교정 및 정합성 점검 완료
 6. `planning/phase6-draft-consistency-check.md`
 7. `planning/phase7-editing-plan.md`
 8. `planning/phase7-editing-consistency-check.md`
-9. 각 `chapters/NN/plan.md`
-10. `planning/future-topics.md`
-11. `STATUS.md`
+9. `planning/phase8-publication-checklist.md`
+10. 각 `chapters/NN/plan.md`
+11. `planning/future-topics.md`
+12. `STATUS.md`
 
 과거 Agent-Native 독립 장 설계와 초기 22~23장 체계는 현행 목차보다 우선하지 않는다.
 
@@ -157,55 +160,93 @@ Phase 7 완료.
 18장 Harness / Orchestration 미래 방향 + 결론
 ```
 
-# Phase 7 Consistency Result
+# Phase 8 Rules
 
-구조적 충돌 없음.
-
-주요 역할 경계:
-
-```text
-2장 = 실행 위치 차이
-5장 = 시작 Routing
-17장 = 실행 중 재Routing
-
-4장 = 병렬화 가치
-12장 = 병렬화 비용
-
-7장 = Task Contract 정의
-16장 = 실제 기능 Timeline에서 적용
-
-13장 = Handoff Protocol
-15장 = 정적 운영 모델
-16장 = 시간순 실행 사례
-```
-
-18장은 Agent Platform 일반론으로 확장하지 않고 현재 Workflow의 반복 결정을 자동화하는 다음 단계로 제한한다.
-
-# Phase 8 - 최종 교정 / 출판 준비
-
-새 구조를 추가하지 않고 출판용 마감에 집중한다.
-
-우선순위:
+`planning/phase8-publication-checklist.md`를 기준으로 진행한다.
 
 ```text
 문장 단위 교정
 → 제목 / 절 제목 / 용어 표기 통일
 → 코드블록 / 표 형식 통일
-→ 장간 참조 번호 검사
-→ 제품 사례 공식 출처 / 기준일 재확인
-→ 참고자료 표기 통일
-→ 설명용 수치 표기 재확인
-→ Part 전환부 / 도입 / 결론 연결
-→ 최종 목차와 본문 제목 일치 확인
-→ 출판용 원고 형태 준비
+→ 장간 참조 검사
+→ 설명용 수치 표기 검사
+→ 제품 사례 / 공식 출처 검사
+→ 참고자료 형식 통일
+→ 도입 / 결론 연결 검사
+→ 최종 목차와 본문 제목 대조
 ```
+
+새 구조와 새 개념은 추가하지 않는다.
+
+# Phase 8 Progress
+
+## 1장 - Coding Agent에서 Cloud Worker로
+
+상태: `최종 교정 완료`
+
+주요 교정:
+
+- `Base Commit`을 `Base SHA`로 통일
+- 핵심 문장을 `Cloud Agent에게 넘기는 것은 Prompt가 아니라 Task다`로 통일
+- Test / Build / Evidence 표기 점검
+- 참고자료 형식 유지
+
+## 2장 - Local Agent와 Cloud Agent
+
+상태: `최종 교정 완료`
+
+주요 교정:
+
+- 결정론적 검증 작업을 `Cloud Runner`로 명확화
+- `DB Schema`, `CPU / RAM`, `Repository Checkout` 표기 정리
+- 설명용 시간 예시임을 명시
+- 5장 Routing / 17장 Fallback 참조 점검
+
+## 3장 - Cloud Session, Container, Compute와 Token
+
+상태: `최종 교정 완료`
+
+주요 교정:
+
+- Reasoning Resource / Execution Resource 표기 정리
+- Build / Test / Tool Output 대소문자와 구분 통일
+- 20분, 10,000 Test, 100MB Log가 설명용 수치임을 명확화
+- `Compute / LLM / Human` 비용 구분 유지
+- 제품별 vCPU / RAM / Session / 가격은 Research에서 관리한다는 경계 재확인
+
+# Phase 8 Remaining Focus
+
+```text
+4~6장
+실행 가치 / Routing / Task Catalog 최종 교정
+
+7~9장
+Task Contract / Evidence / Prepared Environment 형식 통일
+
+10~12장
+Runner / Isolation / Parallel Cost 용어 통일
+
+13~15장
+Handoff / Event / 운영 모델 장간 참조 점검
+
+16~18장
+Timeline / Fallback / 결론 문장 최종 교정
+```
+
+전체 장 교정 후 다음을 별도 점검한다.
+
+- 제품명을 직접 언급한 문장의 공식 출처와 기준일
+- 장 제목과 `planning/toc.md` 일치
+- 장간 참조 번호
+- 참고자료 형식
+- 설명용 수치 표기
+- 코드블록 언어 지정
+- 표 형식
 
 # Next
 
-1. 1~18장 문장/표기 최종 교정
-2. 제품명을 직접 언급한 문장의 공식 출처와 기준일 검증
-3. 장간 참조와 제목 정합성 검사
-4. 참고자료 형식 통일
-5. 최종 원고 묶음 준비
-
-Phase 8에서도 Agent Platform 관련 새 주제를 추가하지 않는다.
+1. 4장 `독립 실행환경, 장시간 작업, 병렬성, 시간 분리` 최종 교정
+2. 5장 `Task Routing: Local인가 Cloud인가` 최종 교정
+3. 6장 `Cloud에 보내기 좋은 개발 작업` 최종 교정
+4. 이후 같은 방식으로 18장까지 진행
+5. 전체 장 교정 완료 후 제품 출처 / 참조 / 목차 / 참고자료 최종 검사
