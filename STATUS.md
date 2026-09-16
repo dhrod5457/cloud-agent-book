@@ -4,7 +4,9 @@ Phase 8 - 최종 교정 / 출판 준비 진행 중
 
 Phase 7에서 1~18장 전체 편집/교정과 정합성 점검을 완료했다.
 
-현재 **1~15장 최종 교정을 완료했다.**
+현재 **1~18장 본문 최종 교정을 모두 완료했다.**
+
+Phase 8의 남은 작업은 본문 외 최종 출판 검사다.
 
 # Source of Truth
 
@@ -180,7 +182,7 @@ Phase 7 완료.
 
 # Phase 8 Progress
 
-## 1~12장
+## 1~15장
 
 상태: `최종 교정 완료`
 
@@ -194,66 +196,95 @@ Phase 7 완료.
 - 10장: Cloud Runner / Failure Classification / Retry / Result SHA 표기 정리
 - 11장: Source / Runtime / Evidence Isolation과 YAML 추적 필드 통일
 - 12장: Parallel Compute / Context Duplication / Fan-in / 설명용 수치 표기 정리
+- 13장: Handoff 반환 경계를 `Evidence + Result SHA / PR`로 통일
+- 14장: Event 입력 `Git SHA`와 Agent 수정 `Result SHA`의 의미 분리
+- 15장: 운영 상태와 병렬 검증을 `Base SHA / Result SHA / Validation Result / Artifact Path` 기준으로 통일
 
-## 13장 - Local → Cloud → Local Handoff
-
-상태: `최종 교정 완료`
-
-주요 교정:
-
-- Handoff 반환 경계를 `Evidence + Result SHA / PR`로 통일
-- `Base SHA → Result SHA → Verification SHA` 관계 명확화
-- Expected Evidence를 `Result SHA / Changed Files / Validation Result`로 통일
-- 상태 YAML을 `result_sha`, `validation_result`, `artifact_path`로 정리
-- 설명용 시간 예시임을 명시
-- 17장의 Local Fallback 경계 참조 유지
-
-## 14장 - Task Queue와 Event-driven Cloud Agent
+## 16장 - 하나의 기능을 Local + Cloud로 끝까지 개발하기
 
 상태: `최종 교정 완료`
 
 주요 교정:
 
-- Event 입력 상태는 `Git SHA`, Agent 수정 결과는 `Result SHA`로 분리
-- CI / Review Event YAML의 SHA 필드 의미 통일
-- Agent 수정 후 재검증 주체를 `Cloud Runner`로 통일
-- Event-driven 반환 경계를 `Result SHA / Evidence / PR`로 정리
-- Failure Fingerprint / Retry Budget 종료 조건과 17장 참조 유지
+- `Base SHA → Result SHA → Verification → PR` 흐름 통일
+- Task Contract 반환 필드를 `Result SHA / Changed Files / Validation Result`로 통일
+- Agent 수정 후 검증 주체를 `Cloud Runner`로 명확화
+- Regression 검증을 같은 `Result SHA` 기준으로 통일
+- Retry 횟수, Timeline, 파일 수는 설명용 예임을 명시
+- Cloud Evidence와 Internal Validation을 같은 PR SHA에 연결
 
-## 15장 - campus-platform Cloud Agent Workflow 설계
+## 17장 - Cloud가 항상 정답은 아니다
 
 상태: `최종 교정 완료`
 
 주요 교정:
 
-- 운영 상태 필드를 `Base SHA / Result SHA / Validation Result / Artifact Path`로 통일
-- YAML을 `result_sha`, `validation_result`, `artifact_path`로 정리
-- 모든 병렬 검증이 같은 `Result SHA`를 사용한다는 표현 명확화
-- Result Gateway 첫 화면의 SHA를 `Result SHA`로 통일
-- Agent 수정 후 `Cloud Runner` 재검증 표기 통일
-- 13장 Handoff / 14장 Event-driven 입력을 하나의 운영 모델로 연결
+- Parallel Compute / Local Resource Occupancy 표기 정리
+- `DB Schema`, Internal Network, Failure Fingerprint 용어 통일
+- Local Fallback Return Package를 `Task ID / Base SHA / Result SHA / Validation Result / Artifact Path / Fallback Reason` 중심으로 정리
+- Migration 일반 검증과 HSM Mock Test의 기본 실행 주체를 `Cloud Runner`로 명확화
+- 시작 Routing과 실행 중 재Routing의 역할 경계 유지
+
+## 18장 - 다음 단계: Harness와 Orchestration
+
+상태: `최종 교정 완료`
+
+주요 교정:
+
+- Harness / Routing / Orchestration 용어와 앞 장 연결 점검
+- `CPU / RAM`, Environment / Build / Validation 표기 통일
+- Best-of-N은 기본값 `N=1`인 제한적 기법으로 유지
+- 최종 Workflow의 실행 주체를 `Cloud Runner / Cloud Agent / Local`로 통일
+- Agent Platform 일반론으로 확장하지 않고 책의 핵심 질문으로 종료
+
+# Phase 8 Main Text Result
+
+**1~18장 본문 최종 교정 완료.**
+
+본문에서 사용하는 핵심 추적 필드는 다음으로 통일했다.
+
+```text
+Task ID
+Base SHA
+Result SHA
+Validation Result
+Artifact Path / Artifact Reference
+PR
+```
+
+실행 주체는 다음 기준을 유지한다.
+
+```text
+Local / Local Agent
+→ 요구사항 / Architecture / Human Steering / Internal Validation / Review
+
+Cloud Runner
+→ Build / Test / E2E / Docker / 결정론적 검증
+
+Cloud Agent
+→ 재현 가능한 Failure 분석 / 제한된 코드 수정
+```
 
 # Phase 8 Remaining Focus
 
-```text
-16~18장
-Timeline / Fallback / 결론 문장 최종 교정
-```
+본문 교정 이후 다음을 일괄 검사한다.
 
-전체 장 교정 후 다음을 별도 점검한다.
-
-- 제품명을 직접 언급한 문장의 공식 출처와 기준일
-- 장 제목과 `planning/toc.md` 일치
-- 장간 참조 번호
-- 참고자료 형식
-- 설명용 수치 표기
-- 코드블록 언어 지정
-- 표 형식
+1. 제품명을 직접 언급한 문장의 공식 출처와 기준일
+2. 1~18장 제목과 `planning/toc.md` 일치 여부
+3. 장간 참조 번호와 역할 경계
+4. 참고자료 형식
+5. 설명용 수치 표기 누락
+6. 코드블록 언어 지정
+7. 표 형식
+8. AUTH-142 예제 필드 일관성
+9. Agent Platform 범위 확장 여부
+10. Phase 8 최종 정합성 점검 문서 작성
 
 # Next
 
-1. 16장 `하나의 기능을 Local + Cloud로 끝까지 개발하기` 최종 교정
-2. 17장 `Cloud가 항상 정답은 아니다` 최종 교정
-3. 18장 `다음 단계: Harness와 Orchestration` 최종 교정
-4. 1~18장 전체 장 교정 완료 상태 점검
-5. 제품 출처 / 참조 / 목차 / 참고자료 최종 검사
+1. 제품 사례 / 공식 출처 / 기준일 검사
+2. 목차와 1~18장 제목 자동 대조
+3. 장간 참조 번호와 참고자료 일괄 검사
+4. 설명용 수치 / 코드블록 / 표 형식 일괄 검사
+5. `planning/phase8-publication-consistency-check.md` 작성
+6. Phase 8 완료 여부 판정
