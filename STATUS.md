@@ -4,7 +4,7 @@ Phase 8 - 최종 교정 / 출판 준비 진행 중
 
 Phase 7에서 1~18장 전체 편집/교정과 정합성 점검을 완료했다.
 
-현재 **1~3장 최종 교정을 완료했다.**
+현재 **1~6장 최종 교정을 완료했다.**
 
 # Source of Truth
 
@@ -50,7 +50,7 @@ Cloud Agent
 
 확장 정의:
 
-> Cloud Agent는 필요할 때 독립된 개발환경을 할당받고, Git을 통해 Task를 받아 비동기적으로 작업하며, 테스트와 Artifact를 포함한 검증 가능한 결과를 반환하는 Remote Development Worker다.
+> Cloud Agent는 필요할 때 독립된 개발환경을 할당받고, Git을 통해 Task를 받아 비동기적으로 작업하며, Test와 Artifact를 포함한 검증 가능한 결과를 반환하는 Remote Development Worker다.
 
 # Core Messages
 
@@ -180,46 +180,52 @@ Phase 7 완료.
 
 # Phase 8 Progress
 
-## 1장 - Coding Agent에서 Cloud Worker로
+## 1~3장
 
 상태: `최종 교정 완료`
 
 주요 교정:
 
-- `Base Commit`을 `Base SHA`로 통일
-- 핵심 문장을 `Cloud Agent에게 넘기는 것은 Prompt가 아니라 Task다`로 통일
-- Test / Build / Evidence 표기 점검
-- 참고자료 형식 유지
+- 1장: `Base SHA`, Task/Evidence 핵심 문장, Build / Test 표기 통일
+- 2장: 결정론적 검증을 `Cloud Runner`로 명확화하고 설명용 시간 예시 표기
+- 3장: Reasoning / Execution Resource, 설명용 수치, Compute / LLM / Human 비용 표기 정리
 
-## 2장 - Local Agent와 Cloud Agent
-
-상태: `최종 교정 완료`
-
-주요 교정:
-
-- 결정론적 검증 작업을 `Cloud Runner`로 명확화
-- `DB Schema`, `CPU / RAM`, `Repository Checkout` 표기 정리
-- 설명용 시간 예시임을 명시
-- 5장 Routing / 17장 Fallback 참조 점검
-
-## 3장 - Cloud Session, Container, Compute와 Token
+## 4장 - 독립 실행환경, 장시간 작업, 병렬성, 시간 분리
 
 상태: `최종 교정 완료`
 
 주요 교정:
 
-- Reasoning Resource / Execution Resource 표기 정리
-- Build / Test / Tool Output 대소문자와 구분 통일
-- 20분, 10,000 Test, 100MB Log가 설명용 수치임을 명확화
-- `Compute / LLM / Human` 비용 구분 유지
-- 제품별 vCPU / RAM / Session / 가격은 Research에서 관리한다는 경계 재확인
+- 설명용 시간 예시를 명시
+- `Cloud Runner`, `Base SHA`, `DB Schema`, `CPU / RAM / Disk` 표기 통일
+- Parallel Compute와 Parallel Reasoning 표현 유지
+- 12장의 병렬화 비용 참조 점검
+
+## 5장 - Task Routing: Local인가 Cloud인가
+
+상태: `최종 교정 완료`
+
+주요 교정:
+
+- `Local 상태`, `DB Schema`, Hard Constraint 표기 정리
+- Routing Decision Matrix와 판단 순서 용어 통일
+- Score를 실제 기준값이 아닌 설명용 예로 명시
+- `Runner-first`와 Cloud Agent 후보 구분 유지
+
+## 6장 - Cloud에 보내기 좋은 개발 작업
+
+상태: `최종 교정 완료`
+
+주요 교정:
+
+- `Cloud Runner → Cloud Agent → Cloud Runner 재검증` 표현 통일
+- Build / Unit / Integration / E2E / Docker / Migration의 실행 주체 표기 정리
+- 기본 Catalog의 Evidence 표기 통일
+- Tool-first / Runner-first / Agent-on-failure 용어 연결 확인
 
 # Phase 8 Remaining Focus
 
 ```text
-4~6장
-실행 가치 / Routing / Task Catalog 최종 교정
-
 7~9장
 Task Contract / Evidence / Prepared Environment 형식 통일
 
@@ -245,8 +251,8 @@ Timeline / Fallback / 결론 문장 최종 교정
 
 # Next
 
-1. 4장 `독립 실행환경, 장시간 작업, 병렬성, 시간 분리` 최종 교정
-2. 5장 `Task Routing: Local인가 Cloud인가` 최종 교정
-3. 6장 `Cloud에 보내기 좋은 개발 작업` 최종 교정
-4. 이후 같은 방식으로 18장까지 진행
+1. 7장 `Cloud Agent Task Contract: 작은 Task와 작은 Context` 최종 교정
+2. 8장 `Tool Output을 줄이고 Evidence를 남기기` 최종 교정
+3. 9장 `Prepared Cloud Environment, Cache, Snapshot` 최종 교정
+4. 이후 10~18장 순차 진행
 5. 전체 장 교정 완료 후 제품 출처 / 참조 / 목차 / 참고자료 최종 검사
