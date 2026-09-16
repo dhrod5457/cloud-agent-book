@@ -4,7 +4,7 @@ Phase 6 - 본문 초고 작성 진행 중
 
 Phase 5의 1~18장 설계와 전체 정합성 점검을 완료했다.
 
-현재 1~14장 초고를 작성했다.
+현재 1~16장 초고를 작성했다.
 
 # Source of Truth
 
@@ -124,7 +124,7 @@ Phase 5 완료.
 
 # Phase 6 Progress
 
-## 1~8장
+## 1~12장
 
 상태: `초고 작성 및 설계 대비 1차 검토 완료`
 
@@ -136,6 +136,10 @@ Phase 5 완료.
 - `chapters/06/draft.md`
 - `chapters/07/draft.md`
 - `chapters/08/draft.md`
+- `chapters/09/draft.md`
+- `chapters/10/draft.md`
+- `chapters/11/draft.md`
+- `chapters/12/draft.md`
 
 핵심 흐름:
 
@@ -148,90 +152,11 @@ Cloud Worker 정의
 → 작업 유형별 Runner / Agent / Local-Hybrid 배치
 → Small Task / Small Context
 → Small Output / Evidence
+→ Prepared Environment
+→ Runner-first / Agent-on-failure
+→ Source / Runtime 격리
+→ 병렬 Fan-out / Fan-in 비용 관리
 ```
-
-## 9장 - Prepared Cloud Environment, Cache, Snapshot
-
-상태: `초고 작성 완료`
-
-- 설계: `chapters/09/plan.md`
-- 초고: `chapters/09/draft.md`
-
-핵심:
-
-- Cloud Cold Start 분해
-- Prepared Cloud Environment
-- Cloud Environment as Code
-- Task-specific Environment
-- Reusable Cache / Fresh State
-- Cache Key / Invalidation
-- Snapshot / Warm Worker
-- Secret과 Prepared Image 분리
-- Cold Start 측정
-
-## 10장 - Cloud Agent를 Test Runner처럼 사용하기
-
-상태: `초고 작성 및 설계 대비 1차 검토 완료`
-
-- 설계: `chapters/10/plan.md`
-- 초고: `chapters/10/draft.md`
-
-핵심:
-
-- Cloud Runner와 Cloud Agent 책임 분리
-- Deterministic First
-- PASS 경로에서 Agent 제거
-- Failure Classification
-- Infra Failure와 Code Failure 분리
-- Result Gateway → Agent-on-failure
-- Agent Fix 후 Runner 재검증
-- Parallel Runner / Test Sharding
-
-## 11장 - Git, Branch, Worktree, Container로 작업 격리하기
-
-상태: `초고 작성 완료`
-
-- 설계: `chapters/11/plan.md`
-- 초고: `chapters/11/draft.md`
-
-핵심:
-
-- Git을 Local↔Cloud Handoff Boundary로 사용
-- Base SHA 고정
-- Branch per Task
-- Task / Session / SHA / Test / PR 상태 연결
-- Branch는 Source, Container/VM은 Runtime을 격리
-- DB / Port / Temp / Artifact Path까지 작업별 격리
-- Migration / Schema / Shared Module은 논리적 충돌로 별도 취급
-- Multi-Repository는 현재 Task에 필요한 Repository만 제공
-
-## 12장 - 병렬 Worker와 중복 Context 비용
-
-상태: `초고 작성 및 설계 대비 1차 검토 완료`
-
-- 설계: `chapters/12/plan.md`
-- 초고: `chapters/12/draft.md`
-
-핵심:
-
-- Parallel Compute와 Parallel Reasoning 구분
-- Fan-out 전 Dependency 확인
-- Context Duplication 비용
-- Agent Count와 Task Count 분리
-- Read-only 검증 우선 병렬화
-- Change Locality
-- Fan-in / Review / Merge / Rework 비용
-- Review Capacity를 병렬도의 상한으로 고려
-- Dependency-aware Parallel Group
-- Best-of-N을 일반 병렬화와 구분
-
-12장의 핵심 원칙:
-
-> 병렬화의 대상은 Agent가 아니라 독립 Task다.
-
-> Agent 수를 늘린다고 생산성이 선형 증가하지 않는다.
-
-> Fan-out만큼 Fan-in 비용도 설계해야 한다.
 
 ## 13장 - Local → Cloud → Local Handoff
 
@@ -250,42 +175,24 @@ Cloud Worker 정의
 - Evidence / Commit / PR을 Cloud→Local Return Boundary로 사용
 - 내부망 자원은 Local Validation으로 남겨 Hybrid 구성
 - Cloud 실패 시 Result Gateway/Agent-on-failure를 먼저 적용하고 필요한 경우 Local Fallback
-- Local Fallback을 정상 Routing으로 정의
 - Multi-Repository는 필요한 Repository만 연결하고 각 Base SHA를 고정
-- Handoff 상태를 최소한으로 추적
-- Developer Blocking Time을 줄이는 비동기 Handoff
-- `campus-platform` Hybrid Workflow 예제
-
-13장의 핵심 원칙:
-
-> Git으로 작업을 넘기고 Evidence로 결과를 돌려받는다.
-
-> Cloud에서 할 수 없는 마지막 검증은 Local로 Handoff하면 된다.
 
 ## 14장 - Task Queue와 Event-driven Cloud Agent
 
-상태: `초고 작성 완료`
+상태: `초고 작성 및 설계 대비 1차 검토 완료`
 
 - 설계: `chapters/14/plan.md`
 - 초고: `chapters/14/draft.md`
 
 핵심:
 
-- Task Source를 사람뿐 아니라 Push / CI Failure / Review Comment / Nightly / Dependency Update / Issue로 확장
+- Push / CI Failure / Review Comment / Nightly / Dependency Update / Issue를 Task Source로 사용
 - Event → Task Candidate → Dedup / Classification → Runner / Agent 흐름
-- 정상 CI 경로는 Runner에서 종료
+- 정상 경로는 Runner에서 종료
 - Infrastructure Failure와 Code Failure 분리
-- CI Failure를 구조화된 Task Contract로 변환
-- PR Review Comment follow-up Task
-- PR 단위 최소 Context 재사용
-- Nightly Failure 분류 후 재현 가능한 실패만 Agent Task 생성
-- Dependency Update는 Runner-first
-- 불명확한 Issue는 Local Investigation과 Task Split을 먼저 수행
-- repo + SHA + event type + Failure Fingerprint를 이용한 중복 Task 억제
-- Agent Push → CI FAIL → Agent 재호출의 무한 Loop를 Budget/Fingerprint로 제한
+- 동일 SHA / Failure Fingerprint 기반 중복 Task 억제
+- Agent Push → CI FAIL → Agent 재호출 Loop를 Budget/Fingerprint로 제한
 - 자동 결과는 Draft PR 또는 기존 PR Commit으로 반환
-- Developer Monitoring을 줄이는 Event-driven Workflow
-- `campus-platform` CI Failure / Nightly 예제
 
 14장의 핵심 원칙:
 
@@ -295,37 +202,98 @@ Cloud Worker 정의
 
 > 자동화에는 시작 조건뿐 아니라 중복 제거와 종료 조건도 필요하다.
 
-# Current Execution Flow
+## 15장 - campus-platform Cloud Agent Workflow 설계
 
-현재 7~14장의 연결은 다음과 같다.
+상태: `초고 작성 완료`
+
+- 설계: `chapters/15/plan.md`
+- 초고: `chapters/15/draft.md`
+
+핵심:
+
+- 1~14장의 원칙을 하나의 Java/Spring Boot 프로젝트 운영 모델로 통합
+- Local Workspace / Cloud Runner / Cloud Agent 역할 분리
+- backend-test / frontend-e2e / migration-test Environment 구성
+- RUN-BUILD / RUN-UNIT / RUN-INTEGRATION / RUN-E2E / RUN-DOCKER / FIX-BUG / REFACTOR-MODULE Task Catalog
+- Task Contract를 운영 입력 형식으로 사용
+- Task ID / Base SHA / Branch / Session / Current SHA / PR 상태 연결
+- 동일 SHA 기준 Unit / Integration / Docker / E2E 병렬 검증
+- Result Gateway / result.json / Artifact 구조
+- Infrastructure Failure를 코드 Agent에서 분리
+- Tibero / HSM / Internal API를 Local Hybrid Validation으로 남김
+- UI Task는 Screenshot / Video / Trace Evidence 사용
+- Compute / LLM / Human Cost를 분리해 관찰
+- 성공 기준을 Agent 수가 아니라 Blocking Time / Lead Time / Evidence / Rework로 정의
+
+15장의 핵심 원칙:
+
+> Task Contract로 작업을 넘기고 Evidence로 결과를 돌려받는다.
+
+> Local에서는 설계와 통합을 하고, Cloud에서는 독립적인 작업을 병렬로 처리한다.
+
+## 16장 - 하나의 기능을 Local + Cloud로 끝까지 개발하기
+
+상태: `초고 작성 완료`
+
+- 설계: `chapters/16/plan.md`
+- 초고: `chapters/16/draft.md`
+
+실전 시나리오:
 
 ```text
-7장
-Task Contract
-→ Small Input / Context
-        ↓
-8장
-Result Gateway / Evidence
-→ Small Output / Tool Result
-        ↓
-9장
-Prepared Environment
-→ 빠른 실행 준비
-        ↓
-10장
-Runner-first / Agent-on-failure
-        ↓
-11장
-Task별 Source / Runtime / Artifact 격리
-        ↓
-12장
-독립 Task만 Fan-out하고 Fan-in 비용 관리
-        ↓
-13장
-Local → Git → Cloud → Evidence → Local Handoff
-        ↓
-14장
-CI / Review / Schedule 이벤트가 동일한 Cloud Task를 생성
+학생 출결 API 인증 변경
+```
+
+핵심:
+
+- Local Requirement/Impact Analysis
+- Base Commit 고정
+- Agent Task와 Runner Task 분리
+- Task Contract 작성
+- Prepared Environment + Fresh Branch
+- Agent는 Relevant Files부터 시작하고 Context를 단계적으로 확대
+- Target Test → Failure Summary → Retry / Failure Fingerprint
+- 수정 SHA에서 Unit / Integration / Docker / E2E 병렬 Regression
+- UI Failure는 Screenshot / Video / Trace부터 확인
+- 최종 Cloud Evidence와 PR 생성
+- Local에서 Evidence → Changed Files → Diff → Architecture 순으로 Review
+- Tibero/Internal API/Jenkins 등 내부망 최종 검증
+- PR 기준 SHA와 Cloud/Internal Evidence 일치 확인
+- Merge 전 Full Validation
+- Merge 후 최소 Task 이력 보존
+- Local-only와 Hybrid의 Blocking Time / Overhead 비교
+- 재현 불가 / 내부 DB 의존 / Scope 확대 시 Local Fallback 또는 Task 재분해
+
+16장의 핵심 원칙:
+
+> Cloud Agent 활용은 별도 도구 사용법이 아니라 개발 Workflow 설계다.
+
+> 작은 Task를 Git으로 넘기고, Runner와 Agent가 작업한 Evidence를 다시 Local로 가져온다.
+
+# Current Execution Flow
+
+현재 7~16장의 연결은 다음과 같다.
+
+```text
+7장  Task Contract / Small Input
+  ↓
+8장  Result Gateway / Small Output / Evidence
+  ↓
+9장  Prepared Environment
+  ↓
+10장 Runner-first / Agent-on-failure
+  ↓
+11장 Source / Runtime / Artifact 격리
+  ↓
+12장 독립 Task Fan-out / Fan-in 비용 관리
+  ↓
+13장 Local → Git → Cloud → Evidence → Local Handoff
+  ↓
+14장 CI / Review / Schedule 이벤트가 Task 생성
+  ↓
+15장 campus-platform 전체 운영 모델로 통합
+  ↓
+16장 하나의 기능을 Requirement → Merge까지 시간 순서로 실행
 ```
 
 # Preserved / Future Topics
@@ -348,11 +316,11 @@ CI / Review / Schedule 이벤트가 동일한 Cloud Task를 생성
 
 # Next
 
-1. 13~14장 설계 대비 자체 검토
+1. 15~16장 설계 대비 자체 검토
 2. 필요한 수정 반영
-3. 15장 `campus-platform Cloud Agent Workflow 설계` 초고 작성
-4. 16장 `하나의 기능을 Local + Cloud로 끝까지 개발하기` 초고 작성
-5. 이후 17~18장 작성
-6. 1~18장 초고 전체 정합성 점검
+3. 17장 `Cloud가 항상 정답은 아니다` 초고 작성
+4. 18장 `다음 단계: Harness와 Orchestration` 초고 작성
+5. 1~18장 초고 전체 정합성 점검
+6. Phase 6 초고 완료 처리
 
 Phase 6에서는 장별로 `초고 → 설계 대비 검토 → 수정 → 다음 장` 순서로 진행한다.
