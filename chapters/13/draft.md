@@ -15,7 +15,7 @@ Local
       ↓
 Cloud
 → Work / Runner / Agent
-→ Evidence + Commit / PR
+→ Evidence + Result SHA / PR
       ↓
 Local
 → Review / Internal Validation / Merge
@@ -28,7 +28,7 @@ Local → Cloud
 Git + Task Contract
 
 Cloud → Local
-Evidence + Commit / PR
+Evidence + Result SHA / PR
 ```
 
 > Task는 Local 또는 Cloud 중 하나에 영구적으로 속하지 않는다. 작업 단계에 따라 실행 위치를 이동할 수 있다.
@@ -87,9 +87,9 @@ Environment
 backend-test
 
 Expected Evidence
-- result commit SHA
-- changed files
-- test result
+- Result SHA
+- Changed Files
+- Validation Result
 ```
 
 Local에서 알고 있는 모든 프로젝트 정보를 넣는 것이 목적이 아니다.
@@ -137,10 +137,10 @@ Branch: agent/auth-142
 Base SHA
 abc123
    ↓
-Result Commit
+Result SHA
 def456
    ↓
-Verification
+Verification SHA
 def456
 ```
 
@@ -232,7 +232,7 @@ Changed Files
 - AuthService.java
 - AuthServiceTest.java
 
-Validation
+Validation Result
 AuthServiceTest.expiredToken: PASS
 AuthServiceTest: 24 / 24 PASS
 
@@ -256,11 +256,11 @@ Evidence
 
 ## 7. PR은 Review 가능한 Return Package다
 
-팀 개발에서는 Commit과 Evidence를 PR로 묶을 수 있다.
+팀 개발에서는 Result SHA와 Evidence를 PR로 묶을 수 있다.
 
 ```text
 Cloud Worker
-→ Result Commit
+→ Result SHA
 → Push
 → PR
       ↓
@@ -375,10 +375,11 @@ Task가 Local과 Cloud를 이동하면 현재 위치를 알 수 있어야 한다
 ```text
 Task ID
 Base SHA
-Current SHA
+Result SHA
 Execution Location
 Status
-Evidence
+Validation Result
+Artifact Path
 PR
 ```
 
@@ -387,10 +388,11 @@ PR
 ```yaml
 task_id: AUTH-142
 base_sha: abc123
-current_sha: def456
+result_sha: def456
 location: cloud
 status: verifying
-result: artifacts/AUTH-142/result.json
+validation_result: PASS
+artifact_path: artifacts/AUTH-142/result.json
 pr: 142
 ```
 
@@ -411,7 +413,7 @@ CLOUD_DONE
 Cloud에서 작업하다 다음 사실이 드러날 수 있다.
 
 ```text
-Internal dependency 발견
+Internal Dependency 발견
 Cloud에서 재현 불가
 예상보다 Scope 확대
 Architecture 판단 필요
@@ -444,6 +446,8 @@ Cloud
 10:40  Cloud Evidence 생성
 11:10  Developer Review
 ```
+
+위 시간은 Handoff와 Developer Blocking Time의 차이를 설명하기 위한 예시다.
 
 Cloud 실행시간과 Developer Blocking Time은 다르다.
 
