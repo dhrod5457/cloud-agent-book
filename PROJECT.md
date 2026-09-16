@@ -1,25 +1,32 @@
 # 프로젝트 목적
 
-Cloud Agent를 실제 개발팀에서 어떻게 활용할지 정리하는 실전 Software Engineering 책을 작성한다.
+Cloud Agent를 실제 개발팀에서 어떻게 활용할지 정리하는 Software Engineering 책을 작성한다.
 
 이 책은 특정 AI 제품 사용 설명서가 아니다.
 
 핵심 질문은 다음과 같다.
 
-> 클라우드 에이전트를 왜 사용하고, 로컬 에이전트와 어떻게 조합하며, 어떤 작업을 맡기고, 토큰과 클라우드 컴퓨팅 자원을 어떻게 효율적으로 활용할 것인가?
+> 클라우드 코딩 에이전트를 실제 개발에서 어떻게 더 빠르고, 저렴하고, 효율적으로 사용할 것인가?
+
+최종 독자 판단은 다음과 같다.
+
+> 이 Task는 Local에서 해야 하는가, Cloud로 보내야 하는가?
 
 독자는 책을 읽은 뒤 자신의 프로젝트에서 다음을 판단하고 구성할 수 있어야 한다.
 
-- 이 Task는 Local에서 할지 Cloud로 보낼지
-- Build/Test/E2E를 Cloud에 어떻게 분산할지
-- 여러 Cloud Worker를 어떻게 병렬화할지
-- Cloud Agent Context와 Tool Output을 어떻게 줄일지
-- Prebuilt Environment와 Cache를 어떻게 활용할지
-- Local + Cloud Hybrid Workflow를 어떻게 구성할지
+- Local / Cloud / Hybrid 중 실행 위치 선택
+- Build / Test / E2E를 Cloud Runner로 분리
+- 재현 가능한 Failure를 Cloud Agent Task로 전환
+- Cloud Agent Context와 Tool Output 축소
+- Prepared Environment와 Cache 활용
+- Git 기반 Local ↔ Cloud Handoff
+- 독립 Task 병렬화와 Fan-in 비용 판단
+- 내부망 검증과 Cloud 검증 경계 분리
+- Cloud 이점이 사라질 때 Local Fallback
 
 ## 작업명
 
-최종 제목은 Phase 5 목차가 안정된 뒤 확정한다.
+최종 제목과 부제는 Phase 9에서 확정한다.
 
 기존 가제:
 
@@ -29,96 +36,143 @@ Cloud Agent를 실제 개발팀에서 어떻게 활용할지 정리하는 실전
 
 **Cloud Agent 활용과 Local + Cloud 개발 Workflow**
 
+## 핵심 정의
+
+```text
+Cloud Agent
+= LLM
++ Repository
++ Independent Execution Environment
++ CPU / RAM / Disk
++ Development Tools
+```
+
+확장 정의:
+
+> Cloud Agent는 필요할 때 독립된 개발환경을 할당받고, Git을 통해 Task를 받아 비동기적으로 작업하며, Test와 Artifact를 포함한 검증 가능한 결과를 반환하는 Remote Development Worker다.
+
 ## 핵심 원칙
 
-1. 전체 책을 한 번에 작성하지 않는다.
-2. Phase 단위로 진행한다.
-3. 각 Phase 결과는 프로젝트 파일에 기록한다.
-4. 프로젝트 파일을 Source of Truth로 사용한다.
-5. 제품 기능과 일반적인 활용 원칙을 구분한다.
-6. Java/Spring Boot를 주요 실전 예제로 사용한다.
-7. 본문보다 먼저 개념, 범위, 목차, 예제 프로젝트, 장별 설계를 확정한다.
-8. 제품 및 기술의 현재 기능은 공식 문서를 통해 검증한다.
-9. 새로운 주제는 `Cloud Agent를 더 잘 사용하는 방법과 직접 관련이 있는가?`를 기준으로 본문 포함 여부를 판단한다.
-10. Agent Platform 일반론은 현재 책의 핵심 범위로 확장하지 않는다.
+1. 프로젝트 파일을 Source of Truth로 사용한다.
+2. 제품 기능과 일반적인 활용 원칙을 구분한다.
+3. Java/Spring Boot를 주요 실전 예제로 사용한다.
+4. 제품 및 기술의 현재 기능은 공식 자료로 검증한다.
+5. 변경 가능한 가격, CPU / RAM, Session 제한은 본문 핵심 논리와 분리한다.
+6. 새로운 주제는 `Cloud Agent를 더 잘 사용하는 방법과 직접 관련이 있는가?`를 기준으로 포함 여부를 판단한다.
+7. Agent Platform 일반론은 현재 책의 핵심 범위로 확장하지 않는다.
+8. Runner가 할 수 있는 일은 Runner에게 맡긴다.
+9. Cloud Agent에는 작은 Task와 작은 Context를 전달한다.
+10. 결과는 Evidence와 Artifact로 검증한다.
 
 ## 책 전체에서 유지할 메시지
 
-> Cloud Agent는 Local Agent를 대체하는 것이 아니다.
+> Cloud Agent는 Local Agent를 대체하지 않는다.
 
 > Cloud Agent의 핵심 가치는 더 많은 Token이 아니라 독립 실행환경과 병렬성이다.
 
 > CPU에는 일을 많이 시키고, LLM에는 필요한 정보만 보여준다.
 
-> Cloud Agent에게 Repository 전체를 반복해서 이해시키지 않는다.
+> Runner가 할 수 있으면 Runner에게 맡긴다.
 
-> 작은 Task와 작은 Context를 전달한다.
+> 병렬화의 대상은 Agent가 아니라 독립 Task다.
 
-> Cloud Agent를 잘 사용하는 핵심은 Agent 수를 늘리는 것이 아니라 어떤 작업을 Cloud로 보낼지 결정하는 것이다.
+> Local Fallback은 실패가 아니라 Routing의 일부다.
 
-## 전체 Phase
+## 현재 진행 상태
 
-1. 책의 방향 정의
-2. 전체 목차 설계
-3. 목차 검증
-4. 예제 프로젝트 설계
-5. 장별 설계
-6. 초고 작성
-7. 기술 검토
-8. 실전 검증
-9. 전체 일관성 검토
-10. 최종 편집
+```text
+Phase 5
+1~18장 설계 완료
 
-## 집필 방식
+Phase 6
+1~18장 초고 완료
 
-각 장은 가능하면 다음 흐름을 따른다.
+Phase 7
+전체 편집 / 중복 압축 완료
 
-- 문제
-- 판단 기준
-- 구조
-- 좋은 사례 / 나쁜 사례
-- 실전 적용
-- 비용/Token/Compute 관점
-- 체크리스트
+Phase 8
+최종 교정 / 출판 정합성 검사 완료
+
+Phase 9
+출판 원고 조립 진행 중
+```
+
+Phase 9에서는 본문을 다시 쓰지 않는다.
+
+다음 항목을 준비한다.
+
+- 6개 Part 구조
+- 서문
+- 책 소개 / 독자 대상
+- 읽는 방법
+- 제목 / 부제
+- Part 전환 문구
+- 참고자료
+- 용어집 / 부록 정책
+- 최종 원고 조립 순서
+
+## 출판용 Part 구조
+
+```text
+Part I. Cloud Agent를 이해한다
+1~4장
+
+Part II. 어떤 Task를 Cloud로 보낼 것인가
+5~8장
+
+Part III. Cloud 실행환경과 검증을 설계한다
+9~12장
+
+Part IV. Local과 Cloud를 연결한다
+13~14장
+
+Part V. 실제 프로젝트에 적용한다
+15~16장
+
+Part VI. Cloud의 한계와 다음 단계를 정한다
+17~18장
+```
+
+세부 조립 순서는 `manuscript/book-structure.md`를 따른다.
 
 ## 주요 실전 예제
 
 Java/Spring Boot 기반 `campus-platform`을 사용한다.
 
-핵심 Workflow 예:
+기본 역할:
 
 ```text
-Local
-→ 기능 설계 / Task 분리
+Local / Local Agent
+→ Requirement / Architecture / Human Steering / Internal Validation / Review
 
-Cloud #1
-→ Unit Test
+Cloud Runner
+→ Build / Test / E2E / Docker / 결정론적 검증
 
-Cloud #2
-→ Integration Test
-
-Cloud #3
-→ Docker Build
-
-Cloud #4
-→ Web E2E
-
-실패
-→ 필요한 경우 Cloud Agent 분석
-
-성공
-→ PR / Local 통합 / 최종 Review
+Cloud Agent
+→ 재현 가능한 Failure 분석 / 제한된 코드 수정
 ```
 
-예제 기술 후보:
+예제 기술:
 
-- Java 21+
-- Spring Boot
+- Java 21
+- Spring Boot 3.x
 - Gradle
 - MyBatis
 - PostgreSQL / Testcontainers
 - Docker
-- Playwright 또는 동등한 E2E 도구
-- GitHub Actions 또는 Jenkins 사례
+- Playwright
 
-Redis, Kafka, HSM, Tibero/Oracle 등은 Cloud/Local 경계를 설명하는 데 필요한 범위에서만 사용한다.
+Tibero, Oracle, HSM, Internal Jenkins, VPN-only API 등은 Local / Cloud 경계를 설명하는 데 필요한 범위에서만 사용한다.
+
+## 현재 Source of Truth
+
+우선순위가 높은 문서:
+
+1. `planning/concept.md`
+2. `planning/scope.md`
+3. `planning/toc.md`
+4. `planning/cloud-agent-remote-worker-model.md`
+5. `planning/phase8-publication-consistency-check.md`
+6. `planning/phase9-manuscript-assembly-plan.md`
+7. `manuscript/book-structure.md`
+8. `STATUS.md`
