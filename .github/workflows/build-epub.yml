@@ -1,0 +1,131 @@
+name: Build EPUB ebook
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'manuscript/master.md'
+      - 'manuscript/epub.css'
+      - '.github/workflows/build-epub.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-epub:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify master manuscript
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s manuscript/master.md
+
+          chapter_count=$(grep -Ec '^# [0-9]+장\.' manuscript/master.md || true)
+          test "$chapter_count" -eq 18
+
+          echo "master manuscript verified"
+          wc -l -w -c manuscript/master.md
+
+      - name: Install EPUB build tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y pandoc unzip
+
+      - name: Prepare EPUB source
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build
+
+          python3 - <<'PY'
+          from pathlib import Path
+
+          source = Path('manuscript/master.md').read_text(encoding='utf-8').splitlines()
+
+          out = [
+              '---',
+              'title: "클라우드 코딩 에이전트 실전"',
+              'subtitle: "Local과 Cloud를 나누고 Task를 위임하는 개발 워크플로 설계"',
+              'lang: ko-KR',
+              'description: "더 많은 Agent보다 더 나은 Task Routing, 실행환경, 검증을 설계하는 법"',
+              '---',
+              '',
+          ]
+
+          started = False
+          skipping_print_toc = False
+          removed_print_toc = False
+
+          for line in source:
+              # EPUB metadata supplies the title page, so start from Preface.
+              if not started:
+                  if line == '# 서문':
+                      started = True
+                  else:
+                      continue
+
+              # E-readers already provide a navigation TOC. Remove the printed
+              # Markdown TOC to avoid duplicate Part/Chapter entries.
+              if not removed_print_toc and line == '# 목차':
+                  skipping_print_toc = True
+                  continue
+
+              if skipping_print_toc:
+                  if line == '# 참고자료':
+                      skipping_print_toc = False
+                      removed_print_toc = True
+                  continue
+
+              out.append(line)
+
+          text = '\n'.join(out).rstrip() + '\n'
+          Path('build/ebook.md').write_text(text, encoding='utf-8')
+
+          chapter_count = sum(1 for line in out if line.startswith('# ') and '장.' in line)
+          if chapter_count != 18:
+              raise SystemExit(f'Expected 18 chapter headings in EPUB source, got {chapter_count}')
+
+          print(f'EPUB source chapter headings: {chapter_count}')
+          print(f'EPUB source chars: {len(text)}')
+          PY
+
+      - name: Build EPUB 3
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          pandoc build/ebook.md \
+            --from=gfm \
+            --to=epub3 \
+            --toc \
+            --toc-depth=2 \
+            --css=manuscript/epub.css \
+            -o build/cloud-agent-book.epub
+
+          test -s build/cloud-agent-book.epub
+          unzip -t build/cloud-agent-book.epub
+          test "$(unzip -p build/cloud-agent-book.epub mimetype)" = "application/epub+zip"
+
+          unzip -l build/cloud-agent-book.epub > build/epub-files.txt
+          grep -Eq 'nav\.xhtml$' build/epub-files.txt
+
+          echo "EPUB bytes: $(wc -c < build/cloud-agent-book.epub)"
+          echo "EPUB files: $(unzip -Z1 build/cloud-agent-book.epub | wc -l)"
+
+      - name: Upload EPUB artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloud-agent-book-epub
+          path: |
+            build/cloud-agent-book.epub
+            build/epub-files.txt
+          retention-days: 14
+          if-no-files-found: error
