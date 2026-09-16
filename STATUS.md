@@ -1,12 +1,12 @@
 # Current Phase
 
-Phase 8 - 최종 교정 / 출판 준비 진행 중
+Phase 8 - 최종 교정 / 출판 준비 완료
 
-Phase 7에서 1~18장 전체 편집/교정과 정합성 점검을 완료했다.
+1~18장 본문 최종 교정과 출판 정합성 점검을 완료했다.
 
-현재 **1~18장 본문 최종 교정을 모두 완료했다.**
+현재 원고는 **본문 작성 → 전체 편집 → 최종 교정 → 출판 정합성 점검**까지 완료된 상태다.
 
-Phase 8의 남은 작업은 본문 외 최종 출판 검사다.
+다음 단계는 새 본문 작성이 아니라 출판 산출물 준비다.
 
 # Source of Truth
 
@@ -21,9 +21,10 @@ Phase 8의 남은 작업은 본문 외 최종 출판 검사다.
 7. `planning/phase7-editing-plan.md`
 8. `planning/phase7-editing-consistency-check.md`
 9. `planning/phase8-publication-checklist.md`
-10. 각 `chapters/NN/plan.md`
-11. `planning/future-topics.md`
-12. `STATUS.md`
+10. `planning/phase8-publication-consistency-check.md`
+11. 각 `chapters/NN/plan.md`
+12. `planning/future-topics.md`
+13. `STATUS.md`
 
 과거 Agent-Native 독립 장 설계와 초기 22~23장 체계는 현행 목차보다 우선하지 않는다.
 
@@ -122,6 +123,97 @@ Phase 7 완료.
 - Agent Platform 일반론 확장 방지
 - `planning/phase7-editing-consistency-check.md` 작성
 
+# Phase 8 Result
+
+Phase 8 완료.
+
+## 본문
+
+- 1~18장 문장 최종 교정 완료
+- 제목 / 절 제목 / 핵심 용어 표기 점검
+- 코드블록 / 표 형식 점검
+- 장간 역할과 참조 점검
+- 설명용 수치 표기 점검
+- AUTH-142 예제 일관성 점검
+
+## 추적 필드
+
+본문의 기본 추적 필드는 다음으로 통일했다.
+
+```text
+Task ID
+Base SHA
+Result SHA
+Validation Result
+Artifact Path / Artifact Reference
+PR
+```
+
+기본 관계:
+
+```text
+Task ID
+→ Base SHA
+→ Branch
+→ Result SHA
+→ Validation Result
+→ Evidence / Artifact
+→ PR
+```
+
+## 실행 주체
+
+```text
+Local / Local Agent
+→ 요구사항 / Architecture / Human Steering / Internal Validation / Review
+
+Cloud Runner
+→ Build / Test / E2E / Docker / 결정론적 검증
+
+Cloud Agent
+→ 재현 가능한 Failure 분석 / 제한된 코드 수정
+```
+
+## 출판 정합성 검사
+
+- `planning/toc.md`와 1~18장 제목 직접 대조: **18 / 18 일치**
+- 현행 본문에서 구목차 19~23장 체계를 사용하지 않음
+- 제품 가변 수치는 본문 원칙과 분리
+- GitHub / OpenAI / Anthropic 공식 근거를 2026-09-16 기준 재검증
+- 1~2장 Research에 공식 URL과 재검증 기준일 기록
+- Anthropic infrastructure 자료의 깨진 내부 경로 발견 및 복구
+- `planning/phase8-publication-consistency-check.md` 작성
+
+# Product Research
+
+## GitHub
+
+현재 공식 근거는 다음 Research에서 관리한다.
+
+- `research/chapter-01-cloud-worker-official-sources.md`
+- `research/chapter-02-local-cloud-official-sources.md`
+
+2026-09-16 기준 공식 문서 URL을 재확인했다.
+
+## OpenAI Codex
+
+공식 근거:
+
+- `Addendum to OpenAI o3 and o4-mini system card: Codex`, 2025-05-16
+- `Codex is now generally available`, 2025-10-06
+
+제품별 변경 가능한 세부사항은 본문의 일반 원칙으로 고정하지 않는다.
+
+## Anthropic
+
+현재 Research:
+
+- `research/anthropic/agent-native-development-environment.md`
+- `research/anthropic/claude-code-web-execution-resources.md`
+- `research/anthropic/infrastructure-noise.md`
+
+공식 실험 수치는 해당 실험의 결과로만 사용하고 일반 성능 기대값으로 확대하지 않는다.
+
 # Final Edited Flow
 
 ```text
@@ -162,129 +254,20 @@ Phase 7 완료.
 18장 Harness / Orchestration 미래 방향 + 결론
 ```
 
-# Phase 8 Rules
+# Publication Readiness
 
-`planning/phase8-publication-checklist.md`를 기준으로 진행한다.
+현재 본문 구조와 정합성은 출판 산출물 준비 단계로 이동할 수 있는 상태다.
 
-```text
-문장 단위 교정
-→ 제목 / 절 제목 / 용어 표기 통일
-→ 코드블록 / 표 형식 통일
-→ 장간 참조 검사
-→ 설명용 수치 표기 검사
-→ 제품 사례 / 공식 출처 검사
-→ 참고자료 형식 통일
-→ 도입 / 결론 연결 검사
-→ 최종 목차와 본문 제목 대조
-```
-
-새 구조와 새 개념은 추가하지 않는다.
-
-# Phase 8 Progress
-
-## 1~15장
-
-상태: `최종 교정 완료`
-
-핵심 교정:
-
-- 1~3장: `Base SHA`, Cloud Runner, 설명용 수치, Compute / LLM / Human 표기 통일
-- 4~6장: 실행 가치 / Routing / Task Catalog의 Runner·Agent·Evidence 표기 통일
-- 7장: Task Contract 반환 필드, YAML Budget, AUTH-142 필드 표기 통일
-- 8장: Raw Artifact / Result Gateway / Result SHA / Failure Fingerprint 표기 정리
-- 9장: Prepared Environment / Cache / Snapshot / Fresh Source / Cold Start 표기 정리
-- 10장: Cloud Runner / Failure Classification / Retry / Result SHA 표기 정리
-- 11장: Source / Runtime / Evidence Isolation과 YAML 추적 필드 통일
-- 12장: Parallel Compute / Context Duplication / Fan-in / 설명용 수치 표기 정리
-- 13장: Handoff 반환 경계를 `Evidence + Result SHA / PR`로 통일
-- 14장: Event 입력 `Git SHA`와 Agent 수정 `Result SHA`의 의미 분리
-- 15장: 운영 상태와 병렬 검증을 `Base SHA / Result SHA / Validation Result / Artifact Path` 기준으로 통일
-
-## 16장 - 하나의 기능을 Local + Cloud로 끝까지 개발하기
-
-상태: `최종 교정 완료`
-
-주요 교정:
-
-- `Base SHA → Result SHA → Verification → PR` 흐름 통일
-- Task Contract 반환 필드를 `Result SHA / Changed Files / Validation Result`로 통일
-- Agent 수정 후 검증 주체를 `Cloud Runner`로 명확화
-- Regression 검증을 같은 `Result SHA` 기준으로 통일
-- Retry 횟수, Timeline, 파일 수는 설명용 예임을 명시
-- Cloud Evidence와 Internal Validation을 같은 PR SHA에 연결
-
-## 17장 - Cloud가 항상 정답은 아니다
-
-상태: `최종 교정 완료`
-
-주요 교정:
-
-- Parallel Compute / Local Resource Occupancy 표기 정리
-- `DB Schema`, Internal Network, Failure Fingerprint 용어 통일
-- Local Fallback Return Package를 `Task ID / Base SHA / Result SHA / Validation Result / Artifact Path / Fallback Reason` 중심으로 정리
-- Migration 일반 검증과 HSM Mock Test의 기본 실행 주체를 `Cloud Runner`로 명확화
-- 시작 Routing과 실행 중 재Routing의 역할 경계 유지
-
-## 18장 - 다음 단계: Harness와 Orchestration
-
-상태: `최종 교정 완료`
-
-주요 교정:
-
-- Harness / Routing / Orchestration 용어와 앞 장 연결 점검
-- `CPU / RAM`, Environment / Build / Validation 표기 통일
-- Best-of-N은 기본값 `N=1`인 제한적 기법으로 유지
-- 최종 Workflow의 실행 주체를 `Cloud Runner / Cloud Agent / Local`로 통일
-- Agent Platform 일반론으로 확장하지 않고 책의 핵심 질문으로 종료
-
-# Phase 8 Main Text Result
-
-**1~18장 본문 최종 교정 완료.**
-
-본문에서 사용하는 핵심 추적 필드는 다음으로 통일했다.
-
-```text
-Task ID
-Base SHA
-Result SHA
-Validation Result
-Artifact Path / Artifact Reference
-PR
-```
-
-실행 주체는 다음 기준을 유지한다.
-
-```text
-Local / Local Agent
-→ 요구사항 / Architecture / Human Steering / Internal Validation / Review
-
-Cloud Runner
-→ Build / Test / E2E / Docker / 결정론적 검증
-
-Cloud Agent
-→ 재현 가능한 Failure 분석 / 제한된 코드 수정
-```
-
-# Phase 8 Remaining Focus
-
-본문 교정 이후 다음을 일괄 검사한다.
-
-1. 제품명을 직접 언급한 문장의 공식 출처와 기준일
-2. 1~18장 제목과 `planning/toc.md` 일치 여부
-3. 장간 참조 번호와 역할 경계
-4. 참고자료 형식
-5. 설명용 수치 표기 누락
-6. 코드블록 언어 지정
-7. 표 형식
-8. AUTH-142 예제 필드 일관성
-9. Agent Platform 범위 확장 여부
-10. Phase 8 최종 정합성 점검 문서 작성
+본문에 새 개념을 추가하기보다 이후 변경은 교정쇄에서 발견되는 오탈자, 사실 오류, 링크 변경처럼 명확한 수정으로 제한한다.
 
 # Next
 
-1. 제품 사례 / 공식 출처 / 기준일 검사
-2. 목차와 1~18장 제목 자동 대조
-3. 장간 참조 번호와 참고자료 일괄 검사
-4. 설명용 수치 / 코드블록 / 표 형식 일괄 검사
-5. `planning/phase8-publication-consistency-check.md` 작성
-6. Phase 8 완료 여부 판정
+다음 단계는 출판 산출물 준비다.
+
+1. 1~18장 최종 원고를 하나의 출판 원고 구조로 묶기
+2. Part 제목과 장 사이 전환 페이지/문구 정리
+3. 서문 / 책 소개 / 독자 대상 / 읽는 방법 작성
+4. 표지용 제목 / 부제 / 책 소개 문구 확정
+5. 참고자료 / 용어집 / 부록 필요 여부 결정
+6. PDF / EPUB / 인쇄 원고 포맷 결정
+7. 최종 교정쇄 생성 후 오탈자만 수정
