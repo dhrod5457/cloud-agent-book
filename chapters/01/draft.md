@@ -2,7 +2,7 @@
 
 소프트웨어 개발에서 AI를 사용할 때 먼저 구분해야 할 것은 `대화하는 AI`와 `작업하는 Agent`다.
 
-Chat 형태의 LLM은 질문을 받고 답을 만든다. 코드 조각을 제안하거나 오류 메시지를 해석할 수 있다. Coding Agent는 여기서 한 단계 더 나아가 Repository를 읽고, 파일을 수정하고, 명령을 실행하며, Build와 Test 결과를 바탕으로 다시 작업한다.
+대화형 LLM은 질문을 받고 답을 만든다. 코드 조각을 제안하거나 오류 메시지를 해석할 수 있다. Coding Agent는 여기서 한 단계 더 나아가 Repository를 읽고, 파일을 수정하고, 명령을 실행하며, Build와 Test 결과를 바탕으로 다시 작업한다.
 
 Cloud Agent는 Coding Agent에 독립된 원격 실행환경이 결합된 형태로 볼 수 있다.
 
@@ -46,7 +46,7 @@ application-test.yml
 DB migration
 ```
 
-오류를 재현하려면 테스트를 실행해야 하고, Mapper XML이나 설정 파일까지 확인해야 할 수도 있다.
+오류를 재현하려면 Test를 실행해야 하고, Mapper XML이나 설정 파일까지 확인해야 할 수도 있다.
 
 Coding Agent는 다음 흐름에 참여한다.
 
@@ -70,7 +70,7 @@ Agent가 **Repository와 Tool을 사용해 실제 작업 상태를 변경한다*
 ./gradlew test --tests AuthServiceTest.expiredToken
 ```
 
-테스트가 실패하면 Agent는 실패 내용을 확인하고 관련 파일을 수정한 뒤 다시 실행할 수 있다.
+Test가 실패하면 Agent는 실패 내용을 확인하고 관련 파일을 수정한 뒤 다시 실행할 수 있다.
 
 이 순간 AI는 코드 설명 도구를 넘어 개발 Workflow의 작업 주체가 된다.
 
@@ -183,7 +183,7 @@ Cloud Worker
 
 > Cloud Agent의 핵심 가치는 더 많은 Token이 아니라 독립 실행환경과 병렬성이다.
 
-LLM이 얼마나 잘 판단하는지와, 어떤 환경에서 무엇을 실행할 수 있는지는 서로 다른 문제다. 3장에서 이 차이를 Compute와 Token 관점으로 분리한다.
+LLM이 얼마나 잘 판단하는지와 어떤 환경에서 무엇을 실행할 수 있는지는 서로 다른 문제다. 3장에서 이 차이를 Compute와 Token 관점으로 분리한다.
 
 ---
 
@@ -191,7 +191,7 @@ LLM이 얼마나 잘 판단하는지와, 어떤 환경에서 무엇을 실행할
 
 Cloud Agent를 `인터넷에 있는 AI 개발자`라고 표현하면 이해하기는 쉽다. 그러나 실제 Workflow를 설계할 때는 `Remote Worker` 관점이 더 유용하다.
 
-개발자 한 명을 추가했다고 생각하면 다음과 같이 넓은 요청을 만들기 쉽다.
+개발자 한 명을 추가했다고 생각하면 다음처럼 넓은 요청을 만들기 쉽다.
 
 ```text
 Repository 전체를 살펴보고 문제가 있으면 알아서 고쳐줘.
@@ -235,7 +235,7 @@ Changed Files
 
 세부 Task Contract는 7장에서 다룬다. 1장에서는 한 가지만 기억하면 된다.
 
-> Cloud Agent에게 넘기는 것은 Prompt보다 Task에 가깝다.
+> Cloud Agent에게 넘기는 것은 Prompt가 아니라 Task다.
 
 ---
 
@@ -248,7 +248,7 @@ Cloud Task의 입력은 자연어 요청 하나로 끝나지 않는다.
 ```text
 Task
 Repository
-Base Commit
+Base SHA
 Environment
 Context
 Validation
@@ -419,7 +419,7 @@ Review / Integration
 
 > Cloud Agent는 Local Agent를 대체하지 않는다.
 
-> Cloud Agent에게 넘기는 것은 대화보다 Task에 가깝고, 결과는 검증 가능한 작업 상태여야 한다.
+> Cloud Agent에게 넘기는 것은 Task이며, 결과는 검증 가능한 작업 상태여야 한다.
 
 다음 장에서는 이 Remote Worker와 Local Agent를 비교해 실행 위치를 선택하는 기준을 만든다.
 
