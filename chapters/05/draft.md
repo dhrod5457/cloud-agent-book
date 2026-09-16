@@ -95,7 +95,7 @@ Static Analysis
 Migration Validation
 ```
 
-이 작업은 명령과 PASS/FAIL 판정 기준이 명확하다.
+이 작업은 명령과 PASS / FAIL 판정 기준이 명확하다.
 
 ```text
 Runner
@@ -119,9 +119,9 @@ Cloud에 유리한 조건을 여러 개 합산하기 전에 **Cloud 실행 자�
 
 ```text
 Internal Network 필수
-Repository/데이터를 Cloud에 제공할 수 없음
-현재 Local State를 그대로 사용해야 함
-특정 장비/디바이스에 직접 접근해야 함
+Repository / 데이터를 Cloud에 제공할 수 없음
+현재 Local 상태를 그대로 사용해야 함
+특정 장비 / 디바이스에 직접 접근해야 함
 ```
 
 예:
@@ -140,7 +140,7 @@ Tibero 운영환경에서만 재현되는 SQL 문제
 Hard Constraint
 → 실행 가능한 위치 결정
         ↓
-그 안에서 비용/시간 최적화
+그 안에서 비용 / 시간 최적화
 ```
 
 보안·정책·네트워크 제약을 우회하는 것이 Routing의 목적은 아니다.
@@ -155,8 +155,8 @@ Hard Constraint
 요구사항이 아직 불명확함
 Human Steering이 잦음
 큰 Context가 필요함
-미커밋 Local State 의존
-내부망/장비 의존
+미커밋 Local 상태 의존
+내부망 / 장비 의존
 재현 절차가 불명확함
 Architecture 판단 비중이 큼
 ```
@@ -239,7 +239,7 @@ Local
 → 요구사항 / 실제 DB 제약 확인
         ↓
 Cloud
-→ Migration 작성/일반 검증
+→ Migration 작성 / 일반 검증
 → Testcontainers 기반 Test
         ↓
 Local
@@ -384,13 +384,13 @@ Routing 단계에서는 다음 정도만 확인한다.
 
 ```text
 예상 변경 파일
-shared/common module
-DB schema / migration
-공통 DTO/API
+shared / common module
+DB Schema / Migration
+공통 DTO / API
 순서 의존성
 ```
 
-Source/Runtime 격리는 11장에서, 병렬화 비용과 Fan-in은 12장에서 상세히 다룬다.
+Source / Runtime 격리는 11장에서, 병렬화 비용과 Fan-in은 12장에서 상세히 다룬다.
 
 ---
 
@@ -457,12 +457,12 @@ Review 가능한 변경 범위
 | 요구사항 불명확 | 유리 | 불리 | 불리 |
 | Human Steering 잦음 | 유리 | 불리 | 가능 |
 | 큰 Context 필요 | 유리 | 불리 | 가능 |
-| 장시간 Build/Test | 가능 | 유리 | 유리 |
+| 장시간 Build / Test | 가능 | 유리 | 유리 |
 | Compute 사용 큼 | 가능 | 유리 | 유리 |
 | Internal Network 필수 | 유리 | 불리 | 유리 |
 | Git Handoff 가능 | 가능 | 유리 | 유리 |
 | 독립 검증 가능 | 가능 | 유리 | 유리 |
-| 동일 파일/Schema 충돌 큼 | 유리 | 불리 | 불리 |
+| 동일 파일 / DB Schema 충돌 큼 | 유리 | 불리 | 불리 |
 | Architecture 판단 | 유리 | 불리 | 가능 |
 
 이 표는 점수 합산으로 정답을 만드는 도구가 아니다.
@@ -475,20 +475,20 @@ Hard Constraint 하나가 다른 조건보다 우선할 수 있다.
 
 팀 내에서 빠르게 대화하기 위해 간단한 Score를 사용할 수 있다.
 
-설명용 예:
+아래 점수는 설명용 예다.
 
 ```text
-Scope 명확성          +2
-독립 검증 가능         +2
-장시간 실행            +1
-Compute 사용 큼        +1
-Human Steering 많음    -2
-Internal Network 필요  -3
-큰 Context 필요        -2
-File Conflict 높음     -2
+Scope 명확성             +2
+독립 검증 가능            +2
+장시간 실행               +1
+Compute 사용 큼           +1
+Human Steering 많음       -2
+Internal Network 필요     -3
+큰 Context 필요           -2
+파일 충돌 가능성 높음     -2
 ```
 
-하지만 점수만으로 자동 결정하지 않는다.
+점수만으로 자동 결정하지 않는다.
 
 판단 순서는 다음이 낫다.
 
@@ -503,7 +503,7 @@ File Conflict 높음     -2
 8. Cloud Overhead와 Task 가치
 ```
 
-Score는 이 대화를 짧게 하기 위한 도구다.
+Score는 이 대화를 짧게 하기 위한 보조 도구다.
 
 ---
 
@@ -512,11 +512,11 @@ Score는 이 대화를 짧게 하기 위한 도구다.
 | Task | 기본 경로 | 이유 |
 | --- | --- | --- |
 | 신규 인증 Architecture | Local | 큰 Context, Human Steering |
-| expired token 수정 | Cloud Agent 후보 | 작은 Scope, 재현/검증 가능 |
+| expired token 수정 | Cloud Agent 후보 | 작은 Scope, 재현 / 검증 가능 |
 | 전체 Unit Test | Cloud Runner | 결정론적, Compute 중심 |
 | Web E2E | Cloud Runner | Browser 기반 독립 검증 |
-| Tibero Migration 실검증 | Local/Hybrid | 내부 DB 의존 |
-| HSM 오류 분석 | Local | 내부 장비/네트워크 의존 |
+| Tibero Migration 실제 검증 | Local / Hybrid | 내부 DB 의존 |
+| HSM 오류 분석 | Local | 내부 장비 / 네트워크 의존 |
 | Docker Build | Cloud Runner | 결정론적 Build |
 | Dependency Update | Runner-first | PASS면 Agent 불필요 |
 | README 한 줄 수정 | Local 후보 | Cloud Overhead가 상대적으로 큼 |
@@ -539,7 +539,7 @@ Score는 이 대화를 짧게 하기 위한 도구다.
 5. Git으로 상태를 전달할 수 있는가?
 6. Human Steering이 많이 필요한가?
 7. Context가 과도하게 큰가?
-8. File/Schema 충돌 가능성이 큰가?
+8. 파일 / DB Schema 충돌 가능성이 큰가?
 9. Cloud Overhead보다 Task 가치가 큰가?
 ```
 
