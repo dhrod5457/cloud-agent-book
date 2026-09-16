@@ -4,7 +4,7 @@ Phase 7 - 전체 초고 편집/교정 진행 중
 
 Phase 6에서 1~18장 본문 초고 작성과 전체 정합성 점검을 완료했다.
 
-현재 1~3장 편집/교정을 완료했다.
+현재 1~6장 편집/교정을 완료했다.
 
 # Source of Truth
 
@@ -139,47 +139,68 @@ Phase 6 완료.
 
 상태: `편집/교정 완료`
 
-주요 변경:
-
 - Cloud Agent 정의와 Remote Development Worker 모델에 집중
-- Task Contract / Result Gateway / Runner 상세 설명을 뒤 장으로 이동
-- 제품 사례를 공통 실행 모델을 설명하는 수준으로 축약
-- Cloud Runner 상세 분류를 제거하고 10장 예고 수준으로 정리
-- Git 세부 격리보다 Handoff 기준점 역할만 유지
+- Task Contract / Result Gateway / Runner 상세를 뒤 장으로 이동
+- 제품 사례를 공통 실행 모델 설명 수준으로 축약
 
 ## 2장 - Local Agent와 Cloud Agent
 
 상태: `편집/교정 완료`
 
-주요 변경:
-
 - Local / Cloud / Hybrid 판단 재료에 집중
 - 5장의 Routing Framework와 중복되는 절차 설명 축약
-- 10장의 Runner-first 상세 설명 제거
-- 11~13장의 Git/Handoff 상세를 예고 수준으로 축약
-- Internal Network / Human Steering / Context / Blocking Time을 핵심 비교축으로 정리
+- 10장의 Runner-first와 11~13장의 Git/Handoff 상세를 예고 수준으로 축약
 
 ## 3장 - Cloud Session, Container, Compute와 Token
 
 상태: `편집/교정 완료`
 
+- Reasoning Resource와 Execution Resource 분리 강화
+- Build wall-clock time과 LLM Usage 분리
+- Tool Output 상세는 8장, Runner-first 상세는 10장으로 이동
+- Parallel Compute / Parallel Reasoning과 Compute / LLM / Human Cost 구조로 정리
+
+## 4장 - 독립 실행환경, 장시간 작업, 병렬성, 시간 분리
+
+상태: `편집/교정 완료`
+
 주요 변경:
 
-- Reasoning Resource와 Execution Resource 분리 강화
-- Cloud Session을 제품 사양이 아닌 작업 실행 단위로 설명
-- Build wall-clock time과 LLM Usage 분리
-- 10,000 Test 예제를 설명용 수치로 명시
-- Tool Output 상세 처리는 8장, Runner-first 상세는 10장으로 이동
-- Parallel Compute와 Parallel Reasoning 구분
-- Compute / LLM / Human Cost 구조로 정리
+- 독립 실행환경 / 비동기 위임 / Developer Blocking Time / 병렬 실행 가치에 집중
+- 병렬화의 중복 Context, Merge, Review, Fan-in 비용은 12장으로 이동
+- Agent Execution Time과 Developer Blocking Time을 핵심 측정축으로 유지
+- Local Resource Occupancy를 Cloud 활용 효과에 포함
+- 병렬화는 독립 Task가 있을 때만 가치가 있다는 조건만 유지
+
+## 5장 - Task Routing: Local인가 Cloud인가
+
+상태: `편집/교정 완료`
+
+주요 변경:
+
+- Task 시작 시점의 Routing Framework에 집중
+- `Hard Constraint → Runner 가능 여부 → Scope/Validation → Handoff → Steering/Context → Conflict/Overhead` 순서로 재구성
+- 17장의 Cloud 중단/Local Fallback 상세를 제거
+- Hybrid를 단계별 Routing으로 정의
+- Score는 보조 수단이고 Hard Constraint가 우선한다는 기준 강화
+
+## 6장 - Cloud에 보내기 좋은 개발 작업
+
+상태: `편집/교정 완료`
+
+주요 변경:
+
+- 작업별 장문 설명을 `기본 실행 주체 + Agent 호출 조건 + Evidence` 중심 Catalog로 압축
+- Build / Unit / Integration / E2E / Docker / Static / Migration / Refactoring / Bug / Documentation / PR Review / Dependency / CI Failure 정리
+- Runner / Agent / Local-Hybrid가 하나의 Task 안에서 단계별로 바뀔 수 있음을 유지
+- `Runner → 필요한 순간에 Agent → 다시 Runner`를 장의 실행 원칙으로 정리
+- campus-platform 반복 Task를 RUN-* / FIX-BUG / REFACTOR-MODULE Catalog로 연결
 
 # Phase 7 Remaining Focus
 
 반복 압축 대상:
 
 ```text
-4 ↔ 12
-5 ↔ 17
 7 ↔ 16
 13 ↔ 15 ↔ 16
 ```
@@ -196,8 +217,8 @@ Phase 6 완료.
 
 # Next
 
-1. 4장 `독립 실행환경, 장시간 작업, 병렬성, 시간 분리` 편집
-2. 5장 `Task Routing: Local인가 Cloud인가` 편집
-3. 6장 `Cloud에 보내기 좋은 개발 작업` 편집
-4. 이후 7~18장 순차 편집
+1. 7장 `Cloud Agent Task Contract: 작은 Task와 작은 Context` 편집
+2. 8장 `Tool Output을 줄이고 Evidence를 남기기` 편집
+3. 9장 `Prepared Cloud Environment, Cache, Snapshot` 편집
+4. 이후 10~18장 순차 편집
 5. 전체 편집 완료 후 최종 교정/출판 준비 단계로 전환
