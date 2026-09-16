@@ -6,11 +6,11 @@ Cloud Agent를 실제 개발 Workflow에 어떻게 배치하고 활용할지 다
 
 > 더 많은 Agent보다 더 나은 Task Routing, 실행환경, 검증을 설계하는 법
 
-책의 중심 질문은 다음과 같습니다.
+책의 중심 질문:
 
 > 클라우드 코딩 에이전트를 실제 개발에서 어떻게 더 빠르고, 저렴하고, 효율적으로 사용할 것인가?
 
-독자가 마지막에 답할 수 있어야 하는 질문은 더 구체적입니다.
+독자가 마지막에 답할 수 있어야 하는 질문:
 
 > 이 Task는 Local에서 해야 하는가, Cloud로 보내야 하는가?
 
@@ -22,25 +22,34 @@ Cloud Agent를 실제 개발 Workflow에 어떻게 배치하고 활용할지 다
 - Runner가 할 수 있는 Build / Test / E2E / Docker는 Runner에게 먼저 맡깁니다.
 - Cloud Agent는 판단과 제한된 코드 수정이 필요한 구간에 사용합니다.
 - 작은 Task와 작은 Context를 전달합니다.
-- 결과는 자연어 완료 보고보다 Evidence와 Artifact로 확인합니다.
-- 병렬화의 대상은 Agent 수가 아니라 독립적으로 실행하고 검증할 수 있는 Task입니다.
+- 결과는 Evidence와 Artifact로 확인합니다.
+- 병렬화의 대상은 Agent 수가 아니라 독립 Task입니다.
 - Cloud 이점이 사라지면 Local 또는 Hybrid로 재Routing합니다.
 
-## 현재 원고 상태
+## 현재 상태
 
-Phase 8까지 1~18장 설계, 초고, 전체 편집, 최종 교정, 출판 정합성 검사를 완료했습니다.
+```text
+Phase 5  1~18장 설계                완료
+Phase 6  1~18장 초고                완료
+Phase 7  전체 편집 / 중복 압축       완료
+Phase 8  최종 교정 / 출판 정합성      완료
+Phase 9  출판 원고 조립              완료
+Phase 10 교정쇄 생성 / 시각 검수      준비 중
+```
 
-현재는 **Phase 9 - 출판 원고 조립**을 진행하고 있습니다.
+Phase 9에서 다음 출판 구성 요소를 완료했습니다.
 
-Phase 9에서 현재까지 완료한 항목:
-
-- 출판용 6개 Part 구조
-- 서문
-- 책 소개 / 독자 대상
-- 읽는 방법
-- 최종 제목 / 부제 / 표지용 한 줄 소개
+- 최종 제목 / 부제
+- Front Matter
 - 6개 Part 전환 페이지
-- 출판 원고 결합 순서 초안
+- 출판용 전체 목차
+- Appendix A
+- Glossary
+- References
+- 32개 파일 Assembly Manifest
+- PDF / EPUB / 인쇄 포맷 정책
+
+Phase 10의 첫 작업은 `manuscript/master.md` 생성입니다.
 
 ## 출판용 Part 구조
 
@@ -64,16 +73,32 @@ Part VI. Cloud의 한계와 다음 단계를 정한다
 17~18장
 ```
 
-출판 원고 구조는 `manuscript/book-structure.md`를 기준으로 관리합니다.
+## 출판 원고 주요 파일
 
-## 출판 원고 파일
+```text
+manuscript/title-page.md
+manuscript/preface.md
+manuscript/about-this-book.md
+manuscript/how-to-read.md
+manuscript/table-of-contents.md
+manuscript/parts/part-01.md ~ part-06.md
+chapters/01/draft.md ~ chapters/18/draft.md
+manuscript/appendix/task-contract-evidence-template.md
+manuscript/glossary.md
+manuscript/references.md
+```
 
-- `manuscript/title-and-positioning.md`
-- `manuscript/preface.md`
-- `manuscript/about-this-book.md`
-- `manuscript/how-to-read.md`
-- `manuscript/book-structure.md`
-- `manuscript/parts/part-01.md` ~ `part-06.md`
+실제 결합 순서:
+
+- `manuscript/assembly-manifest.md`
+
+출판 포맷 정책:
+
+- `manuscript/publication-format.md`
+
+Phase 10 계획:
+
+- `planning/phase10-proof-plan.md`
 
 ## 실전 예제
 
@@ -95,17 +120,6 @@ Local
 
 특정 제품 사용 설명서가 아니라 이 실행 구조를 설계하는 방법을 설명합니다.
 
-## 집필 원칙
-
-- 프로젝트 파일을 Source of Truth로 사용합니다.
-- 특정 AI 제품을 Cloud Agent의 정의로 사용하지 않습니다.
-- 제품별 기능과 일반적인 활용 원칙을 구분합니다.
-- 변경 가능성이 높은 가격, CPU / RAM, Session 제한은 본문 핵심 논리와 분리합니다.
-- 제품 및 기술의 현재 기능은 공식 자료를 기준으로 검증합니다.
-- Java/Spring Boot를 주요 실전 예제로 사용합니다.
-- 새로운 주제는 `Cloud Agent를 더 잘 사용하는 방법과 직접 관련이 있는가?`를 기준으로 본문 포함 여부를 판단합니다.
-- Agent Platform 일반론은 현재 책의 핵심 범위로 확장하지 않습니다.
-
 ## Source of Truth
 
 현재 우선순위가 높은 문서:
@@ -113,9 +127,9 @@ Local
 - `planning/concept.md`
 - `planning/scope.md`
 - `planning/toc.md`
-- `planning/cloud-agent-remote-worker-model.md`
 - `planning/phase8-publication-consistency-check.md`
-- `planning/phase9-manuscript-assembly-plan.md`
+- `planning/phase9-manuscript-assembly-check.md`
+- `planning/phase10-proof-plan.md`
+- `manuscript/assembly-manifest.md`
 - `manuscript/book-structure.md`
-- `manuscript/title-and-positioning.md`
 - `STATUS.md`
