@@ -10,31 +10,17 @@ Cloud Agent를 실제 개발팀에서 어떻게 활용할지 정리하는 Softwa
 
 이 책은 특정 AI 제품 사용 설명서가 아니다.
 
-핵심 질문은 다음과 같다.
+핵심 질문:
 
 > 클라우드 코딩 에이전트를 실제 개발에서 어떻게 더 빠르고, 저렴하고, 효율적으로 사용할 것인가?
 
-최종 독자 판단은 다음과 같다.
+최종 독자 판단:
 
 > 이 Task는 Local에서 해야 하는가, Cloud로 보내야 하는가?
-
-독자는 책을 읽은 뒤 자신의 프로젝트에서 다음을 판단하고 구성할 수 있어야 한다.
-
-- Local / Cloud / Hybrid 중 실행 위치 선택
-- Build / Test / E2E를 Cloud Runner로 분리
-- 재현 가능한 Failure를 Cloud Agent Task로 전환
-- Cloud Agent Context와 Tool Output 축소
-- Prepared Environment와 Cache 활용
-- Git 기반 Local ↔ Cloud Handoff
-- 독립 Task 병렬화와 Fan-in 비용 판단
-- 내부망 검증과 Cloud 검증 경계 분리
-- Cloud 이점이 사라질 때 Local Fallback
 
 ## 표지 메시지
 
 > 더 많은 Agent보다 더 나은 Task Routing, 실행환경, 검증을 설계하는 법
-
-세부 제목 기준은 `manuscript/title-and-positioning.md`에서 관리한다.
 
 ## 핵심 정의
 
@@ -53,30 +39,16 @@ Cloud Agent
 
 ## 핵심 원칙
 
-1. 프로젝트 파일을 Source of Truth로 사용한다.
-2. 제품 기능과 일반적인 활용 원칙을 구분한다.
-3. Java/Spring Boot를 주요 실전 예제로 사용한다.
-4. 제품 및 기술의 현재 기능은 공식 자료로 검증한다.
-5. 변경 가능한 가격, CPU / RAM, Session 제한은 본문 핵심 논리와 분리한다.
-6. 새로운 주제는 `Cloud Agent를 더 잘 사용하는 방법과 직접 관련이 있는가?`를 기준으로 포함 여부를 판단한다.
-7. Agent Platform 일반론은 현재 책의 핵심 범위로 확장하지 않는다.
-8. Runner가 할 수 있는 일은 Runner에게 맡긴다.
-9. Cloud Agent에는 작은 Task와 작은 Context를 전달한다.
-10. 결과는 Evidence와 Artifact로 검증한다.
-
-## 책 전체에서 유지할 메시지
-
-> Cloud Agent는 Local Agent를 대체하지 않는다.
-
-> Cloud Agent의 핵심 가치는 더 많은 Token이 아니라 독립 실행환경과 병렬성이다.
-
-> CPU에는 일을 많이 시키고, LLM에는 필요한 정보만 보여준다.
-
-> Runner가 할 수 있으면 Runner에게 맡긴다.
-
-> 병렬화의 대상은 Agent가 아니라 독립 Task다.
-
-> Local Fallback은 실패가 아니라 Routing의 일부다.
+1. 제품 기능과 일반적인 활용 원칙을 구분한다.
+2. Runner가 할 수 있는 일은 Runner에게 맡긴다.
+3. Cloud Agent에는 작은 Task와 작은 Context를 전달한다.
+4. 결과는 Evidence와 Artifact로 검증한다.
+5. Git을 Local과 Cloud 사이의 Handoff Boundary로 사용한다.
+6. 병렬화의 대상은 Agent가 아니라 독립 Task다.
+7. Local Fallback을 정상적인 Routing으로 다룬다.
+8. 제품별 변경 가능한 가격, CPU / RAM, Session 제한은 본문 핵심 논리와 분리한다.
+9. Java/Spring Boot를 주요 실전 예제로 사용한다.
+10. Agent Platform 일반론은 현재 책의 핵심 범위로 확장하지 않는다.
 
 ## 현재 진행 상태
 
@@ -94,26 +66,33 @@ Phase 8
 최종 교정 / 출판 정합성 검사 완료
 
 Phase 9
-출판 원고 조립 진행 중
+출판 원고 조립 완료
+
+Phase 10
+교정쇄 생성 / 시각 검수 준비 중
 ```
 
-Phase 9에서 현재까지 완료한 항목:
+## Phase 9 결과
 
-- 6개 Part 구조
-- 서문
-- 책 소개 / 독자 대상
-- 읽는 방법
-- 최종 제목 / 부제 / 표지용 한 줄 소개
-- 6개 Part 전환 문구
-- 최종 원고 결합 순서 초안
+출판 원고에 필요한 구성 요소를 모두 준비했다.
 
-남은 주요 항목:
+- 최종 제목 / 부제
+- Title Page
+- Preface
+- About This Book
+- How to Read
+- 출판용 Table of Contents
+- Part I ~ VI 전환 페이지
+- Chapters 1 ~ 18
+- Appendix A
+- Glossary
+- References
+- 32개 파일 Assembly Manifest
+- Markdown → PDF Proof → EPUB → Print-ready PDF 포맷 정책
 
-- 참고자료 구조
-- 용어집 정책 및 필요 시 작성
-- 부록 필요 여부
-- 전체 목차의 출판용 표현
-- PDF / EPUB / 인쇄 포맷 결정
+완료 점검:
+
+- `planning/phase9-manuscript-assembly-check.md`
 
 ## 출판용 Part 구조
 
@@ -137,15 +116,45 @@ Part VI. Cloud의 한계와 다음 단계를 정한다
 17~18장
 ```
 
-각 Part 전환 페이지는 `manuscript/parts/part-01.md` ~ `part-06.md`에서 관리한다.
+## 출판 원고 결합
 
-세부 조립 순서는 `manuscript/book-structure.md`를 따른다.
+파일 단위 Source of Truth:
+
+`manuscript/assembly-manifest.md`
+
+총 32개 파일을 다음 구조로 결합한다.
+
+```text
+5 Front Matter
++ 6 Part Transition
++ 18 Chapter
++ 3 Back Matter
+```
+
+## Phase 10
+
+계획:
+
+`planning/phase10-proof-plan.md`
+
+진행 순서:
+
+```text
+assembly-manifest.md
+→ manuscript/master.md
+→ PDF Proof
+→ 페이지 렌더링
+→ 시각 검수
+→ review/proof-01.md
+→ 원본 Markdown 수정
+→ PDF 재생성
+```
+
+PDF나 EPUB에서 직접 내용을 수정하지 않는다. 모든 교정 결과는 Markdown Source에 역반영한다.
 
 ## 주요 실전 예제
 
 Java/Spring Boot 기반 `campus-platform`을 사용한다.
-
-기본 역할:
 
 ```text
 Local / Local Agent
@@ -158,28 +167,18 @@ Cloud Agent
 → 재현 가능한 Failure 분석 / 제한된 코드 수정
 ```
 
-예제 기술:
-
-- Java 21
-- Spring Boot 3.x
-- Gradle
-- MyBatis
-- PostgreSQL / Testcontainers
-- Docker
-- Playwright
-
 Tibero, Oracle, HSM, Internal Jenkins, VPN-only API 등은 Local / Cloud 경계를 설명하는 데 필요한 범위에서만 사용한다.
 
 ## 현재 Source of Truth
-
-우선순위가 높은 문서:
 
 1. `planning/concept.md`
 2. `planning/scope.md`
 3. `planning/toc.md`
 4. `planning/cloud-agent-remote-worker-model.md`
 5. `planning/phase8-publication-consistency-check.md`
-6. `planning/phase9-manuscript-assembly-plan.md`
-7. `manuscript/title-and-positioning.md`
-8. `manuscript/book-structure.md`
-9. `STATUS.md`
+6. `planning/phase9-manuscript-assembly-check.md`
+7. `planning/phase10-proof-plan.md`
+8. `manuscript/assembly-manifest.md`
+9. `manuscript/book-structure.md`
+10. `manuscript/publication-format.md`
+11. `STATUS.md`
