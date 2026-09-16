@@ -153,12 +153,12 @@ Phase 6 완료.
 
 주요 변경:
 
-- 기존 장문의 17개 절을 Task 경계 중심 구조로 압축
+- Task Contract를 `입력 경계`로 정의
 - `Task / Goal / Scope / Relevant Files / Forbidden Changes / Validation / Expected Result / Evidence`를 핵심 Contract로 정리
 - Progressive Context를 Relevant Files → Dependency → Document → Wider Context 순으로 단순화
 - Base SHA / Environment / Budget은 선택적 실행 메타데이터로 정리
 - AUTH-142 예제를 이후 장에서 재사용할 기준 예제로 고정
-- 16장의 end-to-end Task Contract 반복 설명을 줄일 수 있도록 장 역할을 명확히 함
+- 16장의 End-to-End 절차와 겹치는 실행 설명 축약
 
 ## 8장 - Tool Output을 줄이고 Evidence를 남기기
 
@@ -171,7 +171,7 @@ Phase 6 완료.
 - `result.json`은 예시 결과 인터페이스로만 유지
 - 자연어 Summary와 실행 Evidence 역할 분리
 - Demos over Diffs를 UI 검증 순서로 한정
-- Failure Fingerprint와 Budget을 Retry 종료 판단에 연결
+- Failure Fingerprint는 반복 실패 식별까지 다루고 중단/Local Fallback 판단은 17장으로 이동
 - 7장 Small Input과 8장 Small Output의 대칭 구조 강화
 
 ## 9장 - Prepared Cloud Environment, Cache, Snapshot
@@ -180,14 +180,33 @@ Phase 6 완료.
 
 주요 변경:
 
-- Runner 정의와 실행 경로 설명을 10장으로 넘김
-- Cold Start를 Provisioning / Checkout / Dependency Restore / Warm-up으로 분해
+- Cold Start를 Provisioning / Checkout / Dependency Restore / Warm-up / First Command로 분해
 - Prepared Environment와 Cloud Environment as Code에 집중
 - Task-specific Environment 구분
 - Reusable Cache와 Fresh Source/Runtime State 경계 강화
 - Cache Invalidation / Snapshot / Warm Worker를 준비 비용 관점으로 정리
 - 반복 환경 실패는 Prompt가 아니라 Environment를 수정한다는 원칙 유지
+- Task Contract에는 설치 절차 대신 Environment 이름을 사용하도록 연결
 - 10장 Runner-first로 이어지는 연결부 정리
+
+# Current Edited Flow
+
+```text
+7장
+Task Contract
+→ Small Input / Context
+        ↓
+8장
+Result Gateway
+→ Small Output / Evidence
+        ↓
+9장
+Prepared Environment
+→ Small Startup Overhead
+        ↓
+10장
+Runner-first / Agent-on-failure
+```
 
 # Phase 7 Remaining Focus
 
