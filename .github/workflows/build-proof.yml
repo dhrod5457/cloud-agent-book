@@ -1,0 +1,144 @@
+name: Build PDF proof
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'manuscript/master.md'
+      - 'manuscript/proof.css'
+      - '.github/workflows/build-proof.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-proof:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify master manuscript
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s manuscript/master.md
+
+          chapter_count=$(grep -Ec '^# [0-9]+장\.' manuscript/master.md || true)
+          part_heading_count=$(grep -Ec '^# Part (I|II|III|IV|V|VI)\.' manuscript/master.md || true)
+
+          test "$chapter_count" -eq 18
+          test "$part_heading_count" -eq 12
+
+          echo "master manuscript verified"
+          wc -l -w -c manuscript/master.md
+
+      - name: Install PDF proof dependencies
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y \
+            pandoc \
+            poppler-utils \
+            fonts-noto-cjk \
+            fonts-dejavu-core \
+            python3-venv \
+            libcairo2 \
+            libpango-1.0-0 \
+            libpangoft2-1.0-0 \
+            libgdk-pixbuf-2.0-0 \
+            libffi-dev \
+            shared-mime-info
+
+          python3 -m venv .proof-venv
+          .proof-venv/bin/pip install --upgrade pip
+          .proof-venv/bin/pip install weasyprint
+
+      - name: Prepare proof Markdown
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p build
+
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          source = Path('manuscript/master.md').read_text(encoding='utf-8').splitlines()
+          out = []
+          part_seen = 0
+          back_seen = {
+              'appendix': 0,
+              'glossary': 0,
+              'references': 0,
+          }
+
+          for line in source:
+              page_break = False
+
+              if re.match(r'^# [0-9]+장\.', line):
+                  page_break = True
+              elif re.match(r'^# Part (I|II|III|IV|V|VI)\.', line):
+                  part_seen += 1
+                  if part_seen > 6:
+                      page_break = True
+              elif line.startswith('# 부록 A.'):
+                  back_seen['appendix'] += 1
+                  if back_seen['appendix'] > 1:
+                      page_break = True
+              elif line == '# 용어집':
+                  back_seen['glossary'] += 1
+                  if back_seen['glossary'] > 1:
+                      page_break = True
+              elif line == '# 참고자료':
+                  back_seen['references'] += 1
+                  if back_seen['references'] > 1:
+                      page_break = True
+
+              if page_break:
+                  out.extend(['', '<div class="page-break"></div>', ''])
+
+              out.append(line)
+
+          Path('build/proof.md').write_text('\n'.join(out) + '\n', encoding='utf-8')
+          PY
+
+      - name: Render HTML and PDF proof
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          pandoc build/proof.md \
+            --from=gfm \
+            --to=html5 \
+            --standalone \
+            --metadata title='클라우드 코딩 에이전트 실전' \
+            -o build/proof.html
+
+          .proof-venv/bin/weasyprint \
+            -s manuscript/proof.css \
+            build/proof.html \
+            build/cloud-agent-book-proof-01.pdf
+
+          pdfinfo build/cloud-agent-book-proof-01.pdf | tee build/pdfinfo.txt
+          pdftotext build/cloud-agent-book-proof-01.pdf build/proof.txt
+
+          test -s build/cloud-agent-book-proof-01.pdf
+          test -s build/proof.txt
+
+          echo "PDF bytes: $(wc -c < build/cloud-agent-book-proof-01.pdf)"
+          echo "PDF text chars: $(wc -c < build/proof.txt)"
+
+      - name: Upload proof artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloud-agent-book-proof-01
+          path: |
+            build/cloud-agent-book-proof-01.pdf
+            build/proof.html
+            build/pdfinfo.txt
+          retention-days: 14
+          if-no-files-found: error
