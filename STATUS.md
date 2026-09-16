@@ -4,7 +4,7 @@ Phase 6 - 본문 초고 작성 진행 중
 
 Phase 5의 1~18장 설계와 전체 정합성 점검을 완료했다.
 
-현재 1~12장 초고를 작성했다.
+현재 1~14장 초고를 작성했다.
 
 # Source of Truth
 
@@ -67,6 +67,10 @@ Cloud Agent
 > Cloud Agent에게 결과를 요구하지 말고 검증 가능한 결과물을 요구한다.
 
 > 병렬화의 대상은 Agent가 아니라 서로 독립적으로 실행하고 검증할 수 있는 Task다.
+
+> Task는 Local 또는 Cloud에 영구적으로 속하지 않는다. 작업 단계에 따라 실행 위치를 이동할 수 있다.
+
+> 이벤트가 없으면 Agent도 실행하지 않는다.
 
 # Current TOC
 
@@ -183,12 +187,6 @@ Cloud Worker 정의
 - Agent Fix 후 Runner 재검증
 - Parallel Runner / Test Sharding
 
-10장의 핵심 원칙:
-
-> 정상 경로는 Runner가 처리하고, 예외 경로에서만 Agent를 호출한다.
-
-> Agent가 수정한 결과도 Runner가 다시 검증한다.
-
 ## 11장 - Git, Branch, Worktree, Container로 작업 격리하기
 
 상태: `초고 작성 완료`
@@ -202,22 +200,14 @@ Cloud Worker 정의
 - Base SHA 고정
 - Branch per Task
 - Task / Session / SHA / Test / PR 상태 연결
-- Local Worktree와 Cloud Independent Workspace 구분
 - Branch는 Source, Container/VM은 Runtime을 격리
 - DB / Port / Temp / Artifact Path까지 작업별 격리
 - Migration / Schema / Shared Module은 논리적 충돌로 별도 취급
 - Multi-Repository는 현재 Task에 필요한 Repository만 제공
-- Cloud 결과는 Review 가능한 Commit/PR로 반환
-
-11장의 핵심 원칙:
-
-> Branch는 Source를 격리하고 Container는 Runtime을 격리한다.
-
-> 같은 파일과 같은 Schema를 수정하는 Task는 격리보다 먼저 병렬화 여부를 다시 판단한다.
 
 ## 12장 - 병렬 Worker와 중복 Context 비용
 
-상태: `초고 작성 완료`
+상태: `초고 작성 및 설계 대비 1차 검토 완료`
 
 - 설계: `chapters/12/plan.md`
 - 초고: `chapters/12/draft.md`
@@ -226,17 +216,14 @@ Cloud Worker 정의
 
 - Parallel Compute와 Parallel Reasoning 구분
 - Fan-out 전 Dependency 확인
-- 여러 Agent의 Repository 재탐색에 따른 Context Duplication
-- Agent Count와 Task Count를 분리
-- Read-only 검증을 우선 병렬화
-- Code Change 병렬화에서는 Change Locality 확인
-- Fan-in / Review / Merge / Rework 비용 포함
+- Context Duplication 비용
+- Agent Count와 Task Count 분리
+- Read-only 검증 우선 병렬화
+- Change Locality
+- Fan-in / Review / Merge / Rework 비용
 - Review Capacity를 병렬도의 상한으로 고려
-- Prepared Cache는 공유하고 Runtime State는 분리
 - Dependency-aware Parallel Group
-- Java 17→21 Migration fan-out 예제
-- Best-of-N은 기본값이 아닌 Advanced Pattern으로 제한
-- 병렬 생산성은 PR 수가 아니라 Lead Time과 Integration 비용으로 평가
+- Best-of-N을 일반 병렬화와 구분
 
 12장의 핵심 원칙:
 
@@ -246,9 +233,71 @@ Cloud Worker 정의
 
 > Fan-out만큼 Fan-in 비용도 설계해야 한다.
 
+## 13장 - Local → Cloud → Local Handoff
+
+상태: `초고 작성 완료`
+
+- 설계: `chapters/13/plan.md`
+- 초고: `chapters/13/draft.md`
+
+핵심:
+
+- Task는 단계에 따라 Local과 Cloud 사이를 이동
+- Local은 요구사항/Architecture/내부망/최종 통합에 사용
+- Cloud는 독립 실행/장시간 검증/병렬 처리에 사용
+- Task Contract와 Git Commit을 Local→Cloud 입력으로 사용
+- Git을 Handoff Boundary로 사용
+- Evidence / Commit / PR을 Cloud→Local Return Boundary로 사용
+- 내부망 자원은 Local Validation으로 남겨 Hybrid 구성
+- Cloud 실패 시 Result Gateway/Agent-on-failure를 먼저 적용하고 필요한 경우 Local Fallback
+- Local Fallback을 정상 Routing으로 정의
+- Multi-Repository는 필요한 Repository만 연결하고 각 Base SHA를 고정
+- Handoff 상태를 최소한으로 추적
+- Developer Blocking Time을 줄이는 비동기 Handoff
+- `campus-platform` Hybrid Workflow 예제
+
+13장의 핵심 원칙:
+
+> Git으로 작업을 넘기고 Evidence로 결과를 돌려받는다.
+
+> Cloud에서 할 수 없는 마지막 검증은 Local로 Handoff하면 된다.
+
+## 14장 - Task Queue와 Event-driven Cloud Agent
+
+상태: `초고 작성 완료`
+
+- 설계: `chapters/14/plan.md`
+- 초고: `chapters/14/draft.md`
+
+핵심:
+
+- Task Source를 사람뿐 아니라 Push / CI Failure / Review Comment / Nightly / Dependency Update / Issue로 확장
+- Event → Task Candidate → Dedup / Classification → Runner / Agent 흐름
+- 정상 CI 경로는 Runner에서 종료
+- Infrastructure Failure와 Code Failure 분리
+- CI Failure를 구조화된 Task Contract로 변환
+- PR Review Comment follow-up Task
+- PR 단위 최소 Context 재사용
+- Nightly Failure 분류 후 재현 가능한 실패만 Agent Task 생성
+- Dependency Update는 Runner-first
+- 불명확한 Issue는 Local Investigation과 Task Split을 먼저 수행
+- repo + SHA + event type + Failure Fingerprint를 이용한 중복 Task 억제
+- Agent Push → CI FAIL → Agent 재호출의 무한 Loop를 Budget/Fingerprint로 제한
+- 자동 결과는 Draft PR 또는 기존 PR Commit으로 반환
+- Developer Monitoring을 줄이는 Event-driven Workflow
+- `campus-platform` CI Failure / Nightly 예제
+
+14장의 핵심 원칙:
+
+> 이벤트가 없으면 Agent도 실행하지 않는다.
+
+> 정상 경로에는 LLM이 필요하지 않다.
+
+> 자동화에는 시작 조건뿐 아니라 중복 제거와 종료 조건도 필요하다.
+
 # Current Execution Flow
 
-현재 7~12장의 연결은 다음과 같다.
+현재 7~14장의 연결은 다음과 같다.
 
 ```text
 7장
@@ -271,6 +320,12 @@ Task별 Source / Runtime / Artifact 격리
         ↓
 12장
 독립 Task만 Fan-out하고 Fan-in 비용 관리
+        ↓
+13장
+Local → Git → Cloud → Evidence → Local Handoff
+        ↓
+14장
+CI / Review / Schedule 이벤트가 동일한 Cloud Task를 생성
 ```
 
 # Preserved / Future Topics
@@ -293,10 +348,11 @@ Task별 Source / Runtime / Artifact 격리
 
 # Next
 
-1. 11~12장 설계 대비 자체 검토
+1. 13~14장 설계 대비 자체 검토
 2. 필요한 수정 반영
-3. 13장 `Local → Cloud → Local Handoff` 초고 작성
-4. 14장 `Task Queue와 Event-driven Cloud Agent` 초고 작성
-5. 이후 15~18장 순차 작성
+3. 15장 `campus-platform Cloud Agent Workflow 설계` 초고 작성
+4. 16장 `하나의 기능을 Local + Cloud로 끝까지 개발하기` 초고 작성
+5. 이후 17~18장 작성
+6. 1~18장 초고 전체 정합성 점검
 
 Phase 6에서는 장별로 `초고 → 설계 대비 검토 → 수정 → 다음 장` 순서로 진행한다.
