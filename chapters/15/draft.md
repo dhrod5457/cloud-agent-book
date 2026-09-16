@@ -39,7 +39,7 @@ Runner-first
                     ↓
                   Fix
                     ↓
-                 Runner
+              Cloud Runner
         ↓
 Evidence / PR
         ↓
@@ -228,10 +228,11 @@ Cloud Task가 여러 개 실행될수록 대화창보다 Git 상태가 중요해
 Task ID
 Base SHA
 Branch
-Current SHA
+Result SHA
 Execution Type
 Status
-Evidence
+Validation Result
+Artifact Path
 PR
 ```
 
@@ -241,10 +242,11 @@ PR
 task_id: AUTH-142
 base_sha: abc123
 branch: agent/auth-142
-current_sha: def456
+result_sha: def456
 execution: cloud-agent
 status: verifying
-result: artifacts/AUTH-142/result.json
+validation_result: PASS
+artifact_path: artifacts/AUTH-142/result.json
 pr: 142
 ```
 
@@ -266,10 +268,10 @@ Agent의 대화 기록을 보지 않아도 어느 코드가 어느 검증을 통
 
 ## 6. 같은 SHA에서 검증을 병렬 실행한다
 
-Result Commit이 만들어지면 독립 검증을 병렬 실행할 수 있다.
+Result SHA가 만들어지면 독립 검증을 병렬 실행할 수 있다.
 
 ```text
-Git SHA def456
+Result SHA def456
       ↓
 +---------+-------------+---------+---------+
 |         |             |         |         |
@@ -283,7 +285,7 @@ Unit   Integration    Docker     E2E
 조건은 단순하다.
 
 ```text
-모든 검증이 같은 SHA를 사용
+모든 검증이 같은 Result SHA를 사용
 각 검증이 독립적으로 실행 가능
 결과를 Task 단위로 합산 가능
 ```
@@ -321,7 +323,7 @@ artifacts/AUTH-142/
 
 ```text
 Task: AUTH-142
-SHA: def456
+Result SHA: def456
 
 Unit: PASS
 Integration: PASS
@@ -358,7 +360,7 @@ Retry / Environment Fix                    Cloud Agent
                                               ↓
                                              Fix
                                               ↓
-                                           Runner
+                                        Cloud Runner
 ```
 
 예:
@@ -386,7 +388,7 @@ Cloud에서 끝낼 수 없는 검증은 Workflow 밖의 예외가 아니다.
 
 ```text
 Cloud Validation
-→ PostgreSQL/Testcontainers
+→ PostgreSQL / Testcontainers
 → Unit / Integration
 → Evidence
       ↓
@@ -492,12 +494,14 @@ Agent 호출 수가 줄어도 Review Queue가 늘면 전체 Lead Time은 개선�
 초기에는 다음 정보만으로도 Workflow를 운영할 수 있다.
 
 ```text
-Task
+Task ID
 Branch
-SHA
+Base SHA
+Result SHA
 Execution Type
 Status
-Evidence
+Validation Result
+Artifact Path
 PR
 ```
 
@@ -546,7 +550,7 @@ Unit Runner  Integration    E2E / Docker   Cloud Agent
                     ↓
             필요하면 Agent Fix
                     ↓
-               Runner Verify
+            Cloud Runner Verify
                     ↓
                Evidence / PR
                     ↓
