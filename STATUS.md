@@ -1,8 +1,10 @@
 # Current Phase
 
-Phase 6 완료 - 1~18장 본문 초고 작성 및 전체 정합성 점검 완료
+Phase 7 - 전체 초고 편집/교정 진행 중
 
-다음 단계는 전체 초고 편집/교정이다.
+Phase 6에서 1~18장 본문 초고 작성과 전체 정합성 점검을 완료했다.
+
+현재 1~3장 편집/교정을 완료했다.
 
 # Source of Truth
 
@@ -14,9 +16,10 @@ Phase 6 완료 - 1~18장 본문 초고 작성 및 전체 정합성 점검 완료
 4. `planning/cloud-agent-remote-worker-model.md`
 5. `planning/phase5-consistency-check.md`
 6. `planning/phase6-draft-consistency-check.md`
-7. 각 `chapters/NN/plan.md`
-8. `planning/future-topics.md`
-9. `STATUS.md`
+7. `planning/phase7-editing-plan.md`
+8. 각 `chapters/NN/plan.md`
+9. `planning/future-topics.md`
+10. `STATUS.md`
 
 과거 Agent-Native 독립 장 설계와 초기 22~23장 체계는 현행 목차보다 우선하지 않는다.
 
@@ -49,36 +52,22 @@ Cloud Agent
 
 # Core Messages
 
-> Cloud Agent는 Local Agent를 대체하는 것이 아니다.
-
-> Cloud Agent의 핵심 가치는 더 많은 Token이 아니라 독립 실행환경과 병렬성이다.
-
-> CPU와 RAM 사용량은 LLM Token 사용량과 직접적으로 같은 개념이 아니다.
-
-> CPU에는 일을 많이 시키고, LLM에는 필요한 정보만 보여준다.
-
-> Runner가 할 수 있으면 Runner에게 맡긴다.
-
-> 작은 Task와 작은 Context를 전달한다.
-
-> Agent에게 개발환경을 설치하게 하지 말고, 바로 작업 가능한 환경을 제공한다.
-
-> Cloud Agent에게 결과를 요구하지 말고 검증 가능한 결과물을 요구한다.
-
-> 병렬화의 대상은 Agent가 아니라 서로 독립적으로 실행하고 검증할 수 있는 Task다.
-
-> Task는 Local 또는 Cloud에 영구적으로 속하지 않는다. 작업 단계에 따라 실행 위치를 이동할 수 있다.
-
-> 이벤트가 없으면 Agent도 실행하지 않는다.
-
-> Cloud를 쓰지 않는 결정도 올바른 Routing 결과다.
+- Cloud Agent는 Local Agent를 대체하지 않는다.
+- Cloud Agent의 핵심 가치는 더 많은 Token이 아니라 독립 실행환경과 병렬성이다.
+- CPU와 RAM 사용량은 LLM Token 사용량과 직접적으로 같은 개념이 아니다.
+- CPU에는 일을 많이 시키고, LLM에는 필요한 정보만 보여준다.
+- Runner가 할 수 있으면 Runner에게 맡긴다.
+- 작은 Task와 작은 Context를 전달한다.
+- Agent에게 개발환경을 설치하게 하지 말고 바로 작업 가능한 환경을 제공한다.
+- Cloud Agent에게 결과를 요구하지 말고 검증 가능한 결과물을 요구한다.
+- 병렬화의 대상은 Agent가 아니라 서로 독립적으로 실행하고 검증할 수 있는 Task다.
+- Task는 Local 또는 Cloud에 영구적으로 속하지 않는다. 작업 단계에 따라 실행 위치를 이동할 수 있다.
+- 이벤트가 없으면 Agent도 실행하지 않는다.
+- Cloud를 쓰지 않는 결정도 올바른 Routing 결과다.
 
 # Current TOC
 
 `planning/toc.md`가 최신 목차다.
-
-- 11개 Part
-- 18개 장
 
 1. Coding Agent에서 Cloud Worker로
 2. Local Agent와 Cloud Agent
@@ -107,7 +96,6 @@ Phase 5 완료.
 - 전체 역할/중복/용어/범위 정합성 점검 완료
 - `planning/phase5-consistency-check.md` 작성
 - Agent Platform 확장 내용은 `planning/future-topics.md`로 이동
-- `chapters/02/execution-platform.md`는 과거 확장 참고자료로만 유지
 
 # Phase 6 Result
 
@@ -120,77 +108,96 @@ Phase 6 완료.
 - 1장 제목을 `Coding Agent에서 Cloud Worker로`로 통일
 - Agent Platform 일반론은 18장의 미래 전망 수준으로 제한
 
-# Phase 6 Chapter Flow
+# Phase 7 Editing Rules
+
+`planning/phase7-editing-plan.md`를 기준으로 편집한다.
+
+우선순위:
 
 ```text
-1~4장
-Cloud Agent 정의 / Local-Cloud 차이 / Compute-Token / Cloud 실행 가치
-
-5~6장
-Task Routing / 실제 개발 작업 Catalog
-
-7~8장
-Small Input / Context
-→ Small Output / Evidence
-
-9~10장
-Prepared Environment
-→ Runner-first / Agent-on-failure
-
-11~12장
-Source / Runtime 격리
-→ 독립 Task Fan-out / Fan-in 비용
-
-13~14장
-Human-driven Handoff
-→ Event-driven Handoff
-
-15~16장
-campus-platform 운영 모델
-→ 하나의 기능 End-to-End Timeline
-
-17장
-Cloud 부적합 조건 / Local Fallback
-
-18장
-Harness / Routing Automation / Orchestration 미래 방향
+중복 압축
+→ 용어 통일
+→ 장간 연결
+→ 예제 정리
+→ 수치/근거 구분
+→ 문장 교정
 ```
 
-# Phase 6 Consistency Result
+편집 원칙:
 
-구조적 충돌 없음.
+- 최초 설명 장에서 개념을 정의하고 후속 장에서는 적용 중심으로 줄인다.
+- 새 개념을 추가하지 않는다.
+- 과거 장 번호를 사용하지 않는다.
+- 제품별 변경 가능한 사양은 본문 원칙과 분리한다.
+- `AuthService expired token` 반복 예제는 연결 장치로 유지하되 배경 설명은 반복하지 않는다.
+- 한 문단에 하나의 판단을 두고 같은 의미의 문장을 연속해서 반복하지 않는다.
+- Part 전환부와 장간 연결 문장을 점검한다.
 
-의도적으로 유지하는 반복:
+# Phase 7 Progress
 
-- Cloud Agent = Remote Development Worker
-- Runner-first
-- Task Contract
-- Result Gateway / Evidence
-- Git Handoff
-- Local Fallback
-- `AuthService expired token` 반복 예제
+## 1장 - Coding Agent에서 Cloud Worker로
 
-다음 편집 단계에서 압축할 반복 구간:
+상태: `편집/교정 완료`
+
+주요 변경:
+
+- Cloud Agent 정의와 Remote Development Worker 모델에 집중
+- Task Contract / Result Gateway / Runner 상세 설명을 뒤 장으로 이동
+- 제품 사례를 공통 실행 모델을 설명하는 수준으로 축약
+- Cloud Runner 상세 분류를 제거하고 10장 예고 수준으로 정리
+- Git 세부 격리보다 Handoff 기준점 역할만 유지
+
+## 2장 - Local Agent와 Cloud Agent
+
+상태: `편집/교정 완료`
+
+주요 변경:
+
+- Local / Cloud / Hybrid 판단 재료에 집중
+- 5장의 Routing Framework와 중복되는 절차 설명 축약
+- 10장의 Runner-first 상세 설명 제거
+- 11~13장의 Git/Handoff 상세를 예고 수준으로 축약
+- Internal Network / Human Steering / Context / Blocking Time을 핵심 비교축으로 정리
+
+## 3장 - Cloud Session, Container, Compute와 Token
+
+상태: `편집/교정 완료`
+
+주요 변경:
+
+- Reasoning Resource와 Execution Resource 분리 강화
+- Cloud Session을 제품 사양이 아닌 작업 실행 단위로 설명
+- Build wall-clock time과 LLM Usage 분리
+- 10,000 Test 예제를 설명용 수치로 명시
+- Tool Output 상세 처리는 8장, Runner-first 상세는 10장으로 이동
+- Parallel Compute와 Parallel Reasoning 구분
+- Compute / LLM / Human Cost 구조로 정리
+
+# Phase 7 Remaining Focus
+
+반복 압축 대상:
 
 ```text
-2 ↔ 5 ↔ 17
-3 ↔ 8 ↔ 10
 4 ↔ 12
+5 ↔ 17
 7 ↔ 16
 13 ↔ 15 ↔ 16
 ```
 
-# Next - 전체 초고 편집/교정
+추가 점검:
 
-새 개념 추가보다 다음 작업을 우선한다.
+- 설명용 Test Count / 시간 / Retry 횟수 표기
+- 영문 용어 표기 통일
+- 제품 사례 기준일/공식 출처
+- 7→8→9→10 연결
+- 11→12→13 연결
+- 15→16→17 연결
+- 18장 결론이 Agent Platform 일반론으로 확장되지 않는지 재확인
 
-1. 장간 중복 설명 압축
-2. 핵심 용어 표기 통일
-3. 설명용 수치와 실제 근거 수치 구분
-4. 장간 참조 번호 점검
-5. 제품 사례의 기준일/공식 출처 재검증
-6. 반복 예제의 중복 문장 축약
-7. 문장 길이와 책 문체 교정
-8. 1~18장 전체 흐름을 다시 읽고 Part 전환부 보강
+# Next
 
-편집 단계에서도 책의 범위를 Agent Platform 일반론으로 확장하지 않는다.
+1. 4장 `독립 실행환경, 장시간 작업, 병렬성, 시간 분리` 편집
+2. 5장 `Task Routing: Local인가 Cloud인가` 편집
+3. 6장 `Cloud에 보내기 좋은 개발 작업` 편집
+4. 이후 7~18장 순차 편집
+5. 전체 편집 완료 후 최종 교정/출판 준비 단계로 전환
