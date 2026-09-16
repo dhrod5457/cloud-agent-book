@@ -1,76 +1,70 @@
 # 15장. campus-platform Cloud Agent Workflow 설계
 
-지금까지는 Cloud Agent를 잘 사용하기 위한 원칙을 하나씩 나눠서 설명했다.
+지금까지는 Cloud Agent 활용 원칙을 각각 나눠서 설명했다.
 
 ```text
 Task Routing
 Task Contract
-Small Context
 Result Gateway
 Prepared Environment
 Runner-first
 Git Isolation
 Parallel Worker
-Local ↔ Cloud Handoff
+Handoff
 Event-driven Task
 ```
 
-15장에서는 이 원칙들을 하나의 Java/Spring Boot 프로젝트 운영 흐름으로 합친다.
+15장에서는 이 요소를 `campus-platform` 하나의 운영 모델로 합친다.
 
-이 장의 목적은 새로운 Agent Platform을 만드는 것이 아니다.
+새로운 Agent Platform을 설계하는 장이 아니다.
 
-`campus-platform`이라는 예제 프로젝트에서 Local Agent, Cloud Runner, Cloud Agent를 어디에 배치할지 결정하는 것이다.
+**Local Agent, Cloud Runner, Cloud Agent를 실제 Java/Spring Boot 프로젝트의 어느 지점에 배치할지 연결하는 장**이다.
 
-핵심 구조는 다음과 같다.
+전체 구조는 다음과 같다.
 
 ```text
 Developer / Local Agent
         ↓
-Requirement / Architecture
+Requirement / Architecture / Task Split
         ↓
-Task Routing / Task Contract
+Task Routing
         ↓
-Commit / Push
+Git + Task Contract
         ↓
-Git Repository
+Prepared Cloud Environment
         ↓
-+----------------+----------------+----------------+----------------+
-|                |                |                |                |
-Cloud Runner   Cloud Runner     Cloud Runner     Cloud Agent
-Unit Test      Integration      Docker/E2E       Bug Fix/Refactor
-|                |                |                |
-+----------------+----------------+----------------+----------------+
+Runner-first
+   ├─ PASS → Evidence
+   └─ FAIL → 판단 필요 시 Cloud Agent
+                    ↓
+                  Fix
+                    ↓
+                 Runner
         ↓
-Result Gateway / Evidence
-        ↓
-PR
+Evidence / PR
         ↓
 Developer / Local Agent
         ↓
-Internal Validation
-        ↓
-Review / Merge
+Internal Validation / Review / Merge
 ```
 
-> Local에서는 설계와 통합을 하고, Cloud에서는 독립적인 작업을 병렬로 처리한다.
-
-그리고 두 실행 위치를 연결하는 경계는 이미 앞에서 정리했다.
+이 Workflow의 중심은 Agent가 아니다.
 
 ```text
-Input Boundary
-→ Git + Task Contract
-
-Return Boundary
-→ Evidence + PR
+Local 판단
++ Cloud Compute
++ 필요한 지점의 Agent Reasoning
++ Git Handoff
++ Evidence
 ```
+
+이 다섯 요소를 연결하는 것이 목적이다.
 
 ---
 
-## 1. 예제 프로젝트 구조
+## 1. 예제 프로젝트의 경계를 정한다
 
-책에서 사용할 `campus-platform`은 실제 대학 시스템을 그대로 복제하지 않는다.
-
-Cloud Agent Workflow를 설명하기 위한 축약 구조를 사용한다.
+책에서 사용하는 `campus-platform`은 Cloud Agent Workflow를 설명하기 위한 축약 프로젝트다.
 
 ```text
 campus-platform/
@@ -84,7 +78,7 @@ campus-platform/
 └─ scripts/
 ```
 
-기술 기준은 다음 정도로 둔다.
+기본 기술 예:
 
 ```text
 Java 21
@@ -96,172 +90,117 @@ Docker
 Playwright
 ```
 
-기업 환경의 실제 최종 검증에서는 다음과 같은 내부 자원이 있을 수 있다.
+실제 기업 환경의 마지막 검증에는 다음 자원이 있을 수 있다.
 
 ```text
 Tibero / Oracle
 HSM
 Internal Jenkins
 VPN-only API
-사내 Nexus
+사내 시스템
 ```
 
-이 자원은 Cloud에 억지로 모두 복제하지 않는다.
+이 내부 자원을 Cloud에 모두 복제하는 것을 목표로 하지 않는다.
 
-Cloud에서 재현 가능한 영역과 내부망에서만 검증 가능한 영역을 나눈다.
+Cloud에서 재현 가능한 범위와 내부 환경에서만 검증 가능한 범위를 분리한다.
 
 ---
 
-## 2. Local Workspace의 역할
+## 2. 실행 주체를 세 가지로 나눈다
 
-Local은 프로젝트 전체를 이해하고 방향을 정하는 위치다.
+이 프로젝트에서는 역할을 다음처럼 나눈다.
 
-대표 작업:
+| 실행 주체 | 기본 역할 |
+| --- | --- |
+| Local Agent / Developer | 요구사항, Architecture, Task 분해, 내부망, 최종 통합 |
+| Cloud Runner | Build, Test, E2E, Docker, Migration Validation |
+| Cloud Agent | 재현 가능한 Failure 분석, 작은 Bug Fix, 제한된 Refactoring |
 
-```text
-요구사항 해석
-Architecture 결정
-큰 Context 탐색
-Task 분해
-내부망 확인
-최종 Review
-통합
-```
-
-예를 들어 `학생 출결 인증 오류`가 보고됐다고 하자.
-
-처음부터 Cloud Agent에게 다음처럼 맡기지 않는다.
+핵심은 Cloud Agent가 모든 개발 작업의 기본 실행 주체가 아니라는 점이다.
 
 ```text
-출결 인증 쪽을 전체적으로 보고 고쳐줘.
+판단과 상호작용이 많은 작업
+→ Local
+
+결정론적 실행
+→ Cloud Runner
+
+독립적인 판단 + 코드 수정
+→ Cloud Agent
 ```
 
-먼저 Local에서 문제를 좁힌다.
-
-```text
-현상
-Expired token 요청이 200을 반환
-
-영향 영역
-auth + attendance boundary
-
-DB Schema
-변경 없음
-
-HSM
-변경 없음
-
-Expected
-HTTP 401
-```
-
-이 단계에서 Task를 작게 만들 수 있어야 Cloud로 넘기기 쉬워진다.
+5~6장의 Routing과 Task Catalog를 프로젝트 수준에서 적용한 결과다.
 
 ---
 
-## 3. Cloud Environment는 Task별로 나눈다
+## 3. Cloud Environment는 Task Type과 연결한다
 
-모든 Cloud Worker에 같은 도구를 넣을 필요는 없다.
+9장에서 만든 Prepared Environment를 프로젝트 운영 단위로 연결한다.
 
-`campus-platform`에서는 최소 세 종류의 실행환경을 가정할 수 있다.
-
-### backend-test
+예:
 
 ```text
-Java 21
-Gradle
-Docker CLI
-PostgreSQL client
-Testcontainers image/cache
-Gradle dependency cache
+backend-test
+→ Java 21 / Gradle / Docker / Testcontainers
+
+frontend-e2e
+→ Node / Playwright / Browser
+
+migration-test
+→ Java / Migration Tool / Disposable DB
 ```
 
-### frontend-e2e
-
-```text
-Node
-Playwright
-Chrome
-npm cache
-browser cache
-```
-
-### migration-test
-
-```text
-Java 21
-Migration Tool
-PostgreSQL
-DB client
-```
-
-Cross-stack 문제가 있을 때만 fullstack 환경을 사용한다.
-
-기본 원칙은 다음과 같다.
+운영 시 중요한 것은 설치 절차를 매 Task마다 설명하는 것이 아니다.
 
 ```text
 Task Type
-→ 필요한 Environment 선택
+→ Environment 이름 선택
 ```
 
-큰 Image 하나를 모든 Task에 쓰기보다 필요한 Runtime만 제공한다.
+예:
+
+```text
+RUN-UNIT        → backend-test
+RUN-INTEGRATION → backend-test
+RUN-E2E         → frontend-e2e
+RUN-MIGRATION   → migration-test
+```
+
+필요한 도구가 반복해서 빠진다면 Prompt가 아니라 Environment를 수정한다.
 
 ---
 
-## 4. Cloud Task Catalog를 만든다
+## 4. 반복 작업은 Task Catalog로 고정한다
 
-팀이 매번 Prompt부터 새로 쓰지 않으려면 반복 작업을 Task Type으로 정리할 수 있다.
-
-예를 들어 다음 정도면 충분하다.
-
-### RUN-BUILD
+팀이 매번 새로운 Prompt부터 만들지 않도록 반복 작업의 실행 방식을 정리한다.
 
 ```text
+RUN-BUILD
 execution: runner
-command: ./gradlew build
-```
+validation: ./gradlew build
 
-### RUN-UNIT
-
-```text
+RUN-UNIT
 execution: runner
-command: ./gradlew test
-```
+validation: ./gradlew test
 
-### RUN-INTEGRATION
-
-```text
+RUN-INTEGRATION
 execution: runner
 environment: backend-test
-runtime: Testcontainers
-```
 
-### RUN-E2E
-
-```text
+RUN-E2E
 execution: runner
 environment: frontend-e2e
-command: npx playwright test
-```
 
-### RUN-DOCKER
-
-```text
+RUN-DOCKER
 execution: runner
-command: docker build ...
-```
+validation: docker build ...
 
-### FIX-BUG
-
-```text
+FIX-BUG
 execution: cloud-agent
 input: failure summary + relevant files
 validation: target test + regression
-```
 
-### REFACTOR-MODULE
-
-```text
+REFACTOR-MODULE
 execution: cloud-agent
 scope: one module
 validation: module test
@@ -269,488 +208,26 @@ validation: module test
 
 Task Catalog의 목적은 Prompt Template을 늘리는 것이 아니다.
 
-`이 작업은 Runner인가 Agent인가`, `어떤 Environment를 쓰는가`, `무엇을 Evidence로 남기는가`를 미리 정해두는 것이다.
+다음 세 가지를 매번 다시 결정하지 않게 하는 것이다.
+
+```text
+누가 실행하는가?
+어떤 Environment를 쓰는가?
+무엇으로 검증하는가?
+```
 
 ---
 
-## 5. Task Contract는 운영 입력 형식이 된다
+## 5. Task 상태는 Git 기준점과 연결한다
 
-작은 Bug Fix를 Cloud Agent에 넘긴다고 하자.
+Cloud Task가 여러 개 실행될수록 대화창보다 Git 상태가 중요해진다.
 
-예:
+최소 상태 예:
 
 ```text
-Task
-AuthService expired token 처리 수정
-
+Task ID
 Base SHA
-abc123
-
-Goal
-Expired JWT → HTTP 401
-
-Scope
-- auth module
-
-Relevant Files
-- AuthService.java
-- JwtTokenProvider.java
-- AuthServiceTest.java
-
-Validation
-./gradlew test --tests AuthServiceTest
-
-Do Not Change
-- DB schema
-- OAuth 전체 구조
-- 공통 Exception format
-
-Output
-- commit
-- changed files
-- test result
-- result.json
-```
-
-Task Contract는 Agent에게 생각하는 방법을 지시하는 문서가 아니다.
-
-운영 관점에서는 다음 네 가지를 고정한다.
-
-```text
-어디서 시작하는가?
-어디까지 바꿀 수 있는가?
-무엇이 성공인가?
-무엇을 반환해야 하는가?
-```
-
----
-
-## 6. Git Task 상태를 하나로 묶는다
-
-Cloud Task가 여러 개 생기면 자연어 상태만으로 추적하기 어렵다.
-
-Task ID와 Git 상태를 연결한다.
-
-예:
-
-```text
-Task ID: task-142
-Base SHA: abc123
-Branch: agent/task-142
-Session: cloud-142
-Status: verifying
-Current SHA: def456
-PR: #142
-```
-
-그리고 Artifact도 같은 Task ID를 사용한다.
-
-```text
-artifacts/task-142/
-```
-
-이렇게 하면 다음 관계가 명확해진다.
-
-```text
-Task
-→ Base SHA
-→ Branch
-→ Result Commit
-→ Verification
-→ Evidence
-→ PR
-```
-
-Git은 Source 관리 도구이면서 Cloud Task의 기준점이 된다.
-
----
-
-## 7. 검증은 같은 SHA에서 병렬 실행한다
-
-Cloud Agent가 수정 Commit `def456`을 만들었다고 하자.
-
-이 Commit에서 다음 검증을 동시에 실행할 수 있다.
-
-```text
-Git SHA def456
-      ↓
-+---------+---------+---------+---------+
-|         |         |         |         |
-Unit   Integration Docker    E2E
-|         |         |         |         |
-+---------+---------+---------+---------+
-          ↓
-        Fan-in
-```
-
-여기서 가장 중요한 조건은 모든 Runner가 같은 SHA를 검증하는 것이다.
-
-좋지 않은 상태:
-
-```text
-Unit        → def456
-Integration → def456
-Docker      → def456
-E2E         → def789
-```
-
-이 결과를 한 묶음의 Evidence로 사용하면 안 된다.
-
-검증 결과는 Source State와 항상 연결한다.
-
----
-
-## 8. Result Gateway는 프로젝트의 결과 인터페이스다
-
-Runner가 여러 개면 결과 형식도 제각각이 되기 쉽다.
-
-이를 Task 단위 Artifact로 모은다.
-
-```text
-artifacts/task-142/
-├─ result.json
-├─ unit-junit.xml
-├─ integration-junit.xml
-├─ build.log
-├─ docker-build.log
-├─ screenshots/
-└─ e2e-trace/
-```
-
-Agent와 Developer가 처음 읽는 것은 `result.json`이다.
-
-예:
-
-```json
-{
-  "taskId": "task-142",
-  "gitSha": "def456",
-  "status": "FAIL",
-  "checks": {
-    "unit": "PASS",
-    "integration": "FAIL",
-    "docker": "PASS",
-    "e2e": "PASS"
-  },
-  "failures": [
-    "AttendanceApiTest.expiredToken"
-  ]
-}
-```
-
-이 파일을 표준 제품 포맷으로 정하려는 것은 아니다.
-
-중요한 것은 `큰 로그보다 작은 구조화 결과가 먼저`라는 점이다.
-
----
-
-## 9. 실패는 분류한 뒤 Agent에게 보낸다
-
-병렬 검증 결과가 다음과 같다고 하자.
-
-```text
-Unit        PASS
-Integration FAIL
-Docker      PASS
-E2E         PASS
-```
-
-먼저 Integration Failure를 분류한다.
-
-```text
-Result Gateway
-→ Failure Classification
-```
-
-결과:
-
-```text
-TEST_FAILURE
-Test: AttendanceApiTest.expiredToken
-expected: 401
-actual: 200
-```
-
-이제 Agent Task를 만들 수 있다.
-
-```text
-Task Scope
-attendance auth boundary
-
-Relevant Files
-AttendanceController.java
-AuthService.java
-AttendanceApiTest.java
-```
-
-Agent가 수정한 뒤 다시 Runner로 검증한다.
-
-```text
-Target Integration Test
-→ PASS
-
-Integration Suite
-→ PASS
-```
-
-`Agent가 수정했기 때문에 성공`이 아니다.
-
-Runner가 같은 조건에서 통과했기 때문에 성공이다.
-
----
-
-## 10. Infrastructure Failure는 코드 Agent에게 보내지 않는다
-
-Cloud 환경에서는 다음 실패도 자주 생길 수 있다.
-
-```text
-Docker registry timeout
-Testcontainers image pull failure
-Worker disk full
-Network timeout
-```
-
-이 Failure를 Agent에 넘기면 잘못된 코드 수정이 일어날 수 있다.
-
-예:
-
-```text
-Registry timeout
-→ Agent
-→ Dockerfile 수정
-```
-
-문제의 원인이 아니다.
-
-권장:
-
-```text
-Infra Failure
-→ retry
-→ environment fix
-→ operator escalation
-```
-
-코드 Agent는 코드 판단이 필요한 실패에만 붙인다.
-
----
-
-## 11. Migration은 Hybrid Workflow로 둔다
-
-DB Migration은 Cloud에서 모든 것을 끝내기 어려울 수 있다.
-
-예를 들어 개발용 검증은 PostgreSQL/Testcontainers로 수행하고 실제 운영 대상은 Tibero라고 하자.
-
-Cloud:
-
-```text
-Migration 작성
-→ disposable PostgreSQL
-→ syntax / order / basic integration
-```
-
-Local/Internal:
-
-```text
-Tibero
-→ 실제 syntax
-→ behavior
-→ deployment procedure
-```
-
-구조:
-
-```text
-Cloud Validation
-      ↓
-Evidence
-      ↓
-Local Tibero Validation
-```
-
-내부 DB 때문에 전체 작업을 Local로 되돌릴 필요는 없다.
-
-Cloud에서 가능한 일반 검증을 먼저 끝내고 마지막 경계만 Local에 남긴다.
-
----
-
-## 12. HSM과 Internal API도 같은 방식으로 나눈다
-
-학생증이나 인증 관련 프로젝트에서는 HSM이나 내부 API가 필요할 수 있다.
-
-Cloud에서 다음은 가능하다.
-
-```text
-Pure Logic
-Mock / Fake
-Contract Test
-Input/Output Validation
-```
-
-실제 장비와 내부망 검증은 Local/Internal에서 한다.
-
-```text
-Cloud
-→ Crypto flow logic test
-→ Mock HSM response test
-      ↓
-Local
-→ Real HSM
-→ Internal AP
-```
-
-Cloud Agent가 내부망에 접근하지 못한다는 이유로 Cloud Workflow 전체를 포기하지 않는다.
-
----
-
-## 13. UI Task는 Demo Evidence를 함께 남긴다
-
-Admin Web 변경은 Test 결과만으로 빠르게 판단하기 어려울 수 있다.
-
-다음 결과를 함께 남긴다.
-
-```text
-Build PASS
-E2E PASS
-Before Screenshot
-After Screenshot
-Video / Trace
-```
-
-Developer는 먼저 Demo Evidence를 확인한다.
-
-```text
-Screenshot / Video
-→ 실제 동작 확인
-→ 필요한 Diff Review
-```
-
-Diff를 생략하는 것이 아니다.
-
-Review 순서를 바꾸는 것이다.
-
-결과를 먼저 확인하면 CSS와 UI 변경을 이해하는 시간이 줄어들 수 있다.
-
----
-
-## 14. PR과 CI가 Event-driven 흐름을 만든다
-
-Cloud Agent Workflow가 수동 Task 위임으로만 끝날 필요는 없다.
-
-PR이 만들어지면 CI Runner가 실행된다.
-
-```text
-PR
-→ CI Runner
-→ PASS
-   ↓
- Review
-```
-
-FAIL이라면:
-
-```text
-PR
-→ CI FAIL
-→ Result Gateway
-→ Failure Classification
-→ Agent Fix 필요?
-   ├─ NO → Retry / Tool / Escalation
-   └─ YES
-        ↓
-      Agent
-        ↓
-      Runner
-        ↓
-      PR Update
-```
-
-이 흐름은 Developer가 직접 터미널에서 Agent를 다시 시작하지 않아도 된다.
-
-이벤트가 다음 Cloud Task를 만든다.
-
----
-
-## 15. 비용을 Compute / LLM / Human으로 나눠 본다
-
-이 Workflow에서 비용이 발생하는 위치를 나눠보자.
-
-### Compute
-
-```text
-Gradle Build
-Unit Test
-Integration Test
-Docker Build
-Browser E2E
-```
-
-### LLM
-
-```text
-Task 이해
-Failure 분석
-코드 수정
-의미 기반 Review 보조
-```
-
-### Human
-
-```text
-요구사항 해석
-Task 분해
-Architecture 판단
-Review
-Internal Validation
-Conflict 해결
-```
-
-Cloud Agent 최적화는 이 세 가지 중 하나만 줄이는 문제가 아니다.
-
-예를 들어 Cloud Compute가 조금 늘어도 Developer Blocking Time이 크게 줄 수 있다.
-
-반대로 Agent 호출을 많이 줄였더라도 Review Queue가 쌓이면 전체 Lead Time은 줄지 않는다.
-
----
-
-## 16. Developer Blocking Time을 별도 측정한다
-
-예:
-
-```text
-10:00 Task Cloud 위임
-10:01 Developer 다음 기능 개발
-10:45 Cloud Evidence 생성
-11:10 Developer Review
-```
-
-Cloud Worker는 45분 실행됐다.
-
-그러나 Developer는 대부분의 시간 동안 다른 일을 했다.
-
-측정:
-
-```text
-Cloud Execution Time
-Developer Blocking Time
-Review Time
-Retry Time
-```
-
-Cloud Workflow의 효과는 실행시간 하나로 판단하지 않는다.
-
----
-
-## 17. 처음부터 운영 대시보드를 만들 필요는 없다
-
-Cloud Agent를 도입하면 곧바로 복잡한 Agent Platform UI를 만들고 싶어질 수 있다.
-
-하지만 초기에 필요한 정보는 많지 않다.
-
-```text
-Task
 Branch
-Base SHA
 Current SHA
 Execution Type
 Status
@@ -760,136 +237,328 @@ PR
 
 예:
 
-```text
-TASK-142
-branch: agent/task-142
-sha: def456
+```yaml
+task_id: AUTH-142
+base_sha: abc123
+branch: agent/auth-142
+current_sha: def456
 execution: cloud-agent
 status: verifying
-result: artifacts/task-142/result.json
-pr: #142
+result: artifacts/AUTH-142/result.json
+pr: 142
 ```
 
-이 정보는 파일, CI metadata, PR만으로도 관리할 수 있다.
+관계는 다음처럼 유지한다.
 
-먼저 Workflow가 실제로 가치가 있는지 검증하고, 반복되는 운영 문제가 생길 때 자동화를 확장한다.
+```text
+Task
+→ Base SHA
+→ Branch
+→ Result SHA
+→ Verification
+→ Evidence
+→ PR
+```
+
+Agent의 대화 기록을 보지 않아도 어느 코드가 어느 검증을 통과했는지 알 수 있어야 한다.
 
 ---
 
-## 18. 성공 기준은 Agent 사용량이 아니다
+## 6. 같은 SHA에서 검증을 병렬 실행한다
 
-Cloud Agent Workflow를 도입했다고 다음 수치가 늘어나는 것을 성공으로 보지 않는다.
-
-```text
-Agent Session 수
-Agent가 만든 Commit 수
-Agent가 만든 PR 수
-```
-
-대신 다음을 본다.
+Result Commit이 만들어지면 독립 검증을 병렬 실행할 수 있다.
 
 ```text
-Local CPU/RAM 점유 감소
-Developer Blocking Time 감소
-PASS 경로 Agent 호출 감소
-Failure Context 크기 감소
-Review 가능한 Evidence 확보
-병렬 검증 Lead Time 감소
-Rework 감소
+Git SHA def456
+      ↓
++---------+-------------+---------+---------+
+|         |             |         |         |
+Unit   Integration    Docker     E2E
+|         |             |         |         |
++---------+-------------+---------+---------+
+              ↓
+            Fan-in
 ```
 
-Cloud Agent를 많이 사용한 팀이 아니라 **필요한 곳에만 사용한 팀**이 목표다.
+조건은 단순하다.
+
+```text
+모든 검증이 같은 SHA를 사용
+각 검증이 독립적으로 실행 가능
+결과를 Task 단위로 합산 가능
+```
+
+다른 SHA의 결과를 하나의 Evidence 묶음으로 사용하지 않는다.
+
+```text
+Unit        → def456
+Integration → def456
+Docker      → def456
+E2E         → def789
+```
+
+위 상태라면 E2E를 다시 맞춰야 한다.
 
 ---
 
-## 19. campus-platform 전체 Workflow
+## 7. Result Gateway는 공통 반환 인터페이스가 된다
 
-지금까지의 구조를 한 번에 정리하면 다음과 같다.
+Runner마다 로그 형식이 달라도 Developer와 Agent가 처음 읽는 결과는 작게 맞출 수 있다.
+
+Task Artifact 예:
+
+```text
+artifacts/AUTH-142/
+├─ result.json
+├─ unit-junit.xml
+├─ integration-junit.xml
+├─ build.log
+├─ screenshots/
+└─ e2e-trace/
+```
+
+첫 화면은 다음 정도면 충분하다.
+
+```text
+Task: AUTH-142
+SHA: def456
+
+Unit: PASS
+Integration: PASS
+Docker: PASS
+E2E: PASS
+```
+
+실패가 있을 때만 8장의 Progressive Result Detail을 사용한다.
+
+```text
+Summary
+→ Failure Detail
+→ Specific Artifact
+```
+
+운영 모델에서는 `대형 로그 저장`과 `Agent에게 전달할 결과`를 분리한다.
+
+---
+
+## 8. Failure는 코드 Agent와 Environment 경로로 나눈다
+
+Runner가 FAIL했다고 모두 Cloud Agent Task가 되지는 않는다.
+
+```text
+Runner FAIL
+      ↓
+Failure Classification
+      ↓
++----------------------+----------------------+
+|                                             |
+Infrastructure / Environment              Code Reasoning
+|                                             |
+Retry / Environment Fix                    Cloud Agent
+                                              ↓
+                                             Fix
+                                              ↓
+                                           Runner
+```
+
+예:
+
+```text
+Registry timeout
+→ Environment 경로
+
+Assertion Failure
+→ 재현 가능 + 코드 판단 필요
+→ Cloud Agent 후보
+```
+
+10장의 Agent-on-failure를 실제 운영 Flow에 배치한 것이다.
+
+---
+
+## 9. Internal Validation을 별도 Stage로 둔다
+
+Cloud에서 끝낼 수 없는 검증은 Workflow 밖의 예외가 아니다.
+
+명시적인 Stage로 둔다.
+
+예:
+
+```text
+Cloud Validation
+→ PostgreSQL/Testcontainers
+→ Unit / Integration
+→ Evidence
+      ↓
+Internal Validation
+→ Tibero
+→ HSM
+→ Internal API
+```
+
+Migration:
+
+```text
+Cloud
+→ 일반 Migration Validation
+
+Internal
+→ Tibero 최종 검증
+```
+
+HSM 관련 Task:
+
+```text
+Cloud
+→ Pure Logic / Mock / Contract Test
+
+Internal
+→ Real HSM Integration
+```
+
+이렇게 하면 내부망 제약이 Cloud Workflow 전체를 막지 않는다.
+
+---
+
+## 10. PR과 Event는 같은 운영 모델에 연결된다
+
+수동 Task와 Event-driven Task를 별도 시스템으로 만들 필요는 없다.
+
+사람이 만든 Task:
+
+```text
+Developer
+→ Task Contract
+→ Queue / Worker
+```
+
+Event가 만든 Task:
+
+```text
+CI / Review / Schedule
+→ Task Candidate
+→ Queue / Worker
+```
+
+둘 다 이후 흐름은 같다.
+
+```text
+Routing
+→ Environment
+→ Runner / Agent
+→ Verification
+→ Evidence / PR
+```
+
+14장의 Event-driven 구조는 이 운영 모델의 **Task 입력 채널 하나**로 들어온다.
+
+---
+
+## 11. 비용도 세 층으로 관찰한다
+
+3장에서 구분한 비용을 프로젝트 지표에 적용한다.
+
+```text
+Compute
+- Build / Test / Docker / Browser
+
+LLM
+- Task 이해 / Failure 분석 / 코드 수정
+
+Human
+- Task 분해 / Review / Internal Validation / Conflict 해결
+```
+
+Cloud Agent Workflow가 좋아졌는지는 Agent Session 수로 판단하지 않는다.
+
+확인할 값은 다음과 같다.
+
+```text
+Developer Blocking Time
+Review Queue Time
+Retry / Rework
+Cloud Startup Time
+PASS 경로의 Agent 호출 수
+Evidence 누락률
+병렬 검증 Lead Time
+```
+
+Agent 호출 수가 줄어도 Review Queue가 늘면 전체 Lead Time은 개선되지 않을 수 있다.
+
+---
+
+## 12. 처음부터 운영 플랫폼을 만들 필요는 없다
+
+초기에는 다음 정보만으로도 Workflow를 운영할 수 있다.
+
+```text
+Task
+Branch
+SHA
+Execution Type
+Status
+Evidence
+PR
+```
+
+이를 Git, CI metadata, PR, Artifact 저장소로 관리할 수 있다.
+
+먼저 반복 가능한 실행 규칙을 만든다.
+
+```text
+Task Routing
+→ Runner-first
+→ Evidence
+→ Handoff
+```
+
+그 다음 반복되는 수동 결정을 자동화한다.
+
+18장에서 다룰 Harness와 Orchestration은 이 운영 흐름이 안정화된 이후의 문제다.
+
+---
+
+## 13. campus-platform 전체 운영 모델
+
+지금까지를 하나의 그림으로 합치면 다음과 같다.
 
 ```text
 Developer / Local Agent
         ↓
-Requirement
-Architecture
+Requirement / Architecture
 Task Split
         ↓
 Task Routing
         ↓
-Task Contract
-        ↓
-Commit / Push
-        ↓
-Git Repository
+Git + Task Contract
         ↓
 Task-specific Environment
         ↓
-+-------------+-------------+-------------+-------------+
-|             |             |             |             |
-Unit Runner  Integration   Docker Runner  E2E Runner
-|             Runner        |             |
-+-------------+-------------+-------------+-------------+
-                      ↓
-                Result Gateway
-                      ↓
-              PASS / Failure Class
-                      ↓
-            Code Reasoning Needed?
-                ├─ NO → Done / Retry
-                └─ YES
-                     ↓
-                 Cloud Agent
-                     ↓
-                    Fix
-                     ↓
-                 Runner Verify
-                     ↓
-                 Evidence / PR
-                     ↓
-              Developer / Local
-                     ↓
-          Tibero / HSM / Internal API
-                     ↓
-                Review / Merge
++--------------+--------------+--------------+
+|              |              |              |
+Unit Runner  Integration    E2E / Docker   Cloud Agent
+|              Runner         Runner         |
++--------------+--------------+--------------+
+                    ↓
+              Result Gateway
+                    ↓
+            PASS / Failure Class
+                    ↓
+            필요하면 Agent Fix
+                    ↓
+               Runner Verify
+                    ↓
+               Evidence / PR
+                    ↓
+             Developer / Local
+                    ↓
+       Tibero / HSM / Internal API
+                    ↓
+              Review / Merge
 ```
 
-이 Workflow에서 Cloud Agent는 전체 시스템의 중심이 아니다.
+이 모델의 핵심은 한 문장으로 정리할 수 있다.
 
-**판단과 코드 수정이 필요한 구간에 들어가는 Remote Worker**다.
+> Task Contract로 작업을 넘기고, Runner가 가능한 일을 먼저 실행하며, 판단이 필요한 실패에만 Agent를 사용하고, Evidence로 결과를 다시 Local에 돌려준다.
 
-Runner, Git, Environment, Evidence가 함께 있어야 실제 개발 흐름이 된다.
-
----
-
-## 20. 기억할 운영 원칙
-
-`campus-platform` 예제에서 남겨야 할 원칙은 다음과 같다.
-
-```text
-Local
-→ 설계 / 탐색 / 내부망 / 통합
-
-Cloud Runner
-→ Build / Test / E2E / Docker / Validation
-
-Cloud Agent
-→ Failure 분석 / 작은 Bug Fix / 제한된 Refactoring
-
-Git
-→ Handoff Boundary
-
-Evidence
-→ Return Boundary
-
-Internal Validation
-→ Cloud에서 끝낼 수 없는 마지막 경계
-```
-
-Task Contract로 작업을 넘기고 Evidence로 결과를 돌려받는다.
-
-Prepared Environment로 시작 시간을 줄이고, Runner가 정상 경로를 처리한다.
-
-실패가 생기면 필요한 Context만 Agent에 전달한다.
-
-병렬화는 독립 Task만 수행하고 Fan-in 비용까지 함께 본다.
-
-다음 장에서는 이 운영 모델을 하나의 기능 개발에 시간 순서대로 적용한다.
+다음 장에서는 이 정적인 운영 모델을 `학생 출결 API 인증 변경` 하나에 적용해 Requirement부터 Merge까지 시간 순서대로 따라간다.
