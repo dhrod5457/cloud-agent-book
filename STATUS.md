@@ -4,7 +4,7 @@ Phase 6 - 본문 초고 작성 진행 중
 
 Phase 5의 1~18장 설계와 전체 정합성 점검을 완료했다.
 
-현재 1~10장 초고를 작성했다.
+현재 1~12장 초고를 작성했다.
 
 # Source of Truth
 
@@ -66,7 +66,7 @@ Cloud Agent
 
 > Cloud Agent에게 결과를 요구하지 말고 검증 가능한 결과물을 요구한다.
 
-> Cloud Agent를 잘 사용하는 핵심은 Agent 수를 늘리는 것이 아니라 어떤 작업을 Cloud로 보낼지 결정하는 것이다.
+> 병렬화의 대상은 Agent가 아니라 서로 독립적으로 실행하고 검증할 수 있는 Task다.
 
 # Current TOC
 
@@ -120,7 +120,7 @@ Phase 5 완료.
 
 # Phase 6 Progress
 
-## 1~6장
+## 1~8장
 
 상태: `초고 작성 및 설계 대비 1차 검토 완료`
 
@@ -130,6 +130,8 @@ Phase 5 완료.
 - `chapters/04/draft.md`
 - `chapters/05/draft.md`
 - `chapters/06/draft.md`
+- `chapters/07/draft.md`
+- `chapters/08/draft.md`
 
 핵심 흐름:
 
@@ -139,43 +141,10 @@ Cloud Worker 정의
 → Compute / Token 분리
 → 독립 실행환경 / 비동기 / 병렬성
 → Task Routing
-→ 실제 작업 유형별 Runner / Agent / Local-Hybrid 배치
+→ 작업 유형별 Runner / Agent / Local-Hybrid 배치
+→ Small Task / Small Context
+→ Small Output / Evidence
 ```
-
-## 7장 - Cloud Agent Task Contract
-
-상태: `초고 작성 완료`
-
-- 설계: `chapters/07/plan.md`
-- 초고: `chapters/07/draft.md`
-
-핵심:
-
-- Task / Goal / Scope
-- Relevant Files
-- Forbidden Changes
-- Validation / Expected Result
-- Output / Evidence
-- Progressive Context
-- Base SHA / Branch / Environment
-- Retry / Token Budget
-
-## 8장 - Tool Output을 줄이고 Evidence를 남기기
-
-상태: `초고 작성 및 설계 대비 1차 검토 완료`
-
-- 설계: `chapters/08/plan.md`
-- 초고: `chapters/08/draft.md`
-
-핵심:
-
-- Result Filter / Result Gateway
-- Raw Artifact 보존
-- Small Evidence Summary
-- Artifact First / result.json
-- Demos over Diffs
-- Failure Fingerprint
-- Retry / Budget
 
 ## 9장 - Prepared Cloud Environment, Cache, Snapshot
 
@@ -186,26 +155,19 @@ Cloud Worker 정의
 
 핵심:
 
-- Cloud Cold Start를 Provisioning / Checkout / Dependency Restore / Warm-up으로 분해
+- Cloud Cold Start 분해
 - Prepared Cloud Environment
 - Cloud Environment as Code
 - Task-specific Environment
-- Reusable Cache와 Fresh State 분리
+- Reusable Cache / Fresh State
 - Cache Key / Invalidation
 - Snapshot / Warm Worker
 - Secret과 Prepared Image 분리
 - Cold Start 측정
-- `campus-platform`의 backend-test / frontend-e2e / migration-test 환경 예제
-
-9장의 핵심 원칙:
-
-> Agent에게 개발환경을 설치하게 하지 말고, 바로 작업 가능한 환경을 제공한다.
-
-> Environment/Dependency는 재사용하고 Source/Runtime State는 Fresh하게 유지한다.
 
 ## 10장 - Cloud Agent를 Test Runner처럼 사용하기
 
-상태: `초고 작성 완료`
+상태: `초고 작성 및 설계 대비 1차 검토 완료`
 
 - 설계: `chapters/10/plan.md`
 - 초고: `chapters/10/draft.md`
@@ -220,9 +182,6 @@ Cloud Worker 정의
 - Result Gateway → Agent-on-failure
 - Agent Fix 후 Runner 재검증
 - Parallel Runner / Test Sharding
-- Runner Resource / Timeout
-- CI/Event-driven 호출의 기반
-- `campus-platform` runner-unit / integration / e2e / docker / migration 구성
 
 10장의 핵심 원칙:
 
@@ -230,9 +189,66 @@ Cloud Worker 정의
 
 > Agent가 수정한 결과도 Runner가 다시 검증한다.
 
-# Small Input / Small Output / Prepared Execution
+## 11장 - Git, Branch, Worktree, Container로 작업 격리하기
 
-현재까지의 핵심 연결:
+상태: `초고 작성 완료`
+
+- 설계: `chapters/11/plan.md`
+- 초고: `chapters/11/draft.md`
+
+핵심:
+
+- Git을 Local↔Cloud Handoff Boundary로 사용
+- Base SHA 고정
+- Branch per Task
+- Task / Session / SHA / Test / PR 상태 연결
+- Local Worktree와 Cloud Independent Workspace 구분
+- Branch는 Source, Container/VM은 Runtime을 격리
+- DB / Port / Temp / Artifact Path까지 작업별 격리
+- Migration / Schema / Shared Module은 논리적 충돌로 별도 취급
+- Multi-Repository는 현재 Task에 필요한 Repository만 제공
+- Cloud 결과는 Review 가능한 Commit/PR로 반환
+
+11장의 핵심 원칙:
+
+> Branch는 Source를 격리하고 Container는 Runtime을 격리한다.
+
+> 같은 파일과 같은 Schema를 수정하는 Task는 격리보다 먼저 병렬화 여부를 다시 판단한다.
+
+## 12장 - 병렬 Worker와 중복 Context 비용
+
+상태: `초고 작성 완료`
+
+- 설계: `chapters/12/plan.md`
+- 초고: `chapters/12/draft.md`
+
+핵심:
+
+- Parallel Compute와 Parallel Reasoning 구분
+- Fan-out 전 Dependency 확인
+- 여러 Agent의 Repository 재탐색에 따른 Context Duplication
+- Agent Count와 Task Count를 분리
+- Read-only 검증을 우선 병렬화
+- Code Change 병렬화에서는 Change Locality 확인
+- Fan-in / Review / Merge / Rework 비용 포함
+- Review Capacity를 병렬도의 상한으로 고려
+- Prepared Cache는 공유하고 Runtime State는 분리
+- Dependency-aware Parallel Group
+- Java 17→21 Migration fan-out 예제
+- Best-of-N은 기본값이 아닌 Advanced Pattern으로 제한
+- 병렬 생산성은 PR 수가 아니라 Lead Time과 Integration 비용으로 평가
+
+12장의 핵심 원칙:
+
+> 병렬화의 대상은 Agent가 아니라 독립 Task다.
+
+> Agent 수를 늘린다고 생산성이 선형 증가하지 않는다.
+
+> Fan-out만큼 Fan-in 비용도 설계해야 한다.
+
+# Current Execution Flow
+
+현재 7~12장의 연결은 다음과 같다.
 
 ```text
 7장
@@ -249,7 +265,12 @@ Prepared Environment
         ↓
 10장
 Runner-first / Agent-on-failure
-→ LLM이 필요한 구간만 Agent 사용
+        ↓
+11장
+Task별 Source / Runtime / Artifact 격리
+        ↓
+12장
+독립 Task만 Fan-out하고 Fan-in 비용 관리
 ```
 
 # Preserved / Future Topics
@@ -272,10 +293,10 @@ Runner-first / Agent-on-failure
 
 # Next
 
-1. 9~10장 설계 대비 자체 검토
+1. 11~12장 설계 대비 자체 검토
 2. 필요한 수정 반영
-3. 11장 `Git, Branch, Worktree, Container로 작업 격리하기` 초고 작성
-4. 12장 `병렬 Worker와 중복 Context 비용` 초고 작성
-5. 이후 같은 방식으로 18장까지 순차 진행
+3. 13장 `Local → Cloud → Local Handoff` 초고 작성
+4. 14장 `Task Queue와 Event-driven Cloud Agent` 초고 작성
+5. 이후 15~18장 순차 작성
 
 Phase 6에서는 장별로 `초고 → 설계 대비 검토 → 수정 → 다음 장` 순서로 진행한다.
