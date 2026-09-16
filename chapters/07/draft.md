@@ -19,14 +19,13 @@ Expected Result
 Output / Evidence
 ```
 
-필요한 경우에만 다음 정보를 추가한다.
+필요하면 다음 정보를 추가한다.
 
 ```text
 Base SHA / Branch
 Environment
-Dependency
 Related Document
-Retry / Token Budget
+Budget
 ```
 
 핵심은 한 문장으로 정리할 수 있다.
@@ -37,14 +36,14 @@ Retry / Token Budget
 
 ## 1. Cloud Task는 Prompt가 아니라 작업 패키지다
 
-다음과 같은 지시는 범위가 넓다.
+다음 지시는 범위가 넓다.
 
 ```text
 로그인 쪽에 문제가 있는 것 같은데 Repository 전체를 확인해서
 관련된 부분을 분석하고 수정한 다음 테스트도 해줘.
 ```
 
-Agent는 이 한 문장에서 문제 정의, 관련 파일, 수정 범위, 검증 방법, 완료 조건을 모두 다시 추론해야 한다.
+Agent는 문제 정의, 관련 파일, 변경 범위, 검증 방법, 완료 조건을 모두 다시 추론해야 한다.
 
 같은 작업을 다음처럼 바꿀 수 있다.
 
@@ -80,7 +79,7 @@ Output / Evidence
 - test result
 ```
 
-Task Contract는 Agent의 사고 과정을 대신 쓰는 문서가 아니다.
+Task Contract는 Agent의 사고 과정을 대신 작성하는 문서가 아니다.
 
 다음 네 가지를 고정하는 작업 패키지다.
 
@@ -109,17 +108,9 @@ Scope
 auth 모듈의 expired token 처리와 해당 regression test
 ```
 
-둘을 분리해야 하는 이유는 간단하다.
+Goal만 있으면 Agent가 목표를 달성하기 위해 어디까지 바꿔도 되는지 알기 어렵다.
 
-다음 Goal만으로는 구현 범위가 정해지지 않는다.
-
-```text
-Expired JWT → HTTP 401
-```
-
-이를 위해 Agent는 AuthService, Filter, Exception Handler, 공통 응답 구조까지 바꿀 수 있다.
-
-Task Contract는 필요한 결과를 유지하면서 변경 경로를 좁힌다.
+반대로 Scope만 있으면 어떤 결과를 만들어야 하는지 불분명하다.
 
 > Goal은 결과를 제한하고 Scope는 탐색과 변경 범위를 제한한다.
 
@@ -138,18 +129,18 @@ Relevant Files
 - src/test/java/.../AuthServiceTest.java
 ```
 
-이 목록은 파일 whitelist가 아니다.
+이 목록은 whitelist가 아니다.
 
 예상하지 못한 dependency가 있을 수 있으므로 다음 순서를 기본으로 한다.
 
 ```text
 Relevant Files
       ↓
-직접 연결된 dependency
+Direct Dependency
       ↓
-관련 test / document
+Related Test / Document
       ↓
-필요한 경우 wider module context
+Wider Module Context
 ```
 
 즉 Relevant Files는 `initial context boundary`다.
@@ -160,7 +151,7 @@ Relevant Files
 
 ## 4. Forbidden Changes는 Diff를 작게 유지한다
 
-Agent가 Bug 하나를 고치면서 주변 구조까지 정리하면 Review 범위가 빠르게 커진다.
+Bug 하나를 고치면서 주변 구조까지 함께 정리하면 Review 범위가 빠르게 커진다.
 
 예를 들어 expired token 오류를 수정하다가 다음 변경까지 섞일 수 있다.
 
@@ -172,7 +163,7 @@ DB migration 추가
 OAuth 설정 변경
 ```
 
-각 변경 자체가 타당하더라도 원래 Task와 섞이면 회귀 위험과 Review 비용이 증가한다.
+각 변경이 타당해도 원래 Task와 섞이면 회귀 위험과 Review 비용이 커진다.
 
 따라서 하지 말아야 할 영역을 함께 적는다.
 
@@ -193,7 +184,7 @@ Do Not Change
 - security/oauth/**
 ```
 
-이 항목의 목적은 복잡한 Governance가 아니라 Task의 변경 경계를 지키는 것이다.
+목적은 Governance가 아니라 Task의 변경 경계를 지키는 것이다.
 
 ---
 
@@ -211,7 +202,7 @@ Do Not Change
 ./gradlew test --tests AuthServiceTest.expiredToken
 ```
 
-필요하면 좁은 검증부터 넓힌다.
+필요하면 좁은 검증과 회귀 검증을 나눈다.
 
 ```text
 Target Validation
@@ -231,7 +222,7 @@ Agent가 코드를 읽고 `문제없어 보인다`고 판단하는 것과 실제
 
 ## 6. Expected Result와 Evidence를 미리 정한다
 
-Validation 명령이 있어도 무엇을 확인하는지 불명확할 수 있다.
+Validation 명령만으로는 무엇이 성공인지 충분하지 않을 수 있다.
 
 Expected Result는 관찰 가능한 결과로 작성한다.
 
@@ -243,14 +234,7 @@ Valid token
 → 기존 성공 동작 유지
 ```
 
-테스트 기준으로도 표현할 수 있다.
-
-```text
-AuthServiceTest.expiredToken PASS
-AuthServiceTest.validToken PASS
-```
-
-Cloud Task의 반환 형식도 미리 정한다.
+그리고 Task가 반환할 결과도 미리 정한다.
 
 ```text
 Output / Evidence
@@ -289,18 +273,14 @@ AGENTS.md
 └─ Deployment → docs/deployment.md
 ```
 
-AUTH-142 Task라면 다음 경로만 먼저 사용한다.
+AUTH-142라면 다음 경로부터 시작할 수 있다.
 
 ```text
 Task Contract
 → AGENTS.md
 → docs/security/auth.md
-→ AuthService.java
-→ JwtTokenProvider.java
-→ AuthServiceTest.java
+→ Relevant Files
 ```
-
-Database와 Deployment 문서는 필요할 때만 읽는다.
 
 문제 해결에 실패해도 바로 Repository 전체로 확대하지 않는다.
 
@@ -323,7 +303,7 @@ Wider Module / Repository Context
 
 이 흐름을 `Progressive Context`로 사용할 수 있다.
 
-> Context를 줄이는 것뿐 아니라 Context를 필요할 때 가져오게 만든다.
+> Context를 줄이는 것뿐 아니라 필요할 때 가져오게 만든다.
 
 ---
 
@@ -355,14 +335,12 @@ Task ID
 
 Branch와 Runtime 격리는 11장에서 다룬다.
 
-Environment도 설치 방법 대신 이름으로 선택하게 만든다.
+Environment는 설치 방법보다 이름으로 선택하는 편이 낫다.
 
 ```text
 Environment
 backend-test
 ```
-
-예를 들어 `backend-test`가 Java 21, Gradle, Docker, Testcontainers를 포함한다면 Task Contract에는 환경 이름만 있으면 된다.
 
 환경 구성 자체는 9장의 Prepared Environment에서 관리한다.
 
@@ -370,19 +348,16 @@ backend-test
 
 ## 9. Budget은 선택 필드다
 
-Agent가 실패와 수정을 반복하는 Task에는 중단 조건이 필요할 수 있다.
+실패와 수정을 반복할 수 있는 Task에는 중단 조건을 둘 수 있다.
 
-예시:
+설명용 예시:
 
 ```text
 Budget
 max_retry: 2
-max_turns: 8
 ```
 
-이 숫자는 표준값이 아니라 설명용 예시다.
-
-프로젝트에 따라 다음 기준을 사용할 수 있다.
+표준값은 아니다. 프로젝트에 따라 다음 기준을 사용할 수 있다.
 
 ```text
 max retry
@@ -393,22 +368,22 @@ max changed files
 
 목적은 `성공할 때까지 계속해` 같은 무제한 Task를 피하는 것이다.
 
-같은 Failure가 반복되는지는 8장의 Failure Fingerprint로 판단할 수 있다.
+구체적인 Failure Fingerprint와 중단 판단은 8장과 17장에서 이어서 다룬다.
 
 ---
 
-## 10. Task Contract가 커지면 Task를 다시 본다
+## 10. Task Contract가 너무 커지면 Task를 다시 본다
 
-다음처럼 Task Contract 자체가 커졌다고 하자.
+다음처럼 Contract 자체가 커졌다고 하자.
 
 ```text
-Relevant Files: 80개
-Related Modules: 12개
-Validation Commands: 15개
+Relevant Files: 수십 개
+Related Modules: 다수
+Validation Commands: 다수
 Forbidden Changes: 수십 개
 ```
 
-문서 형식을 더 복잡하게 만들기 전에 Task가 Cloud에서 독립 실행하기에 너무 큰지 확인한다.
+문서 형식을 더 복잡하게 만들기 전에 Task가 독립 실행하기에 너무 큰지 확인한다.
 
 ```text
 Task Contract 과대
@@ -420,13 +395,13 @@ Scope 재검토
   └─ NO  → Local / Hybrid 재검토
 ```
 
-Task를 작게 만드는 것이 목적은 아니다.
+Task를 작게 만드는 것 자체가 목적은 아니다.
 
 Cloud Worker가 사람의 지속적인 개입 없이 끝낼 수 있는 단위인지 확인하는 것이 목적이다.
 
 ---
 
-## 11. AUTH-142 Task Contract
+## 11. AUTH-142 최소 Contract
 
 이 책에서 반복해서 사용할 expired token 예제를 하나의 Task로 정리하면 다음과 같다.
 
@@ -440,22 +415,16 @@ Expired token 처리 수정
 Goal
 Attendance API에 expired JWT 사용 시 HTTP 401 반환
 
-Repository
-campus-platform
-
 Base SHA
 4f29abc
-
-Task Branch
-agent/auth-expired-token-142
 
 Scope
 auth 모듈의 token expiration handling과 관련 test
 
 Relevant Files
-- auth/.../AuthService.java
-- auth/.../JwtTokenProvider.java
-- auth/.../AuthServiceTest.java
+- AuthService.java
+- JwtTokenProvider.java
+- AuthServiceTest.java
 
 Forbidden Changes
 - DB Schema
@@ -467,7 +436,6 @@ backend-test
 
 Validation
 ./gradlew :auth:test --tests AuthServiceTest.expiredToken
-./gradlew :auth:test
 
 Expected Result
 - expired token → 401
@@ -477,16 +445,9 @@ Output / Evidence
 - result commit SHA
 - changed files
 - test result
-
-Budget
-- max retry: 2  # 설명용 예시
 ```
 
-이 Contract에서 Agent는 Relevant Files부터 시작한다.
-
-문제를 해결하지 못하면 Context를 단계적으로 넓힌다.
-
-이 예제의 배경은 뒤 장에서 반복 설명하지 않고 `AUTH-142`로 다시 사용한다.
+이 장 이후에는 같은 배경을 반복하지 않고 `AUTH-142`로 참조한다.
 
 ---
 
@@ -512,4 +473,4 @@ Result Gateway
 → Small Output / Evidence
 ```
 
-입력에서는 `어디까지 읽고 바꿀 것인가`를 줄였고, 출력에서는 `무엇을 먼저 읽을 것인가`를 줄인다.
+7장은 `어디까지 읽고 바꿀 것인가`를 줄이고, 8장은 `무엇을 먼저 읽을 것인가`를 줄인다.
