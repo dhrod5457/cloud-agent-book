@@ -1,10 +1,23 @@
 # Current Phase
 
-Phase 9 - 출판 원고 조립 진행 중
+Phase 10 - 교정쇄 생성 / 시각 검수 준비 중
 
-Phase 8에서 1~18장 본문 최종 교정과 출판 정합성 점검을 완료했다.
+Phase 9에서 출판 원고 구조를 확정했다.
 
-현재는 새 본문을 작성하는 단계가 아니라 **완성된 18개 장을 실제 책 구조로 묶는 단계**다.
+현재 다음 항목이 모두 준비되어 있다.
+
+- 최종 제목 / 부제
+- Front Matter
+- 6개 Part 전환 페이지
+- 1~18장 본문
+- Appendix
+- Glossary
+- References
+- 출판용 전체 목차
+- 32개 파일 Assembly Manifest
+- PDF / EPUB / 인쇄 포맷 정책
+
+다음 작업은 **32개 Markdown 파일을 하나의 Master 원고로 결합하고 PDF 교정쇄를 생성하는 것**이다.
 
 # Final Book Title
 
@@ -20,10 +33,6 @@ Phase 8에서 1~18장 본문 최종 교정과 출판 정합성 점검을 완료�
 
 > 더 많은 Agent보다 더 나은 Task Routing, 실행환경, 검증을 설계하는 법
 
-세부 포지셔닝:
-
-`manuscript/title-and-positioning.md`
-
 # Source of Truth
 
 현재 우선순위는 다음과 같다.
@@ -34,28 +43,14 @@ Phase 8에서 1~18장 본문 최종 교정과 출판 정합성 점검을 완료�
 4. `planning/cloud-agent-remote-worker-model.md`
 5. `planning/phase8-publication-consistency-check.md`
 6. `planning/phase9-manuscript-assembly-plan.md`
-7. `manuscript/title-and-positioning.md`
-8. `manuscript/book-structure.md`
-9. `manuscript/preface.md`
-10. `manuscript/about-this-book.md`
-11. `manuscript/how-to-read.md`
-12. `manuscript/parts/part-01.md` ~ `part-06.md`
+7. `planning/phase9-manuscript-assembly-check.md`
+8. `planning/phase10-proof-plan.md`
+9. `manuscript/assembly-manifest.md`
+10. `manuscript/book-structure.md`
+11. `manuscript/publication-format.md`
+12. 각 `manuscript/*` 출판 원고 파일
 13. 각 `chapters/NN/draft.md`
 14. `STATUS.md`
-
-과거 Agent-Native 독립 장 설계와 초기 22~23장 체계는 현행 18장 원고보다 우선하지 않는다.
-
-# Book Direction
-
-책의 중심 주제는 **Cloud Agent 활용과 Local + Cloud 개발 Workflow**다.
-
-핵심 질문:
-
-> 클라우드 코딩 에이전트를 실제 개발에서 어떻게 더 빠르고, 저렴하고, 효율적으로 사용할 것인가?
-
-최종 독자 판단:
-
-> 이 Task는 Local에서 해야 하는가, Cloud로 보내야 하는가?
 
 # Core Definition
 
@@ -80,9 +75,8 @@ Cloud Agent
 - CPU에는 일을 많이 시키고, LLM에는 필요한 정보만 보여준다.
 - Runner가 할 수 있으면 Runner에게 맡긴다.
 - 작은 Task와 작은 Context를 전달한다.
-- Agent에게 개발환경을 설치하게 하지 않고 바로 작업 가능한 환경을 제공한다.
 - 결과는 자연어 완료 보고보다 Evidence와 Artifact로 확인한다.
-- 병렬화의 대상은 Agent가 아니라 독립적으로 실행하고 검증할 수 있는 Task다.
+- 병렬화의 대상은 Agent가 아니라 독립 Task다.
 - Task는 Local 또는 Cloud에 영구적으로 속하지 않는다.
 - Cloud를 쓰지 않는 결정도 올바른 Routing 결과다.
 - Local Fallback은 실패가 아니라 Routing의 일부다.
@@ -92,172 +86,92 @@ Cloud Agent
 ## Phase 5
 
 - 1~18장 설계 완료
-- 장별 역할과 범위 정합성 점검 완료
 
 ## Phase 6
 
-- `chapters/01/draft.md` ~ `chapters/18/draft.md` 초고 작성 완료
-- 전체 초고 정합성 점검 완료
+- 1~18장 초고 완료
 
 ## Phase 7
 
-- 1~18장 전체 편집 완료
-- 중복 설명 압축
-- 장별 역할 경계 명확화
-- `AUTH-142 / expired token` 공통 사례 연결
-- Agent Platform 일반론 확장 방지
+- 전체 편집 / 중복 압축 완료
 
 ## Phase 8
 
-- 1~18장 최종 교정 완료
-- 용어 / 제목 / 코드블록 / 표 / 장간 참조 점검
-- 설명용 수치 표기 점검
+- 최종 교정 / 출판 정합성 검사 완료
+- `planning/toc.md`와 장 제목 18 / 18 일치
 - 제품 공식 근거 재검증
-- `planning/toc.md`와 장 제목 **18 / 18 일치** 확인
-- 깨진 Anthropic Research 내부 경로 복구
-- `planning/phase8-publication-consistency-check.md` 작성
 
-# Phase 9 Progress
+## Phase 9
 
-현재 완료:
+- 최종 제목 / 부제 확정
+- Front Matter 완료
+- 6개 Part 구조와 전환 페이지 완료
+- 출판용 전체 목차 완료
+- Appendix / Glossary / References 완료
+- 최종 조립 순서 확정
+- 포맷 정책 확정
+- `planning/phase9-manuscript-assembly-check.md` 작성
 
-- 출판용 6개 Part 구조 확정
-- 서문 작성
-- 책 소개 / 독자 대상 작성
-- 읽는 방법 작성
-- 최종 제목 / 부제 / 표지용 한 줄 소개 확정
-- 6개 Part 전환 페이지 작성
-- 출판 원고 결합 순서 초안 작성
-- README / PROJECT의 현재 상태 동기화
-
-# Phase 9 Publication Structure
-
-## Part I. Cloud Agent를 이해한다
-
-1. Coding Agent에서 Cloud Worker로
-2. Local Agent와 Cloud Agent
-3. Cloud Session, Container, Compute와 Token
-4. 독립 실행환경, 장시간 작업, 병렬성, 시간 분리
-
-전환 파일: `manuscript/parts/part-01.md`
-
-## Part II. 어떤 Task를 Cloud로 보낼 것인가
-
-5. Task Routing: Local인가 Cloud인가
-6. Cloud에 보내기 좋은 개발 작업
-7. Cloud Agent Task Contract: 작은 Task와 작은 Context
-8. Tool Output을 줄이고 Evidence를 남기기
-
-전환 파일: `manuscript/parts/part-02.md`
-
-## Part III. Cloud 실행환경과 검증을 설계한다
-
-9. Prepared Cloud Environment, Cache, Snapshot
-10. Cloud Agent를 Test Runner처럼 사용하기
-11. Git, Branch, Worktree, Container로 작업 격리하기
-12. 병렬 Worker와 중복 Context 비용
-
-전환 파일: `manuscript/parts/part-03.md`
-
-## Part IV. Local과 Cloud를 연결한다
-
-13. Local → Cloud → Local Handoff
-14. Task Queue와 Event-driven Cloud Agent
-
-전환 파일: `manuscript/parts/part-04.md`
-
-## Part V. 실제 프로젝트에 적용한다
-
-15. campus-platform Cloud Agent Workflow 설계
-16. 하나의 기능을 Local + Cloud로 끝까지 개발하기
-
-전환 파일: `manuscript/parts/part-05.md`
-
-## Part VI. Cloud의 한계와 다음 단계를 정한다
-
-17. Cloud가 항상 정답은 아니다
-18. 다음 단계: Harness와 Orchestration
-
-전환 파일: `manuscript/parts/part-06.md`
-
-세부 조립 순서:
-
-`manuscript/book-structure.md`
-
-# Front Matter
-
-현재 작성 완료:
-
-- `manuscript/preface.md`
-- `manuscript/about-this-book.md`
-- `manuscript/how-to-read.md`
-- `manuscript/title-and-positioning.md`
-
-# Publication Rules
-
-Phase 9에서는 1~18장 본문을 다시 확장하지 않는다.
-
-본문 변경은 다음 경우로 제한한다.
+# Publication Structure
 
 ```text
-명확한 오탈자
-사실 오류
-깨진 링크
-출판 조립 과정에서 발견된 참조 오류
-```
-
-제품별 변경 가능한 가격, CPU / RAM, Session 제한은 본문에 새로 고정하지 않는다.
-
-# Current Manuscript Components
-
-```text
-Title / Positioning
-- title-and-positioning.md
-
 Front Matter
-- preface.md
-- about-this-book.md
-- how-to-read.md
-
-Part Transitions
-- parts/part-01.md
-  ...
-- parts/part-06.md
-
-Book Structure
-- book-structure.md
-
-Main Text
-- chapters/01/draft.md
-  ...
-- chapters/18/draft.md
-
-Research
-- GitHub / OpenAI / Anthropic 공식 근거
+→ Part I / Chapters 1~4
+→ Part II / Chapters 5~8
+→ Part III / Chapters 9~12
+→ Part IV / Chapters 13~14
+→ Part V / Chapters 15~16
+→ Part VI / Chapters 17~18
+→ Appendix A
+→ Glossary
+→ References
 ```
 
-# Phase 9 Remaining Work
+실제 파일 단위 순서는 다음 문서를 따른다.
 
-1. 전체 목차의 출판용 표현 정리
-2. 참고자료 구조 확정
-3. 용어집 필요 여부 판단 및 필요 시 작성
-4. 부록 필요 여부 결정
-5. PDF / EPUB / 인쇄 포맷 결정
-6. 교정쇄 생성 단계 정의
+`manuscript/assembly-manifest.md`
+
+총 32개 파일이다.
+
+# Publication Format
+
+기준:
+
+`manuscript/publication-format.md`
+
+```text
+1. Markdown Source
+2. PDF Proof
+3. EPUB
+4. Print-ready PDF
+```
+
+교정 결과는 PDF 자체가 아니라 Markdown Source에 역반영한다.
+
+# Phase 10
+
+계획 문서:
+
+`planning/phase10-proof-plan.md`
+
+진행 순서:
+
+```text
+32개 원고 파일
+→ manuscript/master.md 생성
+→ 구조 검사
+→ PDF Proof 생성
+→ PDF 페이지 렌더링
+→ 시각 검수
+→ review/proof-01.md 기록
+→ 원본 Markdown 수정
+→ Master / PDF 재생성
+```
 
 # Next
 
-다음 작업은 **Back Matter 정책과 실제 파일 작성**이다.
-
-우선 다음을 결정한다.
-
-```text
-References
-→ 제품 공식 자료와 기술 근거를 어떤 단위로 묶을 것인가
-
-Glossary
-→ Cloud Agent, Cloud Runner, Task Contract, Evidence 같은 핵심 용어만 별도 정리할 것인가
-
-Appendix
-→ 본문 반복 없이 실무에서 바로 사용할 Template만 남길 것인가
-```
+1. `manuscript/assembly-manifest.md` 기준으로 `manuscript/master.md` 생성
+2. Master 구조 검사
+3. PDF Proof 생성
+4. 페이지 렌더링과 시각 검수
+5. 교정 이슈를 원본 Markdown에 역반영
