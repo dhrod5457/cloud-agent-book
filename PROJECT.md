@@ -1,5 +1,11 @@
 # 프로젝트 목적
 
+**클라우드 코딩 에이전트 실전**
+
+부제:
+
+**Local과 Cloud를 나누고 Task를 위임하는 개발 워크플로 설계**
+
 Cloud Agent를 실제 개발팀에서 어떻게 활용할지 정리하는 Software Engineering 책을 작성한다.
 
 이 책은 특정 AI 제품 사용 설명서가 아니다.
@@ -24,17 +30,11 @@ Cloud Agent를 실제 개발팀에서 어떻게 활용할지 정리하는 Softwa
 - 내부망 검증과 Cloud 검증 경계 분리
 - Cloud 이점이 사라질 때 Local Fallback
 
-## 작업명
+## 표지 메시지
 
-최종 제목과 부제는 Phase 9에서 확정한다.
+> 더 많은 Agent보다 더 나은 Task Routing, 실행환경, 검증을 설계하는 법
 
-기존 가제:
-
-**AI Agent Ready Software Engineering**
-
-현재 책의 중심 주제:
-
-**Cloud Agent 활용과 Local + Cloud 개발 Workflow**
+세부 제목 기준은 `manuscript/title-and-positioning.md`에서 관리한다.
 
 ## 핵심 정의
 
@@ -97,19 +97,23 @@ Phase 9
 출판 원고 조립 진행 중
 ```
 
-Phase 9에서는 본문을 다시 쓰지 않는다.
-
-다음 항목을 준비한다.
+Phase 9에서 현재까지 완료한 항목:
 
 - 6개 Part 구조
 - 서문
 - 책 소개 / 독자 대상
 - 읽는 방법
-- 제목 / 부제
-- Part 전환 문구
-- 참고자료
-- 용어집 / 부록 정책
-- 최종 원고 조립 순서
+- 최종 제목 / 부제 / 표지용 한 줄 소개
+- 6개 Part 전환 문구
+- 최종 원고 결합 순서 초안
+
+남은 주요 항목:
+
+- 참고자료 구조
+- 용어집 정책 및 필요 시 작성
+- 부록 필요 여부
+- 전체 목차의 출판용 표현
+- PDF / EPUB / 인쇄 포맷 결정
 
 ## 출판용 Part 구조
 
@@ -132,6 +136,8 @@ Part V. 실제 프로젝트에 적용한다
 Part VI. Cloud의 한계와 다음 단계를 정한다
 17~18장
 ```
+
+각 Part 전환 페이지는 `manuscript/parts/part-01.md` ~ `part-06.md`에서 관리한다.
 
 세부 조립 순서는 `manuscript/book-structure.md`를 따른다.
 
@@ -174,5 +180,6 @@ Tibero, Oracle, HSM, Internal Jenkins, VPN-only API 등은 Local / Cloud 경계�
 4. `planning/cloud-agent-remote-worker-model.md`
 5. `planning/phase8-publication-consistency-check.md`
 6. `planning/phase9-manuscript-assembly-plan.md`
-7. `manuscript/book-structure.md`
-8. `STATUS.md`
+7. `manuscript/title-and-positioning.md`
+8. `manuscript/book-structure.md`
+9. `STATUS.md`
