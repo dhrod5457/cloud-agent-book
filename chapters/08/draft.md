@@ -31,7 +31,7 @@ Agent / Developer
 
 > 큰 결과는 보존하고, Agent에게는 판단에 필요한 부분만 보여준다.
 
-그리고 Task 완료도 자연어 선언이 아니라 Evidence로 확인한다.
+그리고 Task 완료는 자연어 선언이 아니라 Evidence로 확인한다.
 
 > Cloud Agent에게 결과를 요구하지 말고 검증 가능한 결과물을 요구한다.
 
@@ -62,7 +62,7 @@ Failed: 3
 Raw Log: 100MB
 ```
 
-좋지 않은 흐름은 다음과 같다.
+좋지 않은 흐름:
 
 ```text
 Cloud Runner
@@ -116,11 +116,11 @@ Failures
 3. UserMapperTest.insert
 ```
 
-이 정도 결과는 shell script, JUnit XML parser, Python/Java utility, CI post-processing script로 만들 수 있다.
+이 정도 결과는 shell script, JUnit XML parser, CI post-processing script로 만들 수 있다.
 
 > 코드로 추출할 수 있는 결과를 다시 LLM에게 읽혀서 찾게 하지 않는다.
 
-Result Filter는 정상 경로에서 LLM 호출을 줄이는 10장의 Runner-first 원칙과 연결된다.
+이 원칙은 10장의 Runner-first 구조와 연결된다.
 
 ---
 
@@ -143,7 +143,6 @@ Result Gateway
 ├─ Summary
 ├─ Failed Test Index
 ├─ Exception Index
-├─ Stack Trace Lookup
 ├─ Log Search
 └─ Artifact Lookup
        ↓
@@ -157,9 +156,7 @@ Summary
   ↓
 Failure Detail
   ↓
-Stack Trace
-  ↓
-Specific Test Log
+Specific Log
   ↓
 Related Artifact
   ↓
@@ -211,11 +208,9 @@ Task 결과를 사람이 읽는 긴 로그와 별개로 구조화할 수 있다.
 }
 ```
 
-이 JSON을 표준으로 강제하려는 것은 아니다.
+이 JSON 형식을 표준으로 강제하려는 것은 아니다.
 
 중요한 것은 Agent와 자동화가 먼저 읽을 수 있는 작은 구조화 결과가 있다는 점이다.
-
-7장의 AUTH-142 Scope와 결합하면 Agent 입력은 더 작아진다.
 
 ```text
 Task Scope
@@ -227,7 +222,7 @@ AuthServiceTest.expiredToken FAIL
 Agent
 ```
 
-다른 실패의 상세 로그는 현재 Task에 필요할 때만 조회한다.
+현재 Task에 필요하지 않은 실패와 로그는 처음부터 읽지 않는다.
 
 ---
 
@@ -243,7 +238,6 @@ Task 단위로 Artifact를 보존한다.
 artifacts/AUTH-142/
 ├─ result.json
 ├─ junit.xml
-├─ coverage.xml
 ├─ build.log
 ├─ git.diff
 ├─ screenshots/
@@ -311,7 +305,7 @@ Image Digest
 Build Log Reference
 ```
 
-7장의 `Output / Evidence`에서 필요한 결과를 미리 정한다.
+7장의 `Output / Evidence`에서 필요한 결과를 미리 정하고, 8장에서는 그 결과를 구조화한다.
 
 ---
 
@@ -341,7 +335,7 @@ CLI Output, API Response, Generated Report처럼 결과를 직접 확인할 수 
 
 ---
 
-## 8. Failure Fingerprint로 같은 실패 반복을 구분한다
+## 8. Failure Fingerprint는 반복 실패를 구분한다
 
 Agent가 수정한 뒤 Runner가 다시 실패했다고 하자.
 
@@ -376,47 +370,18 @@ Retry #2 → Fingerprint A
 
 같은 Fingerprint가 반복되면 수정이 실패를 바꾸지 못한 것이다.
 
-반대로 다음처럼 Failure가 바뀌었다면 진행 중일 수 있다.
+반대로 Failure가 바뀌었다면 진행 중일 수 있다.
 
 ```text
 Retry #1 → Compilation Error
 Retry #2 → Unit Test Failure
 ```
 
-Retry 횟수와 Failure 변화 여부를 함께 본다.
+이 장에서는 반복 실패를 식별하는 방법까지만 다룬다. 언제 중단하고 Local로 되돌릴지는 17장에서 정리한다.
 
 ---
 
-## 9. Budget은 Failure 변화와 함께 사용한다
-
-7장에서 Task Contract의 선택 필드로 Budget을 두었다.
-
-설명용 예시:
-
-```text
-max_retry: 2
-max_turns: 8
-```
-
-단순히 숫자가 남았다는 이유만으로 Retry하지 않는다.
-
-```text
-Runner FAIL
-   ↓
-Failure Fingerprint
-   ↓
-변화 있음?
- ├─ YES → Budget 내 Retry 후보
- └─ NO  → 중단 / Human Escalation
-```
-
-Cloud Task의 자율성에는 종료 조건이 있어야 한다.
-
-무한 Retry보다 Evidence를 남기고 Local Fallback하는 편이 나을 수 있다. Local Fallback 기준은 17장에서 정리한다.
-
----
-
-## 10. PASS에도 최소 Evidence를 남긴다
+## 9. PASS에도 최소 Evidence를 남긴다
 
 성공한 Task도 다음 정도의 결과는 남긴다.
 
@@ -443,13 +408,12 @@ Tests: 24 / 24
 
 ---
 
-## 11. AUTH-142 결과 흐름
+## 10. AUTH-142 결과 흐름
 
 7장에서 만든 AUTH-142 Task Contract를 그대로 사용한다.
 
 ```text
 Task Contract
-→ Relevant Files
 → Cloud Agent Fix
 → Commit def456
        ↓
@@ -477,7 +441,6 @@ result.json
 → AuthServiceTest.expiredToken FAIL
 → Failure Detail
 → 필요한 경우 Specific Log
-→ Agent Retry 또는 중단
 ```
 
 입력과 출력이 대칭을 이룬다.
