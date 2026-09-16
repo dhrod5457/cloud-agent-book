@@ -11,7 +11,7 @@ Startup Overhead
 Context Duplication
 Merge Cost
 Review Cost
-Result Integration
+Result Integration Cost
 Coordination Cost
 ```
 
@@ -25,7 +25,7 @@ Coordination Cost
 
 ## 1. 먼저 Parallel Compute와 Parallel Reasoning을 구분한다
 
-하나의 Commit에서 다음 검증이 필요하다고 하자.
+하나의 Git SHA에서 다음 검증이 필요하다고 하자.
 
 ```text
 Unit Test
@@ -34,7 +34,7 @@ E2E
 Docker Build
 ```
 
-이 작업은 대부분 Runner로 병렬화할 수 있다.
+이 작업은 대부분 Cloud Runner로 병렬화할 수 있다.
 
 ```text
 Git SHA
@@ -119,15 +119,15 @@ Static Analysis
 
 ```text
 abc123
-├─ unit
-├─ integration
-├─ e2e
-└─ docker
+├─ Unit
+├─ Integration
+├─ E2E
+└─ Docker
 ```
 
 결과는 마지막에 Fan-in하면 된다.
 
-여러 Agent가 동시에 코드를 수정하는 것보다 여러 Runner가 검증을 병렬 실행하는 것이 더 단순한 시작점이다.
+여러 Agent가 동시에 코드를 수정하는 것보다 여러 Cloud Runner가 검증을 병렬 실행하는 것이 더 단순한 시작점이다.
 
 Cloud 병렬화의 효과를 확인할 때도 이 경로부터 측정하는 편이 좋다.
 
@@ -174,7 +174,7 @@ Agent B → notification module
 Agent C → library module
 ```
 
-각 Module이 별도 테스트를 가지고 공통 변경이 적다면 Fan-out하기 좋다.
+각 Module이 별도 Test를 가지고 공통 변경이 적다면 Fan-out하기 좋다.
 
 반대로 다음 구조는 병렬성이 낮다.
 
@@ -200,7 +200,7 @@ Fan-in
 
 ## 6. Agent Count는 Task Count와 다르다
 
-Task가 10개라고 Agent 10개를 즉시 시작할 필요는 없다.
+설명용 예로 Task가 10개 있다고 해서 Agent 10개를 즉시 시작할 필요는 없다.
 
 실제 독립성이 세 개뿐이라면 다음처럼 그룹을 만들 수 있다.
 
@@ -277,6 +277,8 @@ Agent가 생성 가능한 PR
 5 / day
 ```
 
+이 숫자는 처리량 관계를 설명하기 위한 예시이며 실제 기준값이 아니다.
+
 이 경우 병목은 Agent가 아니라 Review다.
 
 볼 수 있는 지표:
@@ -301,7 +303,7 @@ Worker마다 다음 비용이 생길 수 있다.
 
 ```text
 Provisioning
-Checkout
+Repository Checkout
 Dependency Restore
 Image Pull
 Browser 준비
@@ -329,7 +331,7 @@ Fresh per Worker
 Parallel Benefit
 ≈ Saved Execution Time
 - Startup Overhead
-- Duplicate Context Cost
+- Context Duplication Cost
 - Merge Cost
 - Review Cost
 - Coordination Cost
@@ -337,9 +339,9 @@ Parallel Benefit
 
 정확한 수식을 만들려는 목적은 아니다.
 
-측정해야 할 항목을 놓치지 않기 위한 모델이다.
+측정해야 할 항목을 놓치지 않기 위한 개념 모델이다.
 
-예를 들어 Worker를 2개에서 8개로 늘렸을 때:
+예를 들어 Worker를 2개에서 8개로 늘렸을 때 다음 현상이 동시에 나타날 수 있다.
 
 ```text
 Execution Time 감소
@@ -347,7 +349,9 @@ Review Queue 증가
 Merge Conflict 증가
 ```
 
-한다면 전체 Lead Time은 오히려 비슷하거나 길어질 수 있다.
+이 숫자 역시 설명용 예다.
+
+전체 Lead Time은 오히려 비슷하거나 길어질 수 있다.
 
 병렬도는 실제 결과를 보고 조정한다.
 
@@ -436,7 +440,7 @@ Best-of-N은 같은 어려운 문제를 여러 Agent가 각각 푼다.
 └─ Agent C → Patch C
 ```
 
-같은 Context와 추론 비용이 N번 반복되므로 기본값은 N=1로 둔다.
+같은 Context와 추론 비용이 N번 반복되므로 기본값은 `N=1`로 둔다.
 
 검토할 수 있는 조건:
 
@@ -447,7 +451,7 @@ Best-of-N은 같은 어려운 문제를 여러 Agent가 각각 푼다.
 각 후보를 독립 Branch에서 실행 가능
 ```
 
-후보 선택도 가능한 한 Runner의 결정론적 검증을 먼저 사용한다.
+후보 선택도 가능한 한 Cloud Runner의 결정론적 검증을 먼저 사용한다.
 
 Best-of-N은 일반적인 병렬 전략이 아니라 제한된 고급 기법이다.
 
