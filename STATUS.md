@@ -4,7 +4,7 @@ Phase 8 - 최종 교정 / 출판 준비 진행 중
 
 Phase 7에서 1~18장 전체 편집/교정과 정합성 점검을 완료했다.
 
-현재 **1~9장 최종 교정을 완료했다.**
+현재 **1~12장 최종 교정을 완료했다.**
 
 # Source of Truth
 
@@ -180,59 +180,56 @@ Phase 7 완료.
 
 # Phase 8 Progress
 
-## 1~6장
+## 1~9장
 
 상태: `최종 교정 완료`
 
 핵심 교정:
 
 - 1~3장: `Base SHA`, Cloud Runner, 설명용 수치, Compute / LLM / Human 표기 통일
-- 4장: 시간·병렬성 표현과 `Cloud Runner`, `CPU / RAM / Disk` 표기 정리
-- 5장: Routing / Hard Constraint / Runner-first / 설명용 Score 표기 정리
-- 6장: 작업 Catalog의 `Cloud Runner → Cloud Agent → Cloud Runner 재검증`과 Evidence 표기 통일
+- 4~6장: 실행 가치 / Routing / Task Catalog의 Runner·Agent·Evidence 표기 통일
+- 7장: Task Contract 반환 필드, YAML Budget, AUTH-142 필드 표기 통일
+- 8장: Raw Artifact / Result Gateway / Result SHA / Failure Fingerprint 표기 정리
+- 9장: Prepared Environment / Cache / Snapshot / Fresh Source / Cold Start 표기 정리
 
-## 7장 - Cloud Agent Task Contract: 작은 Task와 작은 Context
-
-상태: `최종 교정 완료`
-
-주요 교정:
-
-- 반환 필드를 `Result SHA / Changed Files / Validation Result`로 통일
-- `DB Schema`, Dependency, Initial Context Boundary 표기 정리
-- Budget 예시는 실제 YAML 코드블록으로 변경
-- `max_retry: 2`는 설명용 값임을 명시
-- AUTH-142 최소 Contract의 필드 표기 통일
-
-## 8장 - Tool Output을 줄이고 Evidence를 남기기
+## 10장 - Cloud Agent를 Test Runner처럼 사용하기
 
 상태: `최종 교정 완료`
 
 주요 교정:
 
-- Tool Output / Raw Artifact / Result Gateway / Evidence 표기 정리
-- `result.json` JSON 문법 유지
-- `Result SHA`, `Git SHA`, Artifact Reference 표기 통일
-- Failure Fingerprint 구성 필드 대소문자 정리
-- 8,214 Test / 100MB Log를 설명용 예로 유지
+- `Cloud Runner → Cloud Agent → Cloud Runner 재검증` 실행 주체 표기 통일
+- `CPU / RAM`, Exit Code, Failure Classification 표기 정리
+- Retry 표현을 `Retry #N`으로 통일
+- Agent 수정 결과를 `Result SHA`와 연결
+- Sharding의 실행시간 / 시작 비용 경계 유지
 
-## 9장 - Prepared Cloud Environment, Cache, Snapshot
+## 11장 - Git, Branch, Worktree, Container로 작업 격리하기
 
 상태: `최종 교정 완료`
 
 주요 교정:
 
-- `Repository Checkout`, `DB Client`, `Dependency Cache`, `Fresh Source` 표기 통일
-- Cache / Snapshot / Warm Worker 용어 정리
-- 반복 환경 실패를 Environment 문제로 보는 핵심 문장 유지
-- Cold Start 시간은 설명용 예임을 명시
-- Secret과 Credential은 실행환경 구성과 분리한다는 경계 유지
+- `Base SHA / Result SHA / Validation Result / Artifact Path` 추적 필드 통일
+- YAML 상태 필드를 `result_sha`, `validation_result`, `artifact_path`로 정리
+- Source / Runtime / Evidence Isolation 표기 통일
+- `DB Schema`, Multi-Repository Base SHA, Artifact 경로 표기 정리
+
+## 12장 - 병렬 Worker와 중복 Context 비용
+
+상태: `최종 교정 완료`
+
+주요 교정:
+
+- Parallel Compute / Parallel Reasoning / Context Duplication / Fan-in 용어 통일
+- Read-only 검증의 실행 주체를 Cloud Runner로 명확화
+- Task 10개, PR 20/5 per day, Worker 2→8은 설명용 수치임을 명시
+- 병렬화 비용 모델을 개념 모델로 명확화
+- Best-of-N 기본값 `N=1` 유지
 
 # Phase 8 Remaining Focus
 
 ```text
-10~12장
-Runner / Isolation / Parallel Cost 용어 통일
-
 13~15장
 Handoff / Event / 운영 모델 장간 참조 점검
 
@@ -252,8 +249,8 @@ Timeline / Fallback / 결론 문장 최종 교정
 
 # Next
 
-1. 10장 `Cloud Agent를 Test Runner처럼 사용하기` 최종 교정
-2. 11장 `Git, Branch, Worktree, Container로 작업 격리하기` 최종 교정
-3. 12장 `병렬 Worker와 중복 Context 비용` 최종 교정
-4. 이후 13~18장 순차 진행
+1. 13장 `Local → Cloud → Local Handoff` 최종 교정
+2. 14장 `Task Queue와 Event-driven Cloud Agent` 최종 교정
+3. 15장 `campus-platform Cloud Agent Workflow 설계` 최종 교정
+4. 이후 16~18장 순차 진행
 5. 전체 장 교정 완료 후 제품 출처 / 참조 / 목차 / 참고자료 최종 검사
