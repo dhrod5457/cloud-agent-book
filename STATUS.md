@@ -6,14 +6,23 @@ Phase 8에서 1~18장 본문 최종 교정과 출판 정합성 점검을 완료�
 
 현재는 새 본문을 작성하는 단계가 아니라 **완성된 18개 장을 실제 책 구조로 묶는 단계**다.
 
-Phase 9 첫 작업으로 다음을 완료했다.
+# Final Book Title
 
-- 출판용 6개 Part 구조 정의
-- 서문 작성
-- 책 소개 / 독자 대상 작성
-- 읽는 방법 작성
-- 출판 원고 조립 순서 문서화
-- README / PROJECT의 과거 진행 상태 정리
+제목:
+
+**클라우드 코딩 에이전트 실전**
+
+부제:
+
+**Local과 Cloud를 나누고 Task를 위임하는 개발 워크플로 설계**
+
+표지용 한 줄 소개:
+
+> 더 많은 Agent보다 더 나은 Task Routing, 실행환경, 검증을 설계하는 법
+
+세부 포지셔닝:
+
+`manuscript/title-and-positioning.md`
 
 # Source of Truth
 
@@ -25,12 +34,14 @@ Phase 9 첫 작업으로 다음을 완료했다.
 4. `planning/cloud-agent-remote-worker-model.md`
 5. `planning/phase8-publication-consistency-check.md`
 6. `planning/phase9-manuscript-assembly-plan.md`
-7. `manuscript/book-structure.md`
-8. `manuscript/preface.md`
-9. `manuscript/about-this-book.md`
-10. `manuscript/how-to-read.md`
-11. 각 `chapters/NN/draft.md`
-12. `STATUS.md`
+7. `manuscript/title-and-positioning.md`
+8. `manuscript/book-structure.md`
+9. `manuscript/preface.md`
+10. `manuscript/about-this-book.md`
+11. `manuscript/how-to-read.md`
+12. `manuscript/parts/part-01.md` ~ `part-06.md`
+13. 각 `chapters/NN/draft.md`
+14. `STATUS.md`
 
 과거 Agent-Native 독립 장 설계와 초기 22~23장 체계는 현행 18장 원고보다 우선하지 않는다.
 
@@ -106,9 +117,20 @@ Cloud Agent
 - 깨진 Anthropic Research 내부 경로 복구
 - `planning/phase8-publication-consistency-check.md` 작성
 
-# Phase 9 Publication Structure
+# Phase 9 Progress
 
-출판용 원고는 기존 장 번호를 유지하면서 6개 Part로 묶는다.
+현재 완료:
+
+- 출판용 6개 Part 구조 확정
+- 서문 작성
+- 책 소개 / 독자 대상 작성
+- 읽는 방법 작성
+- 최종 제목 / 부제 / 표지용 한 줄 소개 확정
+- 6개 Part 전환 페이지 작성
+- 출판 원고 결합 순서 초안 작성
+- README / PROJECT의 현재 상태 동기화
+
+# Phase 9 Publication Structure
 
 ## Part I. Cloud Agent를 이해한다
 
@@ -117,12 +139,16 @@ Cloud Agent
 3. Cloud Session, Container, Compute와 Token
 4. 독립 실행환경, 장시간 작업, 병렬성, 시간 분리
 
+전환 파일: `manuscript/parts/part-01.md`
+
 ## Part II. 어떤 Task를 Cloud로 보낼 것인가
 
 5. Task Routing: Local인가 Cloud인가
 6. Cloud에 보내기 좋은 개발 작업
 7. Cloud Agent Task Contract: 작은 Task와 작은 Context
 8. Tool Output을 줄이고 Evidence를 남기기
+
+전환 파일: `manuscript/parts/part-02.md`
 
 ## Part III. Cloud 실행환경과 검증을 설계한다
 
@@ -131,20 +157,28 @@ Cloud Agent
 11. Git, Branch, Worktree, Container로 작업 격리하기
 12. 병렬 Worker와 중복 Context 비용
 
+전환 파일: `manuscript/parts/part-03.md`
+
 ## Part IV. Local과 Cloud를 연결한다
 
 13. Local → Cloud → Local Handoff
 14. Task Queue와 Event-driven Cloud Agent
+
+전환 파일: `manuscript/parts/part-04.md`
 
 ## Part V. 실제 프로젝트에 적용한다
 
 15. campus-platform Cloud Agent Workflow 설계
 16. 하나의 기능을 Local + Cloud로 끝까지 개발하기
 
+전환 파일: `manuscript/parts/part-05.md`
+
 ## Part VI. Cloud의 한계와 다음 단계를 정한다
 
 17. Cloud가 항상 정답은 아니다
 18. 다음 단계: Harness와 Orchestration
+
+전환 파일: `manuscript/parts/part-06.md`
 
 세부 조립 순서:
 
@@ -157,19 +191,7 @@ Cloud Agent
 - `manuscript/preface.md`
 - `manuscript/about-this-book.md`
 - `manuscript/how-to-read.md`
-
-Front Matter의 역할은 다음과 같다.
-
-```text
-서문
-→ 왜 Cloud Agent Workflow가 필요한가
-
-책 소개
-→ 무엇을 다루고 누구를 위한 책인가
-
-읽는 방법
-→ 독자 목적별 장 선택 경로
-```
+- `manuscript/title-and-positioning.md`
 
 # Publication Rules
 
@@ -189,10 +211,18 @@ Phase 9에서는 1~18장 본문을 다시 확장하지 않는다.
 # Current Manuscript Components
 
 ```text
+Title / Positioning
+- title-and-positioning.md
+
 Front Matter
 - preface.md
 - about-this-book.md
 - how-to-read.md
+
+Part Transitions
+- parts/part-01.md
+  ...
+- parts/part-06.md
 
 Book Structure
 - book-structure.md
@@ -208,20 +238,26 @@ Research
 
 # Phase 9 Remaining Work
 
-1. 표지용 제목 / 부제 후보 작성 및 확정
-2. 6개 Part 전환 페이지 문구 작성
-3. 전체 목차의 출판용 표현 정리
-4. 참고자료 구조 확정
-5. 용어집 필요 여부 판단 및 필요 시 작성
-6. 부록 필요 여부 결정
-7. 최종 원고 결합 순서와 파일 목록 확정
-8. PDF / EPUB / 인쇄 포맷 결정
-9. 교정쇄 생성 단계로 이동
+1. 전체 목차의 출판용 표현 정리
+2. 참고자료 구조 확정
+3. 용어집 필요 여부 판단 및 필요 시 작성
+4. 부록 필요 여부 결정
+5. PDF / EPUB / 인쇄 포맷 결정
+6. 교정쇄 생성 단계 정의
 
 # Next
 
-다음 작업은 **제목 / 부제 / 표지용 한 줄 소개**다.
+다음 작업은 **Back Matter 정책과 실제 파일 작성**이다.
 
-제목은 특정 제품명보다 책의 핵심 판단인 `Cloud Agent`, `Local + Cloud`, `Task Routing`, `Development Workflow`를 중심으로 검토한다.
+우선 다음을 결정한다.
 
-제목 확정 후 6개 Part의 전환 문구를 작성한다.
+```text
+References
+→ 제품 공식 자료와 기술 근거를 어떤 단위로 묶을 것인가
+
+Glossary
+→ Cloud Agent, Cloud Runner, Task Contract, Evidence 같은 핵심 용어만 별도 정리할 것인가
+
+Appendix
+→ 본문 반복 없이 실무에서 바로 사용할 Template만 남길 것인가
+```
