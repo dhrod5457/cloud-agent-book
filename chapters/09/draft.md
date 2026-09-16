@@ -10,7 +10,7 @@ Worker 생성
 → Runtime 확인
 → Dependency 준비
 → Docker / Browser 준비
-→ Build bootstrap
+→ First Command
 → Task 시작
 ```
 
@@ -156,9 +156,7 @@ PostgreSQL
 DB client
 ```
 
-### fullstack
-
-Cross-stack 문제처럼 정말 필요한 Task에만 사용한다.
+Cross-stack 문제처럼 정말 필요한 경우에만 더 큰 `fullstack` 환경을 사용한다.
 
 Routing은 단순하다.
 
@@ -173,7 +171,7 @@ Migration Validation
 → migration-test
 ```
 
-환경이 클수록 항상 좋은 것은 아니다. 필요하지 않은 Tool은 image size와 준비 비용만 늘릴 수 있다.
+환경이 클수록 항상 좋은 것은 아니다. 사용하지 않는 Tool은 image size와 준비 비용을 늘린다.
 
 ---
 
@@ -190,7 +188,6 @@ npm cache
 Docker layer
 Playwright browser
 compiler cache
-immutable generated artifact
 ```
 
 매 Task마다 새로 만들어야 할 상태:
@@ -299,7 +296,7 @@ Source까지 Snapshot에 포함하면 최신 Commit과의 차이 적용 비용�
 
 ## 8. Warm Worker는 선택지다
 
-짧고 반복되는 Task는 READY 상태 Worker를 재사용하면 시작시간을 줄일 수 있다.
+짧고 반복되는 Task는 READY 상태 Worker를 재사용해 시작시간을 줄일 수 있다.
 
 ```text
 READY
@@ -331,7 +328,7 @@ Warm Worker 자체를 기본값으로 두지 않는다. Startup Cost와 격리 �
 
 ---
 
-## 9. 환경 문제는 Prompt로 해결하지 않는다
+## 9. 반복되는 환경 실패는 Prompt 문제가 아니다
 
 다음 상황을 보자.
 
@@ -356,6 +353,8 @@ Prepared Environment 수정
 Playwright Browser가 반복해서 없다면 `frontend-e2e` Environment에 포함한다.
 
 > 반복되는 환경 실패는 Agent reasoning 문제가 아니라 Environment 문제로 취급한다.
+
+이 원칙은 18장의 Harness Engineering과도 연결된다.
 
 ---
 
@@ -394,7 +393,7 @@ browser_ready_ms
 first_command_ms
 ```
 
-설명용 수치로 다음처럼 비교할 수 있다.
+설명용 예시:
 
 ```text
 Before
@@ -410,31 +409,29 @@ Worker ready: 55s
 
 ---
 
-## 12. campus-platform Environment 예
+## 12. campus-platform에서는 Environment 이름으로 Task를 연결한다
+
+예:
 
 ```text
 backend-test
-- Java 21
-- Gradle
-- Docker CLI
-- PostgreSQL client
-- Testcontainers image cache
-- Gradle dependency cache
+→ Java 21 / Gradle / Docker / Testcontainers
 
 frontend-e2e
-- Node
-- Playwright
-- Chrome
-- npm / browser cache
+→ Node / Playwright / Chrome
 
 migration-test
-- Java 21
-- Migration Tool
-- PostgreSQL
-- DB client
+→ Java 21 / Migration Tool / PostgreSQL
 ```
 
-모든 Environment의 Source 상태는 Fresh하게 시작한다.
+Task Contract에는 설치 절차 대신 Environment 이름만 넣는다.
+
+```text
+Task: AUTH-142
+Environment: backend-test
+```
+
+그리고 실행 상태는 Fresh하게 시작한다.
 
 ```text
 Fresh Git checkout
@@ -443,20 +440,31 @@ Disposable Test DB
 New Test Output Directory
 ```
 
-Tibero, HSM, Internal Jenkins처럼 Cloud에서 제공하지 않는 내부 자원은 Prepared Environment로 억지로 해결하지 않는다. 그런 Task는 Hybrid로 남긴다.
+Tibero, HSM, Internal Jenkins처럼 Cloud에서 제공하지 않는 내부 자원을 Prepared Environment로 억지로 복제하지 않는다. 그런 작업은 Hybrid로 남긴다.
 
 ---
 
-## 13. 9장에서 10장으로
+## 13. 작은 입력과 작은 출력 다음에는 빠른 시작이 필요하다
 
-지금까지 준비한 것은 `빠르게 시작할 수 있는 실행환경`이다.
+7~9장의 흐름은 다음과 같다.
 
 ```text
+7장
+Task Contract
+→ Small Input / Context
+        ↓
+8장
+Result Gateway
+→ Small Output / Evidence
+        ↓
+9장
 Prepared Environment
-→ Fresh Task State
+→ Small Startup Overhead
 ```
 
-다음 장에서는 이 환경에 모든 작업을 Agent로 넣지 않는다.
+이제 Task의 입력, 결과, 시작 환경이 정리됐다.
+
+다음 장에서는 이 Prepared Environment에서 어떤 작업을 LLM이 아닌 Runner에게 먼저 맡길지 다룬다.
 
 ```text
 Prepared Environment
