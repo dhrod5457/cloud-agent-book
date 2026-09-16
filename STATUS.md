@@ -1,36 +1,42 @@
 # Current Phase
 
-Phase 8 - 최종 교정 / 출판 준비 완료
+Phase 9 - 출판 원고 조립 진행 중
 
-1~18장 본문 최종 교정과 출판 정합성 점검을 완료했다.
+Phase 8에서 1~18장 본문 최종 교정과 출판 정합성 점검을 완료했다.
 
-현재 원고는 **본문 작성 → 전체 편집 → 최종 교정 → 출판 정합성 점검**까지 완료된 상태다.
+현재는 새 본문을 작성하는 단계가 아니라 **완성된 18개 장을 실제 책 구조로 묶는 단계**다.
 
-다음 단계는 새 본문 작성이 아니라 출판 산출물 준비다.
+Phase 9 첫 작업으로 다음을 완료했다.
+
+- 출판용 6개 Part 구조 정의
+- 서문 작성
+- 책 소개 / 독자 대상 작성
+- 읽는 방법 작성
+- 출판 원고 조립 순서 문서화
+- README / PROJECT의 과거 진행 상태 정리
 
 # Source of Truth
 
-현재 책의 방향은 다음 문서를 우선한다.
+현재 우선순위는 다음과 같다.
 
 1. `planning/concept.md`
 2. `planning/scope.md`
 3. `planning/toc.md`
 4. `planning/cloud-agent-remote-worker-model.md`
-5. `planning/phase5-consistency-check.md`
-6. `planning/phase6-draft-consistency-check.md`
-7. `planning/phase7-editing-plan.md`
-8. `planning/phase7-editing-consistency-check.md`
-9. `planning/phase8-publication-checklist.md`
-10. `planning/phase8-publication-consistency-check.md`
-11. 각 `chapters/NN/plan.md`
-12. `planning/future-topics.md`
-13. `STATUS.md`
+5. `planning/phase8-publication-consistency-check.md`
+6. `planning/phase9-manuscript-assembly-plan.md`
+7. `manuscript/book-structure.md`
+8. `manuscript/preface.md`
+9. `manuscript/about-this-book.md`
+10. `manuscript/how-to-read.md`
+11. 각 `chapters/NN/draft.md`
+12. `STATUS.md`
 
-과거 Agent-Native 독립 장 설계와 초기 22~23장 체계는 현행 목차보다 우선하지 않는다.
+과거 Agent-Native 독립 장 설계와 초기 22~23장 체계는 현행 18장 원고보다 우선하지 않는다.
 
 # Book Direction
 
-책의 중심 주제는 **Cloud Agent 활용**이다.
+책의 중심 주제는 **Cloud Agent 활용과 Local + Cloud 개발 Workflow**다.
 
 핵심 질문:
 
@@ -63,211 +69,159 @@ Cloud Agent
 - CPU에는 일을 많이 시키고, LLM에는 필요한 정보만 보여준다.
 - Runner가 할 수 있으면 Runner에게 맡긴다.
 - 작은 Task와 작은 Context를 전달한다.
-- Agent에게 개발환경을 설치하게 하지 말고 바로 작업 가능한 환경을 제공한다.
-- Cloud Agent에게 결과를 요구하지 말고 검증 가능한 결과물을 요구한다.
-- 병렬화의 대상은 Agent가 아니라 서로 독립적으로 실행하고 검증할 수 있는 Task다.
-- Task는 Local 또는 Cloud에 영구적으로 속하지 않는다. 작업 단계에 따라 실행 위치를 이동할 수 있다.
-- 이벤트가 없으면 Agent도 실행하지 않는다.
+- Agent에게 개발환경을 설치하게 하지 않고 바로 작업 가능한 환경을 제공한다.
+- 결과는 자연어 완료 보고보다 Evidence와 Artifact로 확인한다.
+- 병렬화의 대상은 Agent가 아니라 독립적으로 실행하고 검증할 수 있는 Task다.
+- Task는 Local 또는 Cloud에 영구적으로 속하지 않는다.
 - Cloud를 쓰지 않는 결정도 올바른 Routing 결과다.
 - Local Fallback은 실패가 아니라 Routing의 일부다.
 
-# Current TOC
+# Phase Results
+
+## Phase 5
+
+- 1~18장 설계 완료
+- 장별 역할과 범위 정합성 점검 완료
+
+## Phase 6
+
+- `chapters/01/draft.md` ~ `chapters/18/draft.md` 초고 작성 완료
+- 전체 초고 정합성 점검 완료
+
+## Phase 7
+
+- 1~18장 전체 편집 완료
+- 중복 설명 압축
+- 장별 역할 경계 명확화
+- `AUTH-142 / expired token` 공통 사례 연결
+- Agent Platform 일반론 확장 방지
+
+## Phase 8
+
+- 1~18장 최종 교정 완료
+- 용어 / 제목 / 코드블록 / 표 / 장간 참조 점검
+- 설명용 수치 표기 점검
+- 제품 공식 근거 재검증
+- `planning/toc.md`와 장 제목 **18 / 18 일치** 확인
+- 깨진 Anthropic Research 내부 경로 복구
+- `planning/phase8-publication-consistency-check.md` 작성
+
+# Phase 9 Publication Structure
+
+출판용 원고는 기존 장 번호를 유지하면서 6개 Part로 묶는다.
+
+## Part I. Cloud Agent를 이해한다
 
 1. Coding Agent에서 Cloud Worker로
 2. Local Agent와 Cloud Agent
 3. Cloud Session, Container, Compute와 Token
 4. 독립 실행환경, 장시간 작업, 병렬성, 시간 분리
+
+## Part II. 어떤 Task를 Cloud로 보낼 것인가
+
 5. Task Routing: Local인가 Cloud인가
 6. Cloud에 보내기 좋은 개발 작업
 7. Cloud Agent Task Contract: 작은 Task와 작은 Context
 8. Tool Output을 줄이고 Evidence를 남기기
+
+## Part III. Cloud 실행환경과 검증을 설계한다
+
 9. Prepared Cloud Environment, Cache, Snapshot
 10. Cloud Agent를 Test Runner처럼 사용하기
 11. Git, Branch, Worktree, Container로 작업 격리하기
 12. 병렬 Worker와 중복 Context 비용
+
+## Part IV. Local과 Cloud를 연결한다
+
 13. Local → Cloud → Local Handoff
 14. Task Queue와 Event-driven Cloud Agent
+
+## Part V. 실제 프로젝트에 적용한다
+
 15. campus-platform Cloud Agent Workflow 설계
 16. 하나의 기능을 Local + Cloud로 끝까지 개발하기
+
+## Part VI. Cloud의 한계와 다음 단계를 정한다
+
 17. Cloud가 항상 정답은 아니다
 18. 다음 단계: Harness와 Orchestration
 
-# Phase 5 Result
+세부 조립 순서:
 
-Phase 5 완료.
+`manuscript/book-structure.md`
 
-- 1~18장 설계 완료
-- 장별 역할/중복/용어/범위 정합성 점검 완료
-- `planning/phase5-consistency-check.md` 작성
+# Front Matter
 
-# Phase 6 Result
+현재 작성 완료:
 
-Phase 6 완료.
+- `manuscript/preface.md`
+- `manuscript/about-this-book.md`
+- `manuscript/how-to-read.md`
 
-- `chapters/01/draft.md` ~ `chapters/18/draft.md` 초고 작성 완료
-- 설계 대비 장별 검토 완료
-- 전체 초고 정합성 점검 완료
-- `planning/phase6-draft-consistency-check.md` 작성
-
-# Phase 7 Result
-
-Phase 7 완료.
-
-- 1~18장 전체 편집/교정 완료
-- 중복 설명 압축
-- 장별 역할 경계 명확화
-- 핵심 용어 표기 정리
-- 설명용 숫자와 제품별 변경 가능한 사실의 본문 원칙 분리
-- 장간 연결부 정리
-- `AUTH-142 / expired token` 반복 예제를 공통 연결 사례로 정리
-- Agent Platform 일반론 확장 방지
-- `planning/phase7-editing-consistency-check.md` 작성
-
-# Phase 8 Result
-
-Phase 8 완료.
-
-## 본문
-
-- 1~18장 문장 최종 교정 완료
-- 제목 / 절 제목 / 핵심 용어 표기 점검
-- 코드블록 / 표 형식 점검
-- 장간 역할과 참조 점검
-- 설명용 수치 표기 점검
-- AUTH-142 예제 일관성 점검
-
-## 추적 필드
-
-본문의 기본 추적 필드는 다음으로 통일했다.
+Front Matter의 역할은 다음과 같다.
 
 ```text
-Task ID
-Base SHA
-Result SHA
-Validation Result
-Artifact Path / Artifact Reference
-PR
+서문
+→ 왜 Cloud Agent Workflow가 필요한가
+
+책 소개
+→ 무엇을 다루고 누구를 위한 책인가
+
+읽는 방법
+→ 독자 목적별 장 선택 경로
 ```
 
-기본 관계:
+# Publication Rules
+
+Phase 9에서는 1~18장 본문을 다시 확장하지 않는다.
+
+본문 변경은 다음 경우로 제한한다.
 
 ```text
-Task ID
-→ Base SHA
-→ Branch
-→ Result SHA
-→ Validation Result
-→ Evidence / Artifact
-→ PR
+명확한 오탈자
+사실 오류
+깨진 링크
+출판 조립 과정에서 발견된 참조 오류
 ```
 
-## 실행 주체
+제품별 변경 가능한 가격, CPU / RAM, Session 제한은 본문에 새로 고정하지 않는다.
+
+# Current Manuscript Components
 
 ```text
-Local / Local Agent
-→ 요구사항 / Architecture / Human Steering / Internal Validation / Review
+Front Matter
+- preface.md
+- about-this-book.md
+- how-to-read.md
 
-Cloud Runner
-→ Build / Test / E2E / Docker / 결정론적 검증
+Book Structure
+- book-structure.md
 
-Cloud Agent
-→ 재현 가능한 Failure 분석 / 제한된 코드 수정
+Main Text
+- chapters/01/draft.md
+  ...
+- chapters/18/draft.md
+
+Research
+- GitHub / OpenAI / Anthropic 공식 근거
 ```
 
-## 출판 정합성 검사
+# Phase 9 Remaining Work
 
-- `planning/toc.md`와 1~18장 제목 직접 대조: **18 / 18 일치**
-- 현행 본문에서 구목차 19~23장 체계를 사용하지 않음
-- 제품 가변 수치는 본문 원칙과 분리
-- GitHub / OpenAI / Anthropic 공식 근거를 2026-09-16 기준 재검증
-- 1~2장 Research에 공식 URL과 재검증 기준일 기록
-- Anthropic infrastructure 자료의 깨진 내부 경로 발견 및 복구
-- `planning/phase8-publication-consistency-check.md` 작성
-
-# Product Research
-
-## GitHub
-
-현재 공식 근거는 다음 Research에서 관리한다.
-
-- `research/chapter-01-cloud-worker-official-sources.md`
-- `research/chapter-02-local-cloud-official-sources.md`
-
-2026-09-16 기준 공식 문서 URL을 재확인했다.
-
-## OpenAI Codex
-
-공식 근거:
-
-- `Addendum to OpenAI o3 and o4-mini system card: Codex`, 2025-05-16
-- `Codex is now generally available`, 2025-10-06
-
-제품별 변경 가능한 세부사항은 본문의 일반 원칙으로 고정하지 않는다.
-
-## Anthropic
-
-현재 Research:
-
-- `research/anthropic/agent-native-development-environment.md`
-- `research/anthropic/claude-code-web-execution-resources.md`
-- `research/anthropic/infrastructure-noise.md`
-
-공식 실험 수치는 해당 실험의 결과로만 사용하고 일반 성능 기대값으로 확대하지 않는다.
-
-# Final Edited Flow
-
-```text
-1장  Cloud Agent = Remote Development Worker
-  ↓
-2장  Local / Cloud / Hybrid
-  ↓
-3장  Compute / LLM / Human Cost
-  ↓
-4장  독립 실행환경 / 비동기 / 병렬 실행 가치
-  ↓
-5장  Task Routing
-  ↓
-6장  개발 작업 Catalog
-  ↓
-7장  Task Contract / Small Input
-  ↓
-8장  Result Gateway / Evidence / Small Output
-  ↓
-9장  Prepared Environment / Startup Cost
-  ↓
-10장 Runner-first / Agent-on-failure
-  ↓
-11장 Source / Runtime / Evidence Isolation
-  ↓
-12장 Independent Task Fan-out / Fan-in Cost
-  ↓
-13장 Human-driven Handoff
-  ↓
-14장 Event-driven Handoff
-  ↓
-15장 campus-platform 운영 모델
-  ↓
-16장 End-to-End 기능 Timeline
-  ↓
-17장 Cloud Stop / Local Fallback / 재Routing
-  ↓
-18장 Harness / Orchestration 미래 방향 + 결론
-```
-
-# Publication Readiness
-
-현재 본문 구조와 정합성은 출판 산출물 준비 단계로 이동할 수 있는 상태다.
-
-본문에 새 개념을 추가하기보다 이후 변경은 교정쇄에서 발견되는 오탈자, 사실 오류, 링크 변경처럼 명확한 수정으로 제한한다.
+1. 표지용 제목 / 부제 후보 작성 및 확정
+2. 6개 Part 전환 페이지 문구 작성
+3. 전체 목차의 출판용 표현 정리
+4. 참고자료 구조 확정
+5. 용어집 필요 여부 판단 및 필요 시 작성
+6. 부록 필요 여부 결정
+7. 최종 원고 결합 순서와 파일 목록 확정
+8. PDF / EPUB / 인쇄 포맷 결정
+9. 교정쇄 생성 단계로 이동
 
 # Next
 
-다음 단계는 출판 산출물 준비다.
+다음 작업은 **제목 / 부제 / 표지용 한 줄 소개**다.
 
-1. 1~18장 최종 원고를 하나의 출판 원고 구조로 묶기
-2. Part 제목과 장 사이 전환 페이지/문구 정리
-3. 서문 / 책 소개 / 독자 대상 / 읽는 방법 작성
-4. 표지용 제목 / 부제 / 책 소개 문구 확정
-5. 참고자료 / 용어집 / 부록 필요 여부 결정
-6. PDF / EPUB / 인쇄 원고 포맷 결정
-7. 최종 교정쇄 생성 후 오탈자만 수정
+제목은 특정 제품명보다 책의 핵심 판단인 `Cloud Agent`, `Local + Cloud`, `Task Routing`, `Development Workflow`를 중심으로 검토한다.
+
+제목 확정 후 6개 Part의 전환 문구를 작성한다.
