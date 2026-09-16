@@ -87,7 +87,7 @@ Agent:
 현재 auth와 연동 구조를 보면 두 선택지가 있습니다.
 
 Developer:
-DB schema는 변경하지 않는 방향으로 다시 보자.
+DB Schema는 변경하지 않는 방향으로 다시 보자.
 ```
 
 이 작업은 중간 판단이 계속 바뀐다.
@@ -130,7 +130,7 @@ Validation
 ```text
 Scope가 작음
 완료 조건이 있음
-독립 테스트 가능
+독립 Test 가능
 Git 기준점을 만들 수 있음
 중간 질문이 적음
 ```
@@ -257,7 +257,7 @@ A안 구현
 
 ```text
 Goal
-AuthService가 Java 21에서 기존 테스트를 모두 통과하도록 deprecated API를 수정한다.
+AuthService가 Java 21에서 기존 Test를 모두 통과하도록 deprecated API를 수정한다.
 
 Validation
 ./gradlew :auth:test
@@ -305,7 +305,7 @@ Cloud Agent가 Repository를 읽을 수 있다고 해서 매 Task마다 전체 �
 → Cloud 위임
 ```
 
-이후 7장에서 Cloud Task의 Context 경계를 구체적으로 정의한다.
+7장에서 Cloud Task의 Context 경계를 구체적으로 정의한다.
 
 ---
 
@@ -313,7 +313,7 @@ Cloud Agent가 Repository를 읽을 수 있다고 해서 매 Task마다 전체 �
 
 Cloud Task가 오래 걸린다고 개발자가 같은 시간 동안 멈춰 있어야 하는 것은 아니다.
 
-설명용 예를 보자.
+다음은 설명용 예다.
 
 ```text
 10:00 Cloud Task 위임
@@ -334,13 +334,13 @@ Developer Blocking Time
 
 Cloud 사용의 가치를 평가할 때는 `Agent가 몇 분 걸렸는가`만 보지 않는다.
 
-Local CPU/RAM 점유를 얼마나 줄였는지, 개발자가 다른 작업을 계속할 수 있었는지도 함께 본다. 이 차이는 4장에서 더 자세히 다룬다.
+Local CPU / RAM 점유를 얼마나 줄였는지, 개발자가 다른 작업을 계속할 수 있었는지도 함께 본다. 이 차이는 4장에서 더 자세히 다룬다.
 
 ---
 
 ## 9. Cloud가 항상 더 빠른 것은 아니다
 
-Cloud에서는 Worker 준비, Repository checkout, 환경 준비, 결과 회수 같은 비용이 생길 수 있다.
+Cloud에서는 Worker 준비, Repository Checkout, 환경 준비, 결과 회수 같은 비용이 생길 수 있다.
 
 예를 들어 문구 한 줄을 수정하고 짧은 검증만 하면 되는 Task라면 Cloud 준비 비용이 작업 자체보다 클 수 있다.
 
@@ -368,11 +368,11 @@ Cloud로 보내는 것이 유리한가?
 | --- | --- | --- |
 | 신규 인증 구조 설계 | Local | 넓은 Context와 Human Steering 필요 |
 | expired token 수정 | Cloud Agent 후보 | 작은 Scope, 독립 검증 가능 |
-| 전체 Unit Test | Cloud 실행 후보 | 결정론적 검증, Compute 중심 |
-| Web E2E | Cloud 실행 후보 | Browser/장시간 검증 |
-| Tibero 실제 Migration 검증 | Local/Hybrid | 내부 DB 의존 |
-| HSM 오류 분석 | Local | 내부 장비/네트워크 의존 |
-| Docker Build | Cloud 실행 후보 | 독립 실행 가능 |
+| 전체 Unit Test | Cloud Runner | 결정론적 검증, Compute 중심 |
+| Web E2E | Cloud Runner | Browser / 장시간 검증 |
+| Tibero 실제 Migration 검증 | Local / Hybrid | 내부 DB 의존 |
+| HSM 오류 분석 | Local | 내부 장비 / 네트워크 의존 |
+| Docker Build | Cloud Runner | 독립 실행 가능 |
 
 이 표는 고정 규칙이 아니다.
 
