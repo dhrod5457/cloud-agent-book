@@ -69,7 +69,7 @@ Event
 ```text
 Source Event
 Repository
-Base / Current SHA
+Git SHA
 Task Type
 Goal 또는 Failure
 Scope
@@ -83,7 +83,7 @@ CI Failure 예:
 ```yaml
 source: ci_failure
 repository: campus-platform
-base_sha: abc123
+git_sha: abc123
 task_type: test_failure_fix
 failure: AuthServiceTest.expiredToken
 validation: ./gradlew test --tests AuthServiceTest.expiredToken
@@ -95,7 +95,7 @@ PR Review Comment도 같은 형태로 바꿀 수 있다.
 ```yaml
 source: review_comment
 pr: 142
-base_sha: def456
+git_sha: def456
 goal: expired token regression test 추가
 scope: auth test only
 validation: ./gradlew test --tests AuthServiceTest
@@ -219,7 +219,7 @@ Duplicate Event
 
 ```text
 PR #142
-SHA: abc123
+Git SHA: abc123
 Integration: FAIL
 ```
 
@@ -242,8 +242,8 @@ Actual
 CI Failure
 → Task Contract
 → Cloud Agent
-→ Fix Commit def456
-→ Runner Revalidation
+→ Result SHA def456
+→ Cloud Runner 재검증
 ```
 
 결과는 기존 PR에 Commit으로 추가하거나 별도 Draft PR로 반환할 수 있다.
@@ -352,7 +352,7 @@ Event-driven 구조는 Task Routing을 생략하는 자동화가 아니다.
 
 ## 10. Agent가 만든 변경이 다시 Event를 만들 수 있다
 
-Cloud Agent가 Commit을 Push하면 CI가 다시 실행된다.
+Cloud Agent가 Result SHA를 Push하면 CI가 다시 실행된다.
 
 ```text
 Agent Fix
@@ -396,7 +396,7 @@ Event-driven 작업도 반환 경계는 13장과 같다.
 
 ```text
 Cloud Task
-→ Result Commit
+→ Result SHA
 → Evidence
 → PR 또는 기존 PR Update
 ```
@@ -406,7 +406,7 @@ Cloud Task
 ```text
 Runner Evidence
 → Agent Change
-→ Runner Revalidation
+→ Cloud Runner 재검증
 → Review 가능한 상태
 ```
 
@@ -461,7 +461,7 @@ Push / PR / Schedule / Review
              ↓
             Fix
              ↓
-          Runner
+       Cloud Runner
              ↓
       Evidence / PR Update
 ```
