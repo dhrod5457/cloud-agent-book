@@ -42,18 +42,18 @@ Agent / Developer
 Agent가 읽는 다음 결과는 모두 Context가 된다.
 
 ```text
-Gradle build log
-JUnit output
-Spring Boot startup log
-Testcontainers log
-Docker build output
-Playwright trace
-Browser console log
-Static analysis report
-Git diff
+Gradle Build Log
+JUnit Output
+Spring Boot Startup Log
+Testcontainers Log
+Docker Build Output
+Playwright Trace
+Browser Console Log
+Static Analysis Report
+Git Diff
 ```
 
-설명용 예시로 전체 테스트가 다음 결과를 만들었다고 하자.
+설명용 예로 전체 테스트가 다음 결과를 만들었다고 하자.
 
 ```text
 Tests: 8,214
@@ -66,7 +66,7 @@ Raw Log: 100MB
 
 ```text
 Cloud Runner
-→ 100MB log
+→ 100MB Log
 → Agent에게 전체 전달
 → Agent가 실패 3건 탐색
 ```
@@ -77,7 +77,7 @@ Cloud Runner
 Cloud Runner
 → Raw Log + Report 저장
 → 실패 3건 추출
-→ Agent는 실패 Summary부터 확인
+→ Agent는 Failure Summary부터 확인
 ```
 
 실행 결과의 크기와 LLM에 전달하는 결과의 크기를 분리한다.
@@ -89,15 +89,15 @@ Cloud Runner
 대형 로그에서 다음 값은 LLM이 없어도 추출할 수 있다.
 
 ```text
-exit code
-build status
-total / passed / failed count
-failed test name
-exception type
-assertion message
-top stack frame
-error / warning count
-artifact path
+Exit Code
+Build Status
+Total / Passed / Failed Count
+Failed Test Name
+Exception Type
+Assertion Message
+Top Stack Frame
+Error / Warning Count
+Artifact Path
 ```
 
 예:
@@ -106,8 +106,8 @@ artifact path
 BUILD: FAIL
 
 Tests
-- total: 8214
-- passed: 8211
+- total: 8,214
+- passed: 8,211
 - failed: 3
 
 Failures
@@ -116,7 +116,7 @@ Failures
 3. UserMapperTest.insert
 ```
 
-이 정도 결과는 shell script, JUnit XML parser, CI post-processing script로 만들 수 있다.
+이 정도 결과는 Shell Script, JUnit XML Parser, CI Post-processing Script로 만들 수 있다.
 
 > 코드로 추출할 수 있는 결과를 다시 LLM에게 읽혀서 찾게 하지 않는다.
 
@@ -169,10 +169,10 @@ Full Raw Log
 
 ```text
 CLI
-JSON report
-CI artifact link
-File index
-Object storage path
+JSON Report
+CI Artifact Link
+File Index
+Object Storage Path
 ```
 
 핵심은 원본을 유지하면서 Agent가 처음 읽는 결과를 작게 만드는 것이다.
@@ -274,7 +274,7 @@ expired token 처리 분기를 수정했습니다.
 
 ```text
 Evidence
-Commit: abc123
+Result SHA: abc123
 AuthServiceTest.expiredToken: PASS
 AuthServiceTest: 24 / 24 PASS
 ```
@@ -284,7 +284,7 @@ Task별 Evidence는 다르다.
 Bug Fix:
 
 ```text
-Commit SHA
+Result SHA
 Changed Files
 Unit Test Result
 ```
@@ -354,14 +354,14 @@ AuthServiceTest.java:94
 Fingerprint 후보:
 
 ```text
-failing test id
-exception type
-assertion message
-error code
-top stack frame
+Failing Test ID
+Exception Type
+Assertion Message
+Error Code
+Top Stack Frame
 ```
 
-Timestamp, random port, container id처럼 실행마다 바뀌는 값은 제외한다.
+Timestamp, Random Port, Container ID처럼 실행마다 바뀌는 값은 제외한다.
 
 ```text
 Retry #1 → Fingerprint A
@@ -398,7 +398,7 @@ Artifact Reference if needed
 
 ```text
 Task: AUTH-142
-SHA: def456
+Git SHA: def456
 Validation: ./gradlew :auth:test
 Status: PASS
 Tests: 24 / 24
@@ -415,7 +415,7 @@ Tests: 24 / 24
 ```text
 Task Contract
 → Cloud Agent Fix
-→ Commit def456
+→ Result SHA def456
        ↓
 Cloud Runner
 → ./gradlew :auth:test
@@ -430,7 +430,7 @@ Result Filter
 result.json
        ↓
 Evidence
-- SHA def456
+- Result SHA def456
 - Test PASS
 ```
 
