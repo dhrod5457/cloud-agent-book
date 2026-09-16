@@ -1,6 +1,7 @@
 # 2장 공식 근거 - Local Agent와 Cloud Agent
 
 기준일: 2026-09-16
+공식 자료 재검증: 2026-09-16
 
 이 문서는 Local Agent와 Cloud Agent를 제품 이름이 아니라 실행 위치, 격리, Git/Repository 전달, 비동기 작업 관점에서 설명하기 위한 공식 근거를 정리한다.
 
@@ -22,8 +23,11 @@
 공식 자료:
 
 - GitHub Docs, `About GitHub Copilot cloud agent`
+  - https://docs.github.com/en/copilot/concepts/agents/cloud-agent/about-cloud-agent
 - GitHub Docs, `About cloud and local sandboxes for GitHub Copilot`
+  - https://docs.github.com/en/copilot/concepts/about-cloud-and-local-sandboxes
 - GitHub Docs, `About the GitHub Copilot app`
+  - https://docs.github.com/en/copilot/concepts/agents/github-copilot-app
 
 ## OpenAI Codex
 
@@ -40,6 +44,7 @@
 공식 자료:
 
 - OpenAI, `Codex is now generally available`, 2025-10-06
+  - https://openai.com/index/codex-now-generally-available/
 
 ## 본문 사용 규칙
 
