@@ -14,24 +14,25 @@
 
 > 더 많은 Agent보다 더 나은 Task Routing, 실행환경, 검증을 설계하는 법
 
-세부 포지셔닝은 `manuscript/title-and-positioning.md`를 따른다.
-
-이 문서는 1~18장 본문을 실제 책으로 조립할 때 사용하는 순서를 정의한다.
+내부 포지셔닝 기준은 `manuscript/title-and-positioning.md`에서 관리하고, 실제 출판 원고에는 `manuscript/title-page.md`를 사용한다.
 
 ## Front Matter
 
-1. 서문
-2. 이 책이 다루는 문제
-3. 이 책의 독자
+출판 순서:
+
+1. 제목 페이지
+2. 서문
+3. 이 책이 다루는 문제와 독자
 4. 이 책을 읽는 방법
 5. 전체 목차
 
-관련 파일:
+파일:
 
+- `manuscript/title-page.md`
 - `manuscript/preface.md`
 - `manuscript/about-this-book.md`
 - `manuscript/how-to-read.md`
-- `manuscript/title-and-positioning.md`
+- `manuscript/table-of-contents.md`
 
 ---
 
@@ -169,35 +170,49 @@ Cloud를 계속 사용할지, Local로 되돌릴지, 어느 시점에 자동화�
 
 # Back Matter
 
-다음 단계에서 확정한다.
+본문 반복을 피하기 위해 세 항목만 유지한다.
 
-- 참고자료
-- 용어집
-- 부록 필요 여부
-- 제품별 공식 근거 기준일 표기 방식
+## 부록 A. Task Contract / Evidence / Handoff 템플릿
 
-제품 기능과 가격처럼 변경 가능한 정보는 본문과 분리하고 Research를 근거로 관리한다.
+`manuscript/appendix/task-contract-evidence-template.md`
 
-# 최종 결합 순서
+실무에서 복사해 사용할 수 있는 Task Contract, Runner 입력/출력, Evidence, Handoff, Local Fallback Template을 제공한다.
+
+## 용어집
+
+`manuscript/glossary.md`
+
+책 전체에서 의미를 고정해서 사용하는 핵심 용어만 정리한다.
+
+## 참고자료
+
+`manuscript/references.md`
+
+GitHub, OpenAI, Anthropic 등의 공식 자료와 본문 원칙에 사용한 Engineering 사례를 관리한다. 변경 가능한 제품 사양은 출판 직전에 다시 확인한다.
+
+# 최종 조립 기준
+
+실제 파일 단위 결합 순서는 다음 문서를 Source of Truth로 사용한다.
+
+`manuscript/assembly-manifest.md`
+
+현재 출판 원고는 총 32개 파일로 조립한다.
 
 ```text
-Title / Copyright Page
+Title Page
 → Preface
 → About This Book
 → How to Read
 → Table of Contents
-→ Part I transition
-→ Chapters 1~4
-→ Part II transition
-→ Chapters 5~8
-→ Part III transition
-→ Chapters 9~12
-→ Part IV transition
-→ Chapters 13~14
-→ Part V transition
-→ Chapters 15~16
-→ Part VI transition
-→ Chapters 17~18
+→ Part I transition → Chapters 1~4
+→ Part II transition → Chapters 5~8
+→ Part III transition → Chapters 9~12
+→ Part IV transition → Chapters 13~14
+→ Part V transition → Chapters 15~16
+→ Part VI transition → Chapters 17~18
+→ Appendix A
+→ Glossary
 → References
-→ Glossary / Appendix if retained
 ```
+
+기획과 Research 문서는 최종 독자용 원고에 직접 포함하지 않는다.
