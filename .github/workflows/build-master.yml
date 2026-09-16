@@ -81,22 +81,34 @@ jobs:
 
           mv "$tmp" manuscript/master.md
 
-          title_count=$(grep -Ec '^# [0-9]+장\.' manuscript/master.md || true)
-          part_count=$(grep -Ec '^# Part (I|II|III|IV|V|VI)\.' manuscript/master.md || true)
+          chapter_count=$(grep -Ec '^# [0-9]+장\.' manuscript/master.md || true)
+          part_heading_count=$(grep -Ec '^# Part (I|II|III|IV|V|VI)\.' manuscript/master.md || true)
+          appendix_count=$(grep -Ec '^# 부록 A\.' manuscript/master.md || true)
+          glossary_count=$(grep -Ec '^# 용어집$' manuscript/master.md || true)
+          references_count=$(grep -Ec '^# 참고자료$' manuscript/master.md || true)
 
-          if [ "$title_count" -ne 18 ]; then
-            echo "Expected 18 chapter titles, got $title_count" >&2
+          if [ "$chapter_count" -ne 18 ]; then
+            echo "Expected 18 chapter titles, got $chapter_count" >&2
             exit 1
           fi
 
-          if [ "$part_count" -ne 6 ]; then
-            echo "Expected 6 Part titles, got $part_count" >&2
+          # Part headings occur once in the TOC and once on each Part transition page.
+          if [ "$part_heading_count" -ne 12 ]; then
+            echo "Expected 12 Part heading occurrences, got $part_heading_count" >&2
+            exit 1
+          fi
+
+          if [ "$appendix_count" -lt 1 ] || [ "$glossary_count" -lt 1 ] || [ "$references_count" -lt 1 ]; then
+            echo "Back Matter headings are incomplete" >&2
             exit 1
           fi
 
           echo "master.md generated"
-          echo "chapter titles: $title_count"
-          echo "part titles: $part_count"
+          echo "chapter titles: $chapter_count"
+          echo "Part heading occurrences: $part_heading_count"
+          echo "appendix headings: $appendix_count"
+          echo "glossary headings: $glossary_count"
+          echo "references headings: $references_count"
           wc -l -w -c manuscript/master.md
 
       - name: Commit generated master if changed
