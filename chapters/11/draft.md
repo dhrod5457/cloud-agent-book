@@ -2,7 +2,7 @@
 
 Cloud Worker를 여러 개 사용하려면 먼저 작업 상태를 분리해야 한다.
 
-Agent 수만 늘리고 같은 Working Directory, 같은 Git index, 같은 DB와 임시 경로를 공유하면 병렬화가 아니라 충돌을 만든다.
+Agent 수만 늘리고 같은 Working Directory, 같은 Git Index, 같은 DB와 임시 경로를 공유하면 병렬화가 아니라 충돌을 만든다.
 
 Cloud Task의 격리는 크게 두 층으로 나눈다.
 
@@ -97,12 +97,12 @@ Base SHA: abc123
 Branch: agent/auth-expired-token-142
 ```
 
-Agent가 수정 Commit을 만들면 검증 결과도 그 Commit과 연결한다.
+Agent가 수정 결과를 만들면 검증 결과도 그 Result SHA와 연결한다.
 
 ```text
 Base SHA abc123
    ↓
-Agent Commit def456
+Result SHA def456
    ↓
 Runner Verification def456
    ↓
@@ -112,8 +112,8 @@ PR
 다음 결과는 Evidence가 아니다.
 
 ```text
-Agent Commit: def456
-Test Result: abc123 기준 PASS
+Result SHA: def456
+Validation Result: abc123 기준 PASS
 ```
 
 > Source 상태와 Evidence는 같은 Commit 기준으로 연결한다.
@@ -139,9 +139,9 @@ Task
 ↕
 Branch
 ↕
-Commit
+Result SHA
 ↕
-Verification
+Validation Result
 ↕
 PR
 ```
@@ -161,7 +161,7 @@ Task ID
 Session ID
 Base SHA
 Branch
-Current SHA
+Result SHA
 Status
 Validation Result
 Artifact Path
@@ -175,10 +175,10 @@ task_id: AUTH-142
 session_id: cloud-142
 base_sha: abc123
 branch: agent/auth-expired-token-142
-current_sha: def456
+result_sha: def456
 status: verifying
-validation: PASS
-artifact: artifacts/AUTH-142/
+validation_result: PASS
+artifact_path: artifacts/AUTH-142/def456/
 pr: 142
 ```
 
@@ -248,14 +248,14 @@ Worker B
 격리 대상은 Source만이 아니다.
 
 ```text
-working directory
-git index
-process
-port
-temp directory
-disposable DB
-test output
-artifact path
+Working Directory
+Git Index
+Process
+Port
+Temp Directory
+Disposable DB
+Test Output
+Artifact Path
 ```
 
 Integration Test가 PostgreSQL을 띄운다면 DB 상태도 Worker별로 분리한다.
@@ -362,7 +362,7 @@ Shared Module
 Public API
 Common DTO
 Central Config
-Migration / Schema
+Migration / DB Schema
 ```
 
 여기서 병렬화의 비용을 계산하지는 않는다. 그 문제는 12장에서 다룬다.
@@ -371,7 +371,7 @@ Migration / Schema
 
 ---
 
-## 10. Migration과 Schema는 별도 경계가 필요하다
+## 10. Migration과 DB Schema는 별도 경계가 필요하다
 
 DB Migration은 일반 Source 파일보다 순서 의존성이 크다.
 
@@ -399,11 +399,11 @@ V143 → index 생성
 ```text
 번호 정책
 적용 순서
-Schema dependency
-통합 migration validation
+DB Schema dependency
+통합 Migration Validation
 ```
 
-Container를 나눈다고 Schema 변경의 논리적 의존성이 사라지는 것은 아니다.
+Container를 나눈다고 DB Schema 변경의 논리적 의존성이 사라지는 것은 아니다.
 
 ---
 
@@ -455,7 +455,7 @@ campus-common
 무관한 Repository까지 연결하면 다음 비용이 생긴다.
 
 ```text
-checkout 증가
+Checkout 증가
 검색 범위 증가
 Context 증가
 잘못된 변경 가능성 증가
@@ -464,8 +464,8 @@ Context 증가
 Multi-Repository Task에서는 각 Repository의 기준점도 고정한다.
 
 ```text
-campus-api    → base SHA aaa111
-campus-common → base SHA bbb222
+campus-api    → Base SHA aaa111
+campus-common → Base SHA bbb222
 ```
 
 Git Handoff가 여러 Repository로 늘어났을 뿐 원칙은 같다.
@@ -479,15 +479,15 @@ AUTH-142와 ATTEND-211을 동시에 진행한다고 하자.
 ```text
 AUTH-142
 Branch: agent/auth-expired-token-142
-SHA: def456
+Result SHA: def456
 Runtime: backend-test-A
-Artifact: artifacts/AUTH-142/def456/
+Artifact Path: artifacts/AUTH-142/def456/
 
 ATTEND-211
 Branch: agent/attendance-retry-211
-SHA: xyz789
+Result SHA: xyz789
 Runtime: backend-test-B
-Artifact: artifacts/ATTEND-211/xyz789/
+Artifact Path: artifacts/ATTEND-211/xyz789/
 ```
 
 각 Task는 Source, Runtime, Artifact를 분리한다.
@@ -510,7 +510,7 @@ Runtime
 → Process / Container / VM / DB / Port
 
 Evidence
-→ Task ID / SHA별 Artifact Path
+→ Task ID / Git SHA별 Artifact Path
 ```
 
 그리고 논리적 충돌은 별도로 확인한다.
@@ -520,7 +520,7 @@ same file
 shared module
 public API
 migration
-schema
+DB Schema
 ```
 
 다음 장에서는 이렇게 격리된 Task 중 실제로 무엇을 병렬화할지, Agent 수를 늘릴수록 어떤 중복 Context와 Review/Fan-in 비용이 생기는지 살펴본다.
