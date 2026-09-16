@@ -4,7 +4,7 @@ Phase 8 - 최종 교정 / 출판 준비 진행 중
 
 Phase 7에서 1~18장 전체 편집/교정과 정합성 점검을 완료했다.
 
-현재 **1~6장 최종 교정을 완료했다.**
+현재 **1~9장 최종 교정을 완료했다.**
 
 # Source of Truth
 
@@ -180,55 +180,56 @@ Phase 7 완료.
 
 # Phase 8 Progress
 
-## 1~3장
+## 1~6장
+
+상태: `최종 교정 완료`
+
+핵심 교정:
+
+- 1~3장: `Base SHA`, Cloud Runner, 설명용 수치, Compute / LLM / Human 표기 통일
+- 4장: 시간·병렬성 표현과 `Cloud Runner`, `CPU / RAM / Disk` 표기 정리
+- 5장: Routing / Hard Constraint / Runner-first / 설명용 Score 표기 정리
+- 6장: 작업 Catalog의 `Cloud Runner → Cloud Agent → Cloud Runner 재검증`과 Evidence 표기 통일
+
+## 7장 - Cloud Agent Task Contract: 작은 Task와 작은 Context
 
 상태: `최종 교정 완료`
 
 주요 교정:
 
-- 1장: `Base SHA`, Task/Evidence 핵심 문장, Build / Test 표기 통일
-- 2장: 결정론적 검증을 `Cloud Runner`로 명확화하고 설명용 시간 예시 표기
-- 3장: Reasoning / Execution Resource, 설명용 수치, Compute / LLM / Human 비용 표기 정리
+- 반환 필드를 `Result SHA / Changed Files / Validation Result`로 통일
+- `DB Schema`, Dependency, Initial Context Boundary 표기 정리
+- Budget 예시는 실제 YAML 코드블록으로 변경
+- `max_retry: 2`는 설명용 값임을 명시
+- AUTH-142 최소 Contract의 필드 표기 통일
 
-## 4장 - 독립 실행환경, 장시간 작업, 병렬성, 시간 분리
-
-상태: `최종 교정 완료`
-
-주요 교정:
-
-- 설명용 시간 예시를 명시
-- `Cloud Runner`, `Base SHA`, `DB Schema`, `CPU / RAM / Disk` 표기 통일
-- Parallel Compute와 Parallel Reasoning 표현 유지
-- 12장의 병렬화 비용 참조 점검
-
-## 5장 - Task Routing: Local인가 Cloud인가
+## 8장 - Tool Output을 줄이고 Evidence를 남기기
 
 상태: `최종 교정 완료`
 
 주요 교정:
 
-- `Local 상태`, `DB Schema`, Hard Constraint 표기 정리
-- Routing Decision Matrix와 판단 순서 용어 통일
-- Score를 실제 기준값이 아닌 설명용 예로 명시
-- `Runner-first`와 Cloud Agent 후보 구분 유지
+- Tool Output / Raw Artifact / Result Gateway / Evidence 표기 정리
+- `result.json` JSON 문법 유지
+- `Result SHA`, `Git SHA`, Artifact Reference 표기 통일
+- Failure Fingerprint 구성 필드 대소문자 정리
+- 8,214 Test / 100MB Log를 설명용 예로 유지
 
-## 6장 - Cloud에 보내기 좋은 개발 작업
+## 9장 - Prepared Cloud Environment, Cache, Snapshot
 
 상태: `최종 교정 완료`
 
 주요 교정:
 
-- `Cloud Runner → Cloud Agent → Cloud Runner 재검증` 표현 통일
-- Build / Unit / Integration / E2E / Docker / Migration의 실행 주체 표기 정리
-- 기본 Catalog의 Evidence 표기 통일
-- Tool-first / Runner-first / Agent-on-failure 용어 연결 확인
+- `Repository Checkout`, `DB Client`, `Dependency Cache`, `Fresh Source` 표기 통일
+- Cache / Snapshot / Warm Worker 용어 정리
+- 반복 환경 실패를 Environment 문제로 보는 핵심 문장 유지
+- Cold Start 시간은 설명용 예임을 명시
+- Secret과 Credential은 실행환경 구성과 분리한다는 경계 유지
 
 # Phase 8 Remaining Focus
 
 ```text
-7~9장
-Task Contract / Evidence / Prepared Environment 형식 통일
-
 10~12장
 Runner / Isolation / Parallel Cost 용어 통일
 
@@ -251,8 +252,8 @@ Timeline / Fallback / 결론 문장 최종 교정
 
 # Next
 
-1. 7장 `Cloud Agent Task Contract: 작은 Task와 작은 Context` 최종 교정
-2. 8장 `Tool Output을 줄이고 Evidence를 남기기` 최종 교정
-3. 9장 `Prepared Cloud Environment, Cache, Snapshot` 최종 교정
-4. 이후 10~18장 순차 진행
+1. 10장 `Cloud Agent를 Test Runner처럼 사용하기` 최종 교정
+2. 11장 `Git, Branch, Worktree, Container로 작업 격리하기` 최종 교정
+3. 12장 `병렬 Worker와 중복 Context 비용` 최종 교정
+4. 이후 13~18장 순차 진행
 5. 전체 장 교정 완료 후 제품 출처 / 참조 / 목차 / 참고자료 최종 검사
