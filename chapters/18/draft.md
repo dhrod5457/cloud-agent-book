@@ -1,6 +1,6 @@
 # 18장. 다음 단계: Harness와 Orchestration
 
-17장까지 이 책은 Cloud Agent를 실제 개발 Workflow에 넣는 방법을 정리했다.
+17장까지 이 책은 클라우드 에이전트를 실제 개발 작업 흐름에 넣는 방법을 정리했다.
 
 핵심 구조는 이미 완성되어 있다.
 
@@ -21,11 +21,11 @@ Local / Cloud Routing
 반복되는 준비와 판단을 어디까지 자동화할 수 있을까?
 ```
 
-이 장은 새로운 Agent Platform을 설계하는 장이 아니다.
+이 장은 새로운 에이전트 플랫폼을 설계하는 장이 아니다.
 
-앞에서 만든 Workflow를 안정화한 뒤 자연스럽게 나타나는 다음 단계만 짧게 정리한다.
+앞에서 만든 작업 흐름을 안정화한 뒤 자연스럽게 나타나는 다음 단계만 짧게 정리한다.
 
-> 먼저 Cloud Agent를 잘 사용하는 Workflow를 만들고, 그 다음에 Orchestration을 자동화한다.
+> 먼저 클라우드 에이전트를 잘 사용하는 작업 흐름을 만들고, 그 다음에 Orchestration을 자동화한다.
 
 ---
 
@@ -52,13 +52,13 @@ Task Type
 → Evidence
 ```
 
-자동화의 목적은 Agent 수를 늘리는 것이 아니라 같은 결정을 매번 다시 하지 않는 것이다.
+자동화의 목적은 에이전트 수를 늘리는 데 있지 않다. 같은 결정을 매번 처음부터 하지 않도록 만드는 데 있다.
 
 ---
 
 ## 2. Harness는 Agent가 반복해서 추론할 일을 줄인다
 
-Agent가 Repository에 들어올 때마다 다음을 다시 찾아야 한다면 비용이 반복된다.
+에이전트가 저장소에 들어올 때마다 다음을 다시 찾아야 한다면 비용이 반복된다.
 
 ```text
 어떻게 Setup하는가?
@@ -69,7 +69,7 @@ Agent가 Repository에 들어올 때마다 다음을 다시 찾아야 한다면 
 결과는 어디에 남는가?
 ```
 
-이 정보를 Prompt에 계속 추가하기보다 Repository와 실행환경이 제공하도록 만들 수 있다.
+이 정보를 프롬프트에 계속 추가하기보다 저장소와 실행환경이 제공하도록 만들 수 있다.
 
 예:
 
@@ -89,7 +89,7 @@ Result Gateway
 ./scripts/verify-auth.sh
 ```
 
-Agent 입장에서는 다음 구조가 된다.
+에이전트 입장에서는 다음 구조가 된다.
 
 ```text
 Task Contract
@@ -97,17 +97,17 @@ Task Contract
 → 구조화된 Result
 ```
 
-Harness는 거대한 프레임워크가 아니다.
+에이전트가 개발 규칙을 찾아 실행할 수 있도록 돕는 구성인 하네스(Harness)는 거대한 프레임워크가 아니다.
 
-> Agent가 반복해서 탐색하고 추론해야 했던 개발 규칙을 발견 가능하고 실행 가능한 형태로 꺼내놓는 것에 가깝다.
+> 에이전트가 반복해서 탐색하고 추론해야 했던 개발 규칙을 발견 가능하고 실행 가능한 형태로 꺼내놓는 것에 가깝다.
 
-Agent가 같은 종류의 Environment / Build / Validation 문제로 반복 실패한다면 Prompt를 길게 만들기 전에 Harness와 실행환경을 먼저 점검한다.
+에이전트가 같은 종류의 실행환경 / 빌드 / 검증 문제로 반복 실패한다면 프롬프트를 길게 만들기 전에 Harness와 실행환경을 먼저 점검한다.
 
 ---
 
 ## 3. Routing도 반복되면 일부 자동화할 수 있다
 
-5장과 17장에서 사람이 Routing을 판단했다.
+5장과 17장에서 사람이 실행 위치를 판단했다.
 
 반복 패턴이 안정되면 일부는 규칙으로 만들 수 있다.
 
@@ -125,7 +125,7 @@ requires-hsm
 → Local / Hybrid
 ```
 
-Task Metadata가 있다면 다음처럼 연결할 수 있다.
+작업 정보가 있다면 다음처럼 연결할 수 있다.
 
 ```yaml
 type: bug-fix
@@ -135,22 +135,22 @@ internal_network: false
 validation: ./gradlew test --tests AuthServiceTest
 ```
 
-Hard Constraint는 일반 코드로 처리할 수 있다.
+실행을 제한하는 필수 제약(Hard Constraint)은 일반 코드로 처리할 수 있다.
 
 ```text
 internal_network = true
 → Local / Hybrid
 ```
 
-애매한 Task만 사람이 판단하거나 Agent가 보조한다.
+애매한 작업만 사람이 판단하거나 에이전트가 보조한다.
 
-모든 Routing 결정을 다시 LLM에게 물어보는 것이 자동화는 아니다.
+모든 실행 위치 결정을 다시 LLM에게 물어보는 것이 자동화는 아니다.
 
 ---
 
 ## 4. Orchestration은 Task와 실행환경을 연결한다
 
-Workflow가 반복되면 다음 흐름을 하나의 Orchestration으로 묶을 수 있다.
+작업 흐름이 반복되면 다음 실행 결정들을 한 흐름으로 묶어 관리할 수 있다. 이를 오케스트레이션(Orchestration)이라고 한다.
 
 ```text
 Task
@@ -209,7 +209,7 @@ Agent
 → 결과 비교
 ```
 
-이 경우 다음 두 Lifecycle을 같은 것으로 볼 필요가 없다.
+이 경우 다음 두 생명주기(Lifecycle)를 같은 것으로 볼 필요가 없다.
 
 ```text
 Reasoning Lifecycle
@@ -217,17 +217,17 @@ Reasoning Lifecycle
 Compute Lifecycle
 ```
 
-Session Hibernate, One Brain Multiple Hands, Worker Pool 같은 상세 설계는 이 책의 범위를 넘는다.
+Session Hibernate, One Brain Multiple Hands, 작업자 풀 같은 상세 설계는 이 책의 범위를 넘는다.
 
-여기서는 LLM과 Compute를 분리해 설계할 수 있다는 방향만 남긴다.
+여기서는 LLM과 실행 자원을 분리해 설계할 수 있다는 방향만 남긴다.
 
 ---
 
 ## 6. Evidence는 Query 가능한 인터페이스로 발전할 수 있다
 
-8장에서는 Raw Artifact를 보존하고 작은 Summary부터 읽었다.
+8장에서는 원본 결과물을 보존하고 작은 요약부터 읽었다.
 
-후속 단계에서는 Agent가 필요한 결과를 구조화된 방식으로 조회할 수 있다.
+후속 단계에서는 에이전트가 필요한 결과를 구조화된 방식으로 조회할 수 있다.
 
 ```text
 get_failed_tests(task)
@@ -244,15 +244,15 @@ Dashboard for Humans
 Queryable Evidence for Agents
 ```
 
-핵심은 새 Observability Platform을 만드는 것이 아니다.
+핵심은 새 실행 상태를 관찰하는 플랫폼을 만드는 것이 아니다.
 
-긴 로그를 Agent가 반복해서 읽지 않게 한다는 기존 원칙을 인터페이스로 확장하는 것이다.
+에이전트가 긴 로그를 반복해서 읽지 않도록 한다는 기존 원칙을, 필요한 결과를 조회하는 인터페이스에도 적용하는 것이다.
 
 ---
 
 ## 7. Scheduling도 Task 특성에 맞게 발전할 수 있다
 
-Task마다 필요한 실행환경은 다르다.
+작업마다 필요한 실행환경은 다르다.
 
 ```text
 Unit Test
@@ -268,7 +268,7 @@ Bug Fix
 → Agent + 필요한 Validation
 ```
 
-후속 Scheduler는 Task Metadata와 Environment Capability를 연결할 수 있다.
+후속 작업 스케줄러(Scheduler)는 작업 정보와 실행환경이 제공하는 기능을 연결할 수 있다.
 
 ```text
 Task Requirement
@@ -276,7 +276,7 @@ Task Requirement
 Environment Capability
 ```
 
-또 9장의 Prepared Environment를 바탕으로 Warm Worker와 Ephemeral Worker를 선택할 수 있다.
+또 9장의 미리 준비한 실행환경을 바탕으로 미리 대기시킨 작업자와 작업마다 만들고 폐기하는 임시 작업자를 선택할 수 있다.
 
 ```text
 짧고 반복적인 검증
@@ -286,13 +286,13 @@ Environment Capability
 → Ephemeral Worker 후보
 ```
 
-제품별 CPU / RAM 숫자나 Worker Pool 운영 상세는 현재 책의 원칙으로 고정하지 않는다.
+제품별 CPU / RAM 숫자나 작업자 풀 운영 상세는 현재 책의 원칙으로 고정하지 않는다.
 
 ---
 
 ## 8. Best-of-N과 Replay는 제한된 고급 기법이다
 
-같은 어려운 Task를 여러 Agent가 독립적으로 풀게 하는 Best-of-N은 일반 병렬화와 다르다.
+같은 어려운 작업을 여러 에이전트가 독립적으로 풀게 하는 Best-of-N은 일반 병렬화와 다르다.
 
 ```text
 같은 Bug
@@ -303,11 +303,11 @@ Environment Capability
 Deterministic Validation
 ```
 
-Context와 LLM 비용도 반복되므로 기본값은 N=1이다.
+맥락 정보와 LLM 비용도 반복되므로 기본값은 N=1이다.
 
-자동 검증 가능하고 실패 비용이 큰 어려운 Task에서만 제한적으로 검토한다.
+자동 검증 가능하고 실패 비용이 큰 어려운 작업에서만 제한적으로 검토한다.
 
-Workflow 자체가 바뀌었을 때는 과거 Task를 다시 실행해 비교하는 Replay도 생각할 수 있다.
+작업 흐름 자체가 바뀌었을 때는 과거 작업을 다시 실행해 비교하는 Replay도 생각할 수 있다.
 
 ```text
 같은 Task
@@ -316,7 +316,7 @@ Workflow 자체가 바뀌었을 때는 과거 Task를 다시 실행해 비교하
 → 성공 여부 / Retry / Token / Human Intervention 비교
 ```
 
-이 책에서는 Best-of-N 시스템이나 평가 플랫폼을 설계하지 않는다. Cloud Workflow를 개선할 때 사용할 수 있는 후속 관점으로만 소개한다.
+이 책에서는 Best-of-N 시스템이나 평가 플랫폼을 설계하지 않는다. 클라우드 작업 흐름을 개선할 때 사용할 수 있는 후속 관점으로만 소개한다.
 
 ---
 
@@ -346,15 +346,15 @@ Cloud Runner로 Test 분리
 → 반복 Routing 일부 자동화
 ```
 
-각 단계에서 실제로 Developer Blocking Time, Retry, Review Cost가 줄었는지 확인한다.
+각 단계에서 실제로 개발자가 다른 일을 하지 못하고 기다리는 시간, 재시도, 검토 비용이 줄었는지 확인한다.
 
-복잡한 Platform보다 반복되는 수동 결정을 하나씩 코드로 옮기는 편이 이 책의 방향에 맞다.
+복잡한 플랫폼보다 반복되는 수동 결정을 하나씩 코드로 옮기는 편이 이 책의 방향에 맞다.
 
 ---
 
 ## 10. 이 책의 범위는 여기까지다
 
-Cloud Agent를 다루다 보면 다음 주제로 쉽게 확장된다.
+클라우드 에이전트를 다루다 보면 다음 주제로 쉽게 확장된다.
 
 ```text
 Agent Memory Architecture
@@ -373,7 +373,7 @@ Agent 조직론
 
 > 클라우드 코딩 에이전트를 실제 개발에서 어떻게 더 빠르고, 저렴하고, 효율적으로 사용할 것인가?
 
-이 질문에 직접 필요하지 않은 Platform 일반론은 여기서 확장하지 않는다.
+이 질문에 직접 필요하지 않은 플랫폼 일반론은 여기서 확장하지 않는다.
 
 ---
 
@@ -432,10 +432,10 @@ Cloud 이점이 사라지면 언제 Local로 돌아올 것인가?
 이 마지막 검증은 내부망에서 하자.
 ```
 
-> 더 많은 Agent보다 더 나은 Task Routing, Harness, Validation이 먼저다.
+> 더 많은 에이전트보다 더 나은 작업 실행 위치 결정, Harness, 검증이 먼저다.
 
-Cloud Agent는 Local Agent를 없애지 않는다. Cloud Runner나 CI도 없애지 않는다.
+클라우드 에이전트는 로컬 에이전트를 없애지 않는다. 클라우드 실행기나 CI도 없애지 않는다.
 
-각 역할을 분리하고 Task 특성에 맞는 실행 위치에 배치한다.
+각 역할을 분리하고 작업 특성에 맞는 실행 위치에 배치한다.
 
-이 책의 최종 목적은 독자가 자신의 개발 흐름에서 **Local과 Cloud의 역할을 직접 나눌 수 있게 하는 것**이다.
+이 책의 최종 목적은 독자가 자신의 개발 흐름에서 **로컬과 클라우드의 역할을 직접 나눌 수 있게 하는 것**이다.

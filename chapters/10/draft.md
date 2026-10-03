@@ -1,10 +1,10 @@
 # 10장. Cloud Agent를 Test Runner처럼 사용하기
 
-Cloud 환경에서 실행되는 모든 작업에 LLM이 필요한 것은 아니다.
+클라우드 환경에서 실행되는 모든 작업에 LLM이 필요한 것은 아니다.
 
-9장에서 Prepared Cloud Environment를 만들었다면 그 환경은 Agent 전용 공간이 아니라 반복 가능한 실행 노드가 된다.
+9장에서 미리 준비한 클라우드 실행환경을 만들었다면 그 환경은 에이전트 전용 공간이 아니라 반복 가능한 실행 노드가 된다.
 
-Build, Test, E2E, Docker Build처럼 명령과 판정 기준이 정해진 작업은 먼저 Cloud Runner가 처리할 수 있다.
+빌드, 테스트, E2E, Docker 빌드처럼 명령과 판정 기준이 정해진 작업은 먼저 클라우드 실행기가 처리할 수 있다.
 
 ```text
 Cloud Runner
@@ -19,9 +19,9 @@ Cloud Agent
 
 이 장의 원칙은 간단하다.
 
-> 정상 경로는 Runner가 처리하고, 판단이 필요한 예외 경로에서만 Agent를 호출한다.
+> 정상 경로는 실행기가 처리하고, 판단이 필요한 예외 경로에서만 에이전트를 호출한다.
 
-> 검증할 수 있는 것은 Agent에게 묻지 말고 실행한다.
+> 검증할 수 있는 것은 에이전트에게 묻지 말고 실행한다.
 
 ---
 
@@ -33,7 +33,7 @@ Cloud Agent
 ./gradlew test
 ```
 
-필요한 것은 Repository와 Runtime, CPU / RAM, Test Tool이다.
+필요한 것은 저장소와 실행환경, CPU / RAM, 테스트 도구다.
 
 반대로 다음 질문은 판단이 필요하다.
 
@@ -42,7 +42,7 @@ AuthServiceTest.expiredToken이 왜 실패했는가?
 어느 코드를 바꿔야 하는가?
 ```
 
-따라서 한 Task 안에서도 실행 주체가 바뀐다.
+따라서 한 작업 안에서도 실행 주체가 바뀐다.
 
 ```text
 Cloud Runner
@@ -56,7 +56,7 @@ Cloud Runner
 → Verification
 ```
 
-Cloud Agent를 많이 호출하는 것이 목적이 아니다. Agent가 필요한 구간을 좁히는 것이 목적이다.
+클라우드 에이전트를 많이 호출하는 것이 목적이 아니다. 에이전트가 필요한 구간을 좁히는 것이 목적이다.
 
 ---
 
@@ -105,7 +105,7 @@ Migration
 
 ## 3. 성공 경로에서는 Agent를 호출하지 않는다
 
-설명용 예시로 100개의 검증 Task가 있다고 하자.
+설명용 예시로 100개의 검증 작업이 있다고 하자.
 
 ```text
 100 Runner Execution
@@ -115,7 +115,7 @@ Migration
 
 95개 PASS 경로는 그대로 종료할 수 있다.
 
-실패 5개도 모두 Agent 작업은 아니다.
+실패 5개도 모두 에이전트 작업은 아니다.
 
 ```text
 5 FAIL
@@ -124,7 +124,7 @@ Migration
 └─ Code Reasoning이 필요한 Failure
 ```
 
-Agent는 마지막 경우에만 필요하다.
+에이전트는 마지막 경우에만 필요하다.
 
 ```text
 Cloud Runner
@@ -138,13 +138,13 @@ Reasoning 필요?
     └─ YES → Cloud Agent
 ```
 
-Cloud Agent 비용을 줄이는 가장 단순한 방법 중 하나는 Agent 한 번의 Token을 조금 줄이는 것이 아니라 불필요한 Agent 호출 자체를 없애는 것이다.
+클라우드 에이전트 비용을 줄이려면 한 번 호출할 때 쓰는 토큰을 줄이는 방법도 있다. 그보다 더 단순한 방법 중 하나는 필요하지 않은 에이전트 호출 자체를 없애는 것이다.
 
 ---
 
 ## 4. Runner 입력과 출력도 고정한다
 
-Runner는 단순 Shell 실행이지만 어떤 Source를 검증했는지 추적할 수 있어야 한다.
+실행기가 하는 일은 단순한 셸 명령 실행이지만 어떤 소스 코드를 검증했는지 추적할 수 있어야 한다.
 
 입력 예:
 
@@ -178,15 +178,15 @@ EXIT=1
 RESULT=artifacts/AUTH-142/result.json
 ```
 
-8장에서 만든 작은 구조화 결과를 Runner의 출력 경계로 사용할 수 있다.
+8장에서 만든 작은 구조화 결과를 실행기의 출력 경계로 사용할 수 있다.
 
-핵심은 Runner의 결과가 특정 Git SHA와 연결되어 있다는 점이다.
+핵심은 실행기의 결과가 특정 Git SHA와 연결되어 있다는 점이다.
 
 ---
 
 ## 5. FAIL이라고 모두 코드 문제는 아니다
 
-Runner가 실패하면 먼저 실패 종류를 구분한다.
+실행기가 실패하면 먼저 실패 종류를 구분한다.
 
 ```text
 FAIL
@@ -208,7 +208,7 @@ Dependency mirror unavailable
 Container start failure
 ```
 
-이런 실패를 Agent에게 보내 코드 수정을 시키면 잘못된 변경이 생길 수 있다.
+이런 실패를 에이전트에게 보내 코드 수정을 시키면 잘못된 변경이 생길 수 있다.
 
 ```text
 INFRA_FAILURE
@@ -225,13 +225,13 @@ UI selector mismatch
 Migration syntax error
 ```
 
-그중 자동 수정 도구가 해결할 수 있는 것은 Tool을 먼저 사용한다.
+그중 자동 수정 도구가 해결할 수 있는 것은 도구를 먼저 사용한다.
 
 ---
 
 ## 6. Agent-on-failure
 
-코드 판단이 필요한 실패가 남으면 Agent를 호출한다.
+코드 판단이 필요한 실패가 남으면 에이전트를 호출한다.
 
 ```text
 Cloud Runner
@@ -251,7 +251,7 @@ Cloud Runner
 Verification
 ```
 
-AUTH-142를 예로 들면 Agent가 처음 받아야 할 정보는 대형 로그가 아니다.
+AUTH-142를 예로 들면 에이전트가 처음 받아야 할 정보는 대형 로그가 아니다.
 
 ```text
 Test
@@ -269,9 +269,9 @@ JwtTokenProvider.java
 AuthServiceTest.java
 ```
 
-필요한 경우에만 8장의 Result Gateway에서 상세 Artifact를 추가 조회한다.
+필요한 경우에만 8장의 Result Gateway에서 상세 결과물을 추가 조회한다.
 
-10장의 핵심은 Failure Summary 형식을 다시 정의하는 것이 아니라 **Runner와 Agent 사이의 호출 경계**를 만드는 것이다.
+10장의 핵심은 실패 요약 형식을 다시 정의하는 것이 아니라 **실행기와 에이전트 사이의 호출 경계**를 만드는 것이다.
 
 ---
 
@@ -300,7 +300,7 @@ Agent Fix
 ./gradlew test --tests AuthServiceTest.expiredToken
 ```
 
-Target Test가 PASS하면 필요한 범위까지 회귀 검증을 넓힌다.
+대상 테스트가 PASS하면 필요한 범위까지 회귀 검증을 넓힌다.
 
 ```text
 Target Test
@@ -309,13 +309,13 @@ Target Test
 → 필요한 Full Verification
 ```
 
-Agent의 설명과 실행 사실을 분리하는 과정이다.
+이렇게 해야 에이전트가 설명한 내용과 실제 실행으로 확인한 사실을 구분할 수 있다.
 
 ---
 
 ## 8. Retry 판단도 Runner 결과를 기준으로 한다
 
-수정 후 다시 실패하면 8장의 Failure Fingerprint를 사용한다.
+수정 후 다시 실패하면 8장의 실패 식별 정보를 사용한다.
 
 ```text
 Agent Fix
@@ -334,16 +334,16 @@ Retry #2
 Assertion Failure
 ```
 
-반대로 동일 Failure Fingerprint가 반복된다면 같은 시도를 계속할 이유가 줄어든다.
+반대로 동일 실패 식별 정보가 반복된다면 같은 시도를 계속할 이유가 줄어든다.
 
 ```text
 Retry #1 → Fingerprint A
 Retry #2 → Fingerprint A
 ```
 
-구체적인 중단과 Local Fallback 기준은 17장에서 다룬다.
+구체적인 중단과 로컬 복귀 기준은 17장에서 다룬다.
 
-여기서는 Runner 결과가 다음 행동을 결정하는 Evidence가 된다는 점만 유지한다.
+여기서는 실행기 결과가 다음 행동을 결정하는 검증 근거가 된다는 점만 유지한다.
 
 ---
 
@@ -363,7 +363,7 @@ Unit   Integration E2E      Docker
         Fan-in
 ```
 
-이때 모든 결과는 같은 Source 상태를 검증해야 한다.
+이때 모든 결과는 같은 소스 코드 상태를 검증해야 한다.
 
 ```text
 Unit        → def456
@@ -374,13 +374,13 @@ Docker      → def456
 
 서로 다른 SHA의 결과를 하나의 PASS 묶음으로 취급하면 안 된다.
 
-병렬화의 중복 Context, Review, Merge 비용은 12장에서 다룬다. 10장에서는 먼저 **결정론적 검증을 여러 Runner로 분리할 수 있다**는 점만 사용한다.
+병렬화의 중복 맥락 정보, 검토, 병합 비용은 12장에서 다룬다. 10장에서는 먼저 **결정론적 검증을 여러 실행기로 분리할 수 있다**는 점만 사용한다.
 
 ---
 
 ## 10. Sharding은 실행시간과 시작 비용을 함께 본다
 
-큰 Test Suite는 여러 Runner로 나눌 수 있다.
+큰 테스트 묶음은 여러 실행기로 나눌 수 있다.
 
 ```text
 Test Suite
@@ -399,23 +399,23 @@ Shard 간 State 공유가 적음
 같은 Git SHA 사용
 ```
 
-하지만 Worker Provisioning과 Environment Restore에도 비용이 있다.
+하지만 작업자 할당과 실행환경 복원에도 비용이 있다.
 
 짧은 테스트를 너무 잘게 나누면 시작 비용이 실행시간보다 커질 수 있다.
 
-따라서 Shard 수는 고정 규칙이 아니라 프로젝트의 실제 실행시간과 준비시간을 보고 정한다.
+따라서 나눠 실행할 테스트 묶음인 샤드(Shard)의 수는 고정 규칙이 아니라 프로젝트의 실제 실행시간과 준비시간을 보고 정한다.
 
 ---
 
 ## 11. campus-platform에 적용하면
 
-출결 인증 변경 Commit이 있다고 하자.
+출결 인증 변경 커밋이 있다고 하자.
 
 ```text
 Git SHA: def456
 ```
 
-Cloud Runner가 먼저 검증한다.
+클라우드 실행기가 먼저 검증한다.
 
 ```text
 Unit        PASS
@@ -424,7 +424,7 @@ Docker      PASS
 E2E         PASS
 ```
 
-Integration Failure가 인프라 문제가 아니라 재현 가능한 Code Failure라면 Agent가 해당 실패만 분석한다.
+통합 테스트 실패가 인프라 문제가 아니라 재현할 수 있는 코드 문제로 인한 실패라면 에이전트가 해당 실패만 분석한다.
 
 ```text
 Integration Runner
@@ -439,9 +439,9 @@ Integration Runner
 
 Result SHA가 바뀌었으므로 필요한 검증은 `ghi789` 기준으로 다시 맞춘다.
 
-이 구조에서 Agent는 전체 검증 파이프라인을 대신하는 존재가 아니다.
+이 구조에서 에이전트는 전체 검증 파이프라인을 대신하는 존재가 아니다.
 
-판단과 변경이 필요한 지점에 들어가는 Worker다.
+판단과 변경이 필요한 지점에 들어가는 작업자다.
 
 ---
 
@@ -463,10 +463,10 @@ Cloud Runner
 
 정리하면 다음 세 문장으로 충분하다.
 
-> Runner가 할 수 있으면 Runner에게 맡긴다.
+> 실행기가 할 수 있으면 실행기에게 맡긴다.
 
-> FAIL이라고 모두 Agent를 호출하지 않는다.
+> FAIL이라고 모두 에이전트를 호출하지 않는다.
 
-> Agent가 수정했으면 다시 Runner가 검증한다.
+> 에이전트가 수정했으면 다시 실행기가 검증한다.
 
-다음 장에서는 여러 Runner와 Agent가 동시에 작업할 때 Source와 Runtime이 서로 섞이지 않도록 Git, Branch, Worktree, Container를 이용해 작업을 격리한다.
+다음 장에서는 여러 실행기와 에이전트가 동시에 작업할 때 소스 코드와 실행환경이 서로 섞이지 않도록 Git, 브랜치, Worktree, 컨테이너를 이용해 작업을 격리한다.

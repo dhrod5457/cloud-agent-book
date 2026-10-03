@@ -4,119 +4,119 @@
 
 ## Agent-on-failure
 
-Cloud Runner가 먼저 검증을 실행하고, 재현 가능한 실패 중 코드 판단이 필요한 경우에만 Cloud Agent를 호출하는 방식.
+클라우드 실행기가 먼저 검증을 실행하고, 재현 가능한 실패 중 코드 판단이 필요한 경우에만 클라우드 에이전트를 호출하는 방식.
 
 ## Artifact
 
-Test Report, Log, Screenshot, Video, Trace처럼 실행 결과를 보존한 원본 또는 상세 결과물. Agent가 처음 읽는 작은 Evidence와 구분한다.
+테스트 보고서, 로그, 화면 캡처, 영상, 실행 추적 기록처럼 실행 결과를 보존한 원본 또는 상세 결과물. 에이전트가 처음 읽는 작은 검증 근거와 구분한다.
 
 ## Base SHA
 
-Cloud Task가 시작한 Git 기준점. 어떤 Source 상태에서 작업을 시작했는지 식별한다.
+클라우드 작업이 시작한 Git 기준점. 어떤 소스 코드 상태에서 작업을 시작했는지 식별한다.
 
 ## Cloud Agent
 
-Repository와 독립 실행환경을 사용해 Task를 수행하는 Remote Development Worker. 이 책에서는 판단과 제한된 코드 수정이 필요한 구간에 사용한다.
+저장소와 독립 실행환경을 사용해 작업을 수행하는 원격 개발 작업자. 이 책에서는 판단과 제한된 코드 수정이 필요한 구간에 사용한다.
 
 ## Cloud Runner
 
-Build, Test, E2E, Docker Build처럼 명령과 판정 기준이 정해진 작업을 실행하는 Cloud 실행 주체. LLM 판단이 필요하지 않은 결정론적 경로를 우선 담당한다.
+빌드, 테스트, E2E, Docker 빌드처럼 명령과 판정 기준이 정해진 작업을 실행하는 클라우드 실행 주체. LLM 판단이 필요하지 않은 결정론적 경로를 우선 담당한다.
 
 ## Cloud Session
 
-Repository, Workspace, 실행환경, Tool, Agent Interaction이 결합된 하나의 Cloud 작업 실행 단위. 제품별 Session 명칭과 정확히 일치한다는 의미는 아니다.
+저장소, 작업공간, 실행환경, 도구, 에이전트와의 상호작용이 결합된 하나의 클라우드 작업 실행 단위. 제품별 세션 명칭과 정확히 일치한다는 의미는 아니다.
 
 ## Context Duplication
 
-여러 Agent가 같은 Repository, 문서, 공통 Source를 반복해서 읽으면서 생기는 중복 Context와 탐색 비용.
+여러 에이전트가 같은 저장소, 문서, 공통 소스 코드를 반복해서 읽으면서 생기는 중복 맥락 정보와 탐색 비용.
 
 ## Developer Blocking Time
 
-Cloud Task의 총 실행시간이 아니라 개발자가 해당 Task 때문에 다른 일을 진행하지 못하고 기다린 시간.
+클라우드 작업의 총 실행시간이 아니라 개발자가 해당 작업 때문에 다른 일을 진행하지 못하고 기다린 시간.
 
 ## Evidence
 
-작업 결과를 검증할 수 있도록 정리한 작은 구조화 결과. Result SHA, Validation Result, 실패 요약, Artifact Reference 등이 포함될 수 있다.
+작업 결과를 검증할 수 있도록 정리한 작은 구조화 결과. Result SHA, 검증 결과, 실패 요약, 결과물 참조 등이 포함될 수 있다.
 
 ## Failure Fingerprint
 
-동일한 실패가 반복되는지 식별하기 위해 Test, Error Type, 핵심 Message, 위치 같은 정보를 조합한 실패 식별 정보.
+동일한 실패가 반복되는지 식별하기 위해 테스트, 오류 유형, 핵심 메시지, 위치 같은 정보를 조합한 실패 식별 정보.
 
 ## Fan-out
 
-서로 독립적인 Task나 검증을 여러 Runner 또는 Worker로 나누어 동시에 실행하는 것.
+서로 독립적인 작업이나 검증을 여러 실행기 또는 작업자로 나누어 동시에 실행하는 것.
 
 ## Fan-in
 
-병렬 실행된 결과를 다시 합치고 Review, Merge, Regression, Integration Validation을 수행하는 단계.
+병렬 실행된 결과를 다시 합치고 검토, 병합, 회귀 검증, 통합 검증을 수행하는 단계.
 
 ## Handoff
 
-Task와 Source 상태를 한 실행 위치에서 다른 실행 위치로 넘기는 과정. 이 책의 기본 경계는 Git, Task Contract, Evidence다.
+작업과 소스 코드 상태를 한 실행 위치에서 다른 실행 위치로 넘기는 과정. 이 책의 기본 경계는 Git, 작업 명세, 검증 근거다.
 
 ## Harness
 
-Agent가 반복해서 탐색하거나 추론해야 했던 개발 규칙을 발견 가능하고 실행 가능한 형태로 제공하는 구성. 예를 들어 표준 Build/Test Script, AGENTS.md, Task Contract, Result Gateway가 포함될 수 있다.
+에이전트가 반복해서 탐색하거나 추론해야 했던 개발 규칙을 발견 가능하고 실행 가능한 형태로 제공하는 구성. 예를 들어 표준 Build/Test Script, AGENTS.md, 작업 명세, Result Gateway가 포함될 수 있다.
 
 ## Human Steering
 
-작업 도중 사람이 방향을 자주 확인하고 수정해야 하는 정도. Human Steering이 높을수록 비동기 Cloud 위임의 이점이 줄어들 수 있다.
+작업 도중 사람이 방향을 자주 확인하고 수정해야 하는 정도. 사람이 자주 판단하고 방향을 조정해야 할수록 비동기 클라우드 위임의 이점이 줄어들 수 있다.
 
 ## Local Agent
 
-개발자의 현재 Workspace와 짧은 Feedback Loop 안에서 사용하는 Agent. 요구사항 탐색, Architecture, 내부 자원 접근, Human Steering이 많은 작업에 유리할 수 있다.
+개발자의 현재 작업공간과 짧은 피드백 주기 안에서 사용하는 에이전트. 요구사항 탐색, 시스템 구조, 내부 자원 접근, 사람의 중간 판단과 방향 조정이 많은 작업에 유리할 수 있다.
 
 ## Local Fallback
 
-Cloud Task를 계속 유지하는 이점이 사라졌을 때 현재 결과와 Evidence를 보존한 채 Local 또는 Hybrid Workflow로 이동하는 것. 실패가 아니라 재Routing의 한 형태다.
+클라우드 작업을 계속 유지하는 이점이 사라졌을 때 현재 결과와 검증 근거를 보존한 채 로컬 또는 로컬과 클라우드를 함께 쓰는 작업 흐름으로 이동하는 것. 실패가 아니라 실행 위치 재결정의 한 형태다.
 
 ## Orchestration
 
-Task Classification, Environment Selection, Runner / Agent Selection, Retry, Validation, Evidence 연결처럼 반복되는 실행 결정을 Workflow로 묶는 것.
+작업 분류, 실행환경 선택, 실행기 / 에이전트 선택, 재시도, 검증, 검증 근거 연결처럼 반복되는 실행 결정을 작업 흐름으로 묶는 것.
 
 ## Prepared Environment
 
-Task가 시작될 때 Runtime, Tool, Dependency, Cache가 이미 준비되어 있어 Agent가 개발환경 설치부터 반복하지 않도록 만든 Cloud 실행환경.
+작업이 시작될 때 실행환경, 도구, 의존 패키지, 캐시가 이미 준비되어 있어 에이전트가 개발환경 설치부터 반복하지 않도록 만든 클라우드 실행환경.
 
 ## Progressive Context
 
-처음에는 Relevant Files 같은 작은 Context만 제공하고, Task 수행에 실제로 필요한 경우에만 Direct Dependency, 관련 문서, 넓은 Module Context 순으로 확장하는 방식.
+처음에는 관련 파일 같은 적은 양의 맥락 정보만 제공하고, 작업 수행에 실제로 필요한 경우에만 직접 연결된 의존 대상, 관련 문서, 넓은 모듈 맥락 정보 순으로 확장하는 방식.
 
 ## Result Gateway
 
-대형 Tool Output과 Artifact를 그대로 Agent에게 전달하지 않고, 필요한 결과를 작은 구조화 Evidence로 변환하거나 필요한 상세 결과를 선택적으로 조회하게 하는 경계.
+대형 도구 출력과 결과물을 그대로 에이전트에게 전달하지 않고, 필요한 결과를 작은 구조화 검증 근거로 변환하거나 필요한 상세 결과를 선택적으로 조회하게 하는 경계.
 
 ## Result SHA
 
-Cloud Agent 또는 작업 결과로 만들어진 Git Commit의 SHA. Validation Result와 Evidence는 가능한 한 이 Source 상태와 연결한다.
+클라우드 에이전트 또는 작업 결과로 만들어진 Git 커밋의 SHA. 검증 결과와 검증 근거는 가능한 한 이 소스 코드 상태와 연결한다.
 
 ## Runner-first
 
-검증 가능한 작업은 먼저 Cloud Runner나 기존 CI가 실행하고, LLM 판단은 필요한 예외 경로에만 사용하는 원칙.
+검증 가능한 작업은 먼저 클라우드 실행기나 기존 CI가 실행하고, LLM 판단은 필요한 예외 경로에만 사용하는 원칙.
 
 ## Task
 
-Cloud 또는 Local 실행 위치에 위임할 수 있도록 범위와 완료 조건을 가진 작업 단위.
+클라우드 또는 로컬 실행 위치에 위임할 수 있도록 범위와 완료 조건을 가진 작업 단위.
 
 ## Task Candidate
 
-Issue, CI Failure, Review Comment, Schedule 같은 Event에서 만들어진 작업 후보. Event가 발생했다고 즉시 Agent Task가 되는 것은 아니며 Dedup, Classification, Routing을 거친다.
+Issue, CI 실패, 검토 의견, 예약 실행 같은 이벤트에서 만들어진 작업 후보. 이벤트가 발생했다고 즉시 에이전트 작업이 되는 것은 아니며 중복 제거, 분류, 실행 위치 결정을 거친다.
 
 ## Task Contract
 
-Cloud Worker가 독립적으로 작업을 시작할 수 있도록 Goal, Scope, Relevant Files, Forbidden Changes, Validation, Expected Result, Output / Evidence 등을 정의한 입력 경계.
+클라우드 작업자가 독립적으로 작업을 시작할 수 있도록 목표, 범위, 관련 파일, 금지된 변경, 검증, 기대 결과, 출력 / 검증 근거 등을 정의한 입력 경계.
 
 ## Task Routing
 
-Task의 특성과 제약을 기준으로 Local, Cloud Runner, Cloud Agent, Hybrid 중 실행 위치와 실행 주체를 결정하는 과정.
+작업의 특성과 제약을 기준으로 로컬, 클라우드 실행기, 클라우드 에이전트, Hybrid 중 실행 위치와 실행 주체를 결정하는 과정.
 
 ## Validation Result
 
-특정 Source 상태에서 실행한 Build/Test/E2E 등의 검증 결과. PASS / FAIL뿐 아니라 어떤 명령과 범위를 실행했는지 추적할 수 있어야 한다.
+특정 소스 코드 상태에서 실행한 Build/Test/E2E 등의 검증 결과. PASS / FAIL뿐 아니라 어떤 명령과 범위를 실행했는지 추적할 수 있어야 한다.
 
 ## Hybrid Workflow
 
-하나의 Task나 기능을 단계별로 Local과 Cloud에 나누어 수행하는 방식. 예를 들어 Cloud에서 일반 검증을 끝낸 뒤 Tibero, HSM, VPN-only API 같은 내부 자원 검증을 Local에서 이어갈 수 있다.
+하나의 작업이나 기능을 단계별로 로컬과 클라우드에 나누어 수행하는 방식. 예를 들어 클라우드에서 일반 검증을 끝낸 뒤 Tibero, HSM, VPN-only API 같은 내부 자원 검증을 로컬에서 이어갈 수 있다.
 
 ## 이 책에서 유지하는 기본 관계
 

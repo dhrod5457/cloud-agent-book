@@ -1,15 +1,15 @@
 # 8장. Tool Output을 줄이고 Evidence를 남기기
 
-7장에서는 Cloud Agent에게 전달하는 입력을 줄였다.
+7장에서는 클라우드 에이전트에게 전달하는 입력을 줄였다.
 
 ```text
 Task Contract
 → Small Input / Context
 ```
 
-하지만 입력만 작게 만든다고 Context 비용이 줄어드는 것은 아니다.
+하지만 입력만 작게 만든다고 맥락 정보 비용이 줄어드는 것은 아니다.
 
-Build, Test, E2E, Docker 작업은 많은 로그와 Artifact를 만든다. 이 결과를 그대로 LLM에 전달하면 몇 건의 실패를 찾기 위해 대량의 정상 로그까지 읽게 된다.
+빌드, 테스트, E2E, Docker 작업은 많은 로그와 결과물을 만든다. 이 결과를 그대로 LLM에 전달하면 몇 건의 실패를 찾기 위해 대량의 정상 로그까지 읽게 된다.
 
 8장의 기본 구조는 다음과 같다.
 
@@ -29,17 +29,17 @@ Agent / Developer
 
 핵심은 결과를 버리는 것이 아니다.
 
-> 큰 결과는 보존하고, Agent에게는 판단에 필요한 부분만 보여준다.
+> 큰 결과는 보존하고, 에이전트에게는 판단에 필요한 부분만 보여준다.
 
-그리고 Task 완료는 자연어 선언이 아니라 Evidence로 확인한다.
+그리고 작업 완료는 자연어 선언이 아니라 검증 근거로 확인한다.
 
-> Cloud Agent에게 결과를 요구하지 말고 검증 가능한 결과물을 요구한다.
+> 클라우드 에이전트에게 결과를 요구하지 말고 검증 가능한 결과물을 요구한다.
 
 ---
 
 ## 1. Tool Output도 Context다
 
-Agent가 읽는 다음 결과는 모두 Context가 된다.
+에이전트가 읽는 다음 결과는 모두 맥락 정보가 된다.
 
 ```text
 Gradle Build Log
@@ -116,7 +116,7 @@ Failures
 3. UserMapperTest.insert
 ```
 
-이 정도 결과는 Shell Script, JUnit XML Parser, CI Post-processing Script로 만들 수 있다.
+이 정도 결과는 셸 스크립트, JUnit XML 분석 도구, CI 후처리 스크립트로 만들 수 있다.
 
 > 코드로 추출할 수 있는 결과를 다시 LLM에게 읽혀서 찾게 하지 않는다.
 
@@ -126,7 +126,7 @@ Failures
 
 ## 3. Result Gateway는 원본을 버리지 않는다
 
-Result Filter가 필요한 값을 추출하는 단계라면 Result Gateway는 Raw Artifact를 보존하고 필요할 때 다시 조회할 수 있게 하는 경계다.
+Result Filter는 결과에서 필요한 값을 추출하는 단계다. Result Gateway는 여기서 더 나아가 원본 결과물을 보존하고, 필요할 때 다시 찾아볼 수 있게 하는 창구다.
 
 ```text
 Raw Artifact
@@ -163,7 +163,7 @@ Related Artifact
 Full Raw Log
 ```
 
-7장의 Progressive Context를 실행 결과에도 적용한 구조다.
+7장의 단계적 정보 제공을 실행 결과에도 적용한 구조다.
 
 이 인터페이스가 반드시 HTTP API일 필요는 없다.
 
@@ -175,13 +175,13 @@ File Index
 Object Storage Path
 ```
 
-핵심은 원본을 유지하면서 Agent가 처음 읽는 결과를 작게 만드는 것이다.
+핵심은 원본을 유지하면서 에이전트가 처음 읽는 결과를 작게 만드는 것이다.
 
 ---
 
 ## 4. result.json은 첫 번째 결과 인터페이스가 될 수 있다
 
-Task 결과를 사람이 읽는 긴 로그와 별개로 구조화할 수 있다.
+작업 결과를 사람이 읽는 긴 로그와 별개로 구조화할 수 있다.
 
 예:
 
@@ -210,7 +210,7 @@ Task 결과를 사람이 읽는 긴 로그와 별개로 구조화할 수 있다.
 
 이 JSON 형식을 표준으로 강제하려는 것은 아니다.
 
-중요한 것은 Agent와 자동화가 먼저 읽을 수 있는 작은 구조화 결과가 있다는 점이다.
+중요한 것은 에이전트와 자동화가 먼저 읽을 수 있는 작은 구조화 결과가 있다는 점이다.
 
 ```text
 Task Scope
@@ -222,17 +222,17 @@ AuthServiceTest.expiredToken FAIL
 Agent
 ```
 
-현재 Task에 필요하지 않은 실패와 로그는 처음부터 읽지 않는다.
+현재 작업에 필요하지 않은 실패와 로그는 처음부터 읽지 않는다.
 
 ---
 
 ## 5. Artifact First
 
-Cloud Runner가 `FAIL` 한 줄만 반환하면 원인을 다시 재현해야 한다.
+클라우드 실행기가 `FAIL` 한 줄만 반환하면 원인을 다시 재현해야 한다.
 
-반대로 Raw Log 전체를 Agent에게 보내는 것도 과하다.
+반대로 원본 로그 전체를 에이전트에게 보내는 것도 과하다.
 
-Task 단위로 Artifact를 보존한다.
+작업 단위로 결과물을 보존한다.
 
 ```text
 artifacts/AUTH-142/
@@ -245,9 +245,9 @@ artifacts/AUTH-142/
 └─ traces/
 ```
 
-Agent는 기본적으로 `result.json`부터 읽고 필요한 파일만 추가로 조회한다.
+에이전트는 기본적으로 `result.json`부터 읽고 필요한 파일만 추가로 조회한다.
 
-Artifact First의 목적은 파일을 많이 남기는 것이 아니다.
+결과물을 먼저 보존하는 원칙의 목적은 파일을 많이 남기는 것이 아니다.
 
 다음 질문에 답할 수 있어야 한다.
 
@@ -263,7 +263,7 @@ Artifact First의 목적은 파일을 많이 남기는 것이 아니다.
 
 ## 6. 자연어 설명과 실행 사실을 분리한다
 
-Agent Summary는 변경 의도를 설명하는 데 유용하다.
+에이전트 요약은 변경 의도를 설명하는 데 유용하다.
 
 ```text
 Agent Summary
@@ -279,9 +279,9 @@ AuthServiceTest.expiredToken: PASS
 AuthServiceTest: 24 / 24 PASS
 ```
 
-Task별 Evidence는 다르다.
+작업별 검증 근거는 다르다.
 
-Bug Fix:
+오류 수정:
 
 ```text
 Result SHA
@@ -289,7 +289,7 @@ Changed Files
 Unit Test Result
 ```
 
-UI Task:
+UI 작업:
 
 ```text
 E2E Result
@@ -297,7 +297,7 @@ Before / After Screenshot
 Browser Video / Trace
 ```
 
-Docker Build:
+Docker 빌드:
 
 ```text
 Build Result
@@ -311,9 +311,9 @@ Build Log Reference
 
 ## 7. UI 변경은 Demo Evidence를 먼저 볼 수 있다
 
-UI 변경은 Diff만 읽어서는 실제 결과를 빠르게 판단하기 어렵다.
+UI 변경은 코드 변경 내역만 읽어서는 실제 결과를 빠르게 판단하기 어렵다.
 
-예를 들어 Layout과 CSS가 바뀌었다면 다음 순서를 사용할 수 있다.
+예를 들어 화면 배치와 CSS가 바뀌었다면 다음 순서를 사용할 수 있다.
 
 ```text
 Build PASS
@@ -325,21 +325,17 @@ Browser Video
 필요한 경우 Diff Review
 ```
 
-이를 이 책에서는 `Demos over Diffs` 관점으로 사용한다.
+이 책에서는 이를 `Demos over Diffs`, 즉 코드 변경 내역보다 동작 결과를 먼저 확인하는 관점으로 설명한다. 코드 검토를 생략한다는 뜻은 아니다. 동작 결과를 확인한 뒤 구현의 세부 내용을 검토하는 순서다.
 
-코드 Review를 생략한다는 의미는 아니다.
-
-동작 결과를 먼저 확인하고 구현 세부를 검토하는 순서다.
-
-CLI Output, API Response, Generated Report처럼 결과를 직접 확인할 수 있는 작업에도 같은 원칙을 적용할 수 있다.
+명령줄 도구의 출력, API 응답, 생성된 보고서처럼 결과를 직접 확인할 수 있는 작업에도 같은 원칙을 적용할 수 있다.
 
 ---
 
 ## 8. Failure Fingerprint는 반복 실패를 구분한다
 
-Agent가 수정한 뒤 Runner가 다시 실패했다고 하자.
+에이전트가 수정한 뒤 실행기가 다시 실패했다고 하자.
 
-Retry마다 Raw Log 전체를 비교하지 않고 안정적인 Failure 정보를 조합할 수 있다.
+재시도마다 원본 로그 전체를 비교하지 않고 안정적인 실패 정보를 조합할 수 있다.
 
 예:
 
@@ -351,7 +347,7 @@ actual=200
 AuthServiceTest.java:94
 ```
 
-Fingerprint 후보:
+실패 식별 정보 후보:
 
 ```text
 Failing Test ID
@@ -361,29 +357,29 @@ Error Code
 Top Stack Frame
 ```
 
-Timestamp, Random Port, Container ID처럼 실행마다 바뀌는 값은 제외한다.
+타임스탬프, 임의의 포트 번호, 컨테이너 ID처럼 실행마다 바뀌는 값은 제외한다.
 
 ```text
 Retry #1 → Fingerprint A
 Retry #2 → Fingerprint A
 ```
 
-같은 Fingerprint가 반복되면 수정이 실패를 바꾸지 못한 것이다.
+같은 실패 식별 정보가 반복되면 수정이 실패를 바꾸지 못한 것이다.
 
-반대로 Failure가 바뀌었다면 진행 중일 수 있다.
+반대로 실패가 바뀌었다면 진행 중일 수 있다.
 
 ```text
 Retry #1 → Compilation Error
 Retry #2 → Unit Test Failure
 ```
 
-이 장에서는 반복 실패를 식별하는 방법까지만 다룬다. 언제 중단하고 Local로 되돌릴지는 17장에서 정리한다.
+이 장에서는 반복 실패를 식별하는 방법까지만 다룬다. 언제 중단하고 로컬로 되돌릴지는 17장에서 정리한다.
 
 ---
 
 ## 9. PASS에도 최소 Evidence를 남긴다
 
-성공한 Task도 다음 정도의 결과는 남긴다.
+성공한 작업도 다음 정도의 결과는 남긴다.
 
 ```text
 Task ID
@@ -410,7 +406,7 @@ Tests: 24 / 24
 
 ## 10. AUTH-142 결과 흐름
 
-7장에서 만든 AUTH-142 Task Contract를 그대로 사용한다.
+7장에서 만든 AUTH-142 작업 명세를 그대로 사용한다.
 
 ```text
 Task Contract
