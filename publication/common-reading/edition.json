@@ -1,0 +1,39 @@
+{
+  "repository": "dhrod5457/cloud-agent-book",
+  "version": "2026.10.04-preview.1",
+  "date": "2026-10-04",
+  "manuscript_commit": "de1aa04eefb7327152f3f31b57fec0ca2b6172a2",
+  "baseline_collection_commit": "a8688c83fe0d169a8c2141c5100ac70fc6b87781",
+  "baseline_version": "2026.10.03-preview.2",
+  "publication_pipeline": "published-book/scripts/build_common_books.py",
+  "collection_version": "collection-2026-10-04.1",
+  "status": "조립 원고의 전자책 검토본",
+  "manuscript_sha256": {
+    "manuscript/about-this-book.md": "0f8230851f56506291ad192ab3077d746001d6868f6991568c50cae1401858dd",
+    "manuscript/appendix/task-contract-evidence-template.md": "7eb0643d9ce1e81b606fb1c5faef2bed7400b13c8d26ec8815f178a44e3e0c5b",
+    "manuscript/assembly-manifest.md": "db2e4c607fcd3f7f6df194866c16e7dd7166a0719a070d62f0a52c6217e69f93",
+    "manuscript/book-structure.md": "559711ea0f4716e0eb14e1e693f44df4466941f4125e64a94ab3d200dd38a87d",
+    "manuscript/epub.css": "27be553b4ddace01bdac90b8576cffe5a4eefd30d7520fc767aec314aac08cbd",
+    "manuscript/glossary.md": "bebccb0f64820863c72a6b3753f63fb33bcf385e9dfd542209457b96b8cfba01",
+    "manuscript/how-to-read.md": "c57537d39ba3b884e4d34206309c5749c34b0761b51567009d08240d5c479806",
+    "manuscript/master.md": "9c58c1d59eccf3613d650e69834adf93b1b1d98269a0e76ed847ab246018d729",
+    "manuscript/parts/part-01.md": "0c74059de0571e82717f971be92c545dc8b4925b578dfb74c06b29324b749422",
+    "manuscript/parts/part-02.md": "c4c9820a470adb525f00b59eb0b766200f0e2b7aff49d23b02b533c781acb5a5",
+    "manuscript/parts/part-03.md": "f342fb081ddcd331b6c104693c297dc3e12a92e753ae45b8bf82b802f895b8fd",
+    "manuscript/parts/part-04.md": "e4b0958526203cdfd84ff9972b6d64f67c042f354d34afd8fe5e166a6dadefd4",
+    "manuscript/parts/part-05.md": "79452d05015d086661ca0b360843b3325cd149e887540d5b9301c44f6d74f644",
+    "manuscript/parts/part-06.md": "fa9514665bfc7d5b1505bbeaed8a5aa55596a50b8a8db5a81599bea35b0a43e2",
+    "manuscript/preface.md": "94c74cad4d292c59f6edb7e0d5183b067aec918816d3c0d5b946e92ec81ea164",
+    "manuscript/proof.css": "4b469fe6ccf5231d5f7f03f2e9bff3a234477f9e8127119f0a49000e2c6ffd55",
+    "manuscript/publication-format.md": "535281cf6847dc603743d40f3e497939f3ed29bb0d2d6c4abe3ae00157c5281c",
+    "manuscript/references.md": "fdf5e964e0bbabb6754fc217db64f43064662dd5c2199e14efbfbf7dfff1d5ce",
+    "manuscript/table-of-contents.md": "21f6325c5f07a8cb1aa5c2fa021af6a43cac39c806e881683fbac9ca7d41ac98",
+    "manuscript/title-and-positioning.md": "c21fe6a525dfc94f14df46d2c9466fabfff3dddb5dabb3c3682a57bf3b8f94c9",
+    "manuscript/title-page.md": "aec0a8a37838580879681a1a98ff0e187ffd171708d96958128a4efd01d1050a"
+  },
+  "style_sha256": {
+    "reader.css": "4150300c1b6075a022aa333775ba73f7db0633f41b2ea921ed808fc0e5008474",
+    "epub.css": "52823eb43282e43f7bebe0bab5587bfd67d3c5ba6b4a272ac172303af9806f80",
+    "reader.js": "d2c7ccf83caf2a42b5712932740dd7e2524754d80b7c95aab864c8e18dfbd265"
+  }
+}

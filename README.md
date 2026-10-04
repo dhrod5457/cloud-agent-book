@@ -133,3 +133,7 @@ Local
 - `manuscript/assembly-manifest.md`
 - `manuscript/book-structure.md`
 - `STATUS.md`
+
+## 공통 독서판
+
+[공통 디자인 2026.10.04-preview.1 발행 파일](https://github.com/dhrod5457/cloud-agent-book/releases/tag/2026.10.04-preview.1) · [독서판 제작·검증 규칙](publication/common-reading/README.md). 기존 원고와 검토 상태를 보존한 새 디자인 판입니다.
